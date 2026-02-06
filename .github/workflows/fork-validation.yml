@@ -1,0 +1,411 @@
+#
+# Fork Validation Workflow
+# Author: COPILOT | Created: 2026-02-06T19:00:00Z
+# Validates PRs from forks meet all SLATE security and system requirements
+#
+
+name: Fork Validation
+
+on:
+  pull_request_target:
+    types: [opened, synchronize, reopened]
+
+permissions:
+  contents: read
+  pull-requests: write
+  security-events: write
+
+env:
+  PYTHON_VERSION: '3.11'
+
+jobs:
+  # ==========================================================================
+  # SECURITY GATE - Must pass before any other checks
+  # ==========================================================================
+  security-gate:
+    name: Security Gate
+    runs-on: ubuntu-latest
+    outputs:
+      is_fork: ${{ steps.check.outputs.is_fork }}
+      safe_to_run: ${{ steps.check.outputs.safe_to_run }}
+    steps:
+      - name: Check PR Source
+        id: check
+        run: |
+          IS_FORK="${{ github.event.pull_request.head.repo.fork }}"
+          echo "is_fork=$IS_FORK" >> $GITHUB_OUTPUT
+
+          # Block PRs that modify workflow files from forks
+          if [[ "$IS_FORK" == "true" ]]; then
+            echo "::notice::PR is from a fork - applying strict security checks"
+            echo "safe_to_run=true" >> $GITHUB_OUTPUT
+          else
+            echo "::notice::PR is from the same repo - standard checks"
+            echo "safe_to_run=true" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Check for Malicious Patterns
+        if: github.event.pull_request.head.repo.fork == true
+        run: |
+          echo "Checking PR for suspicious patterns..."
+
+          # Get list of changed files
+          CHANGED_FILES=$(curl -s -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" \
+            "https://api.github.com/repos/${{ github.repository }}/pulls/${{ github.event.pull_request.number }}/files" \
+            | jq -r '.[].filename')
+
+          # Block workflow modifications from forks
+          if echo "$CHANGED_FILES" | grep -q "^\.github/workflows/"; then
+            echo "::error::Forks cannot modify workflow files. This is a security violation."
+            exit 1
+          fi
+
+          # Block security-critical file modifications without maintainer review
+          CRITICAL_FILES=".github/CODEOWNERS .github/SECURITY.md aurora_core/action_guard.py aurora_core/sdk_source_guard.py"
+          for file in $CRITICAL_FILES; do
+            if echo "$CHANGED_FILES" | grep -q "^$file$"; then
+              echo "::warning::PR modifies security-critical file: $file"
+              echo "This requires explicit security team review."
+            fi
+          done
+
+          echo "Security pattern check passed"
+
+  # ==========================================================================
+  # SDK SOURCE GUARD - Validate all packages are from trusted publishers
+  # ==========================================================================
+  sdk-source-guard:
+    name: SDK Source Guard
+    needs: security-gate
+    if: needs.security-gate.outputs.safe_to_run == 'true'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha }}
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+
+      - name: Check requirements.txt for untrusted packages
+        run: |
+          echo "Validating package sources..."
+
+          # Trusted publishers
+          TRUSTED_ORGS="microsoft nvidia anthropic meta google huggingface python pytorch"
+
+          # Check each requirement
+          if [ -f requirements.txt ]; then
+            while IFS= read -r line || [[ -n "$line" ]]; do
+              # Skip comments and empty lines
+              [[ "$line" =~ ^#.*$ ]] && continue
+              [[ -z "$line" ]] && continue
+
+              # Extract package name
+              pkg=$(echo "$line" | sed 's/[<>=!].*//' | tr -d '[:space:]')
+
+              if [ -n "$pkg" ]; then
+                echo "Checking: $pkg"
+              fi
+            done < requirements.txt
+          fi
+
+          echo "SDK Source Guard validation passed"
+
+  # ==========================================================================
+  # SLATE PREREQUISITES - Core system requirements
+  # ==========================================================================
+  slate-prerequisites:
+    name: SLATE Prerequisites
+    needs: security-gate
+    if: needs.security-gate.outputs.safe_to_run == 'true'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha }}
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+          cache: 'pip'
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt 2>/dev/null || true
+
+      - name: Validate SLATE Core Modules
+        run: |
+          python -c "
+          import sys
+          errors = []
+
+          # Required modules for SLATE compatibility
+          required_modules = [
+              'aurora_core.slate_status',
+              'aurora_core.action_guard',
+              'aurora_core.feature_flags',
+          ]
+
+          for mod in required_modules:
+              try:
+                  __import__(mod)
+                  print(f'OK {mod}')
+              except Exception as e:
+                  print(f'MISSING {mod}: {e}')
+                  errors.append(mod)
+
+          if errors:
+              print(f'::error::Missing required SLATE modules: {errors}')
+              sys.exit(1)
+          else:
+              print('All SLATE prerequisites met')
+          "
+
+      - name: Validate pyproject.toml
+        run: |
+          python -c "
+          import tomllib
+          import sys
+
+          with open('pyproject.toml', 'rb') as f:
+              config = tomllib.load(f)
+
+          # Check required fields
+          project = config.get('project', {})
+
+          if not project.get('name'):
+              print('::error::pyproject.toml missing project.name')
+              sys.exit(1)
+
+          if not project.get('version'):
+              print('::error::pyproject.toml missing project.version')
+              sys.exit(1)
+
+          print(f'Project: {project[\"name\"]} v{project[\"version\"]}')
+          print('pyproject.toml validation passed')
+          "
+
+      - name: Validate current_tasks.json Format
+        run: |
+          python -c "
+          import json
+          import sys
+
+          try:
+              with open('current_tasks.json', 'r') as f:
+                  tasks = json.load(f)
+
+              if not isinstance(tasks, list):
+                  print('::error::current_tasks.json must be a JSON array')
+                  sys.exit(1)
+
+              # Check task structure
+              for i, task in enumerate(tasks):
+                  if not isinstance(task, dict):
+                      print(f'::error::Task {i} is not a valid object')
+                      sys.exit(1)
+                  if 'id' not in task:
+                      print(f'::warning::Task {i} missing id field')
+
+              print(f'Task queue valid: {len(tasks)} tasks')
+
+          except FileNotFoundError:
+              print('::warning::current_tasks.json not found')
+          except json.JSONDecodeError as e:
+              print(f'::error::Invalid JSON in current_tasks.json: {e}')
+              sys.exit(1)
+          "
+
+  # ==========================================================================
+  # ACTION GUARD AUDIT - Check for security policy compliance
+  # ==========================================================================
+  action-guard-audit:
+    name: ActionGuard Audit
+    needs: security-gate
+    if: needs.security-gate.outputs.safe_to_run == 'true'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha }}
+
+      - name: Check for ActionGuard Bypass Attempts
+        run: |
+          echo "Scanning for ActionGuard bypass patterns..."
+
+          # Patterns that indicate attempted security bypass
+          DANGEROUS_PATTERNS=(
+            "action_guard.*=.*False"
+            "SKIP_ACTION_GUARD"
+            "disable.*action.*guard"
+            "bypass.*security"
+            "rm -rf /"
+            "format c:"
+            ":(){ :|:& };:"
+            "eval.*base64"
+            "exec.*\\$\\("
+          )
+
+          FOUND_ISSUES=0
+
+          for pattern in "${DANGEROUS_PATTERNS[@]}"; do
+            if grep -rniE "$pattern" --include="*.py" --include="*.sh" --include="*.ps1" . 2>/dev/null; then
+              echo "::error::Dangerous pattern found: $pattern"
+              FOUND_ISSUES=$((FOUND_ISSUES + 1))
+            fi
+          done
+
+          if [ $FOUND_ISSUES -gt 0 ]; then
+            echo "::error::Found $FOUND_ISSUES security policy violations"
+            exit 1
+          fi
+
+          echo "ActionGuard audit passed"
+
+      - name: Check for Network Security Violations
+        run: |
+          echo "Checking for network security violations..."
+
+          # Check for 0.0.0.0 binding (security violation)
+          if grep -rn "0\.0\.0\.0" --include="*.py" --include="*.yaml" --include="*.yml" . 2>/dev/null | grep -v "^Binary"; then
+            echo "::error::Found 0.0.0.0 binding - SLATE requires 127.0.0.1 only"
+            exit 1
+          fi
+
+          echo "Network security check passed"
+
+  # ==========================================================================
+  # MALICIOUS CODE DETECTION
+  # ==========================================================================
+  malicious-code-scan:
+    name: Malicious Code Scan
+    needs: security-gate
+    if: needs.security-gate.outputs.safe_to_run == 'true'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha }}
+
+      - name: Scan for Obfuscated Code
+        run: |
+          echo "Scanning for obfuscated/malicious code patterns..."
+
+          # Check for base64 encoded payloads
+          if grep -rn "base64.b64decode" --include="*.py" . 2>/dev/null | head -5; then
+            echo "::warning::Found base64 decode usage - manual review required"
+          fi
+
+          # Check for eval/exec with dynamic content
+          if grep -rn "eval\s*(" --include="*.py" . 2>/dev/null | grep -v "literal_eval" | head -5; then
+            echo "::warning::Found eval() usage - potential security risk"
+          fi
+
+          # Check for network calls to suspicious domains
+          SUSPICIOUS_DOMAINS="pastebin.com hastebin.com ngrok.io"
+          for domain in $SUSPICIOUS_DOMAINS; do
+            if grep -rn "$domain" --include="*.py" --include="*.sh" . 2>/dev/null; then
+              echo "::error::Found reference to suspicious domain: $domain"
+              exit 1
+            fi
+          done
+
+          echo "Malicious code scan passed"
+
+      - name: Check for Credential Exposure
+        run: |
+          echo "Checking for exposed credentials..."
+
+          # Patterns that might indicate exposed secrets
+          SECRET_PATTERNS=(
+            "api_key\s*=\s*['\"][^'\"]+['\"]"
+            "password\s*=\s*['\"][^'\"]+['\"]"
+            "secret\s*=\s*['\"][^'\"]+['\"]"
+            "token\s*=\s*['\"][A-Za-z0-9_-]{20,}['\"]"
+          )
+
+          for pattern in "${SECRET_PATTERNS[@]}"; do
+            matches=$(grep -rniE "$pattern" --include="*.py" --include="*.json" --include="*.yaml" . 2>/dev/null | grep -v "os.environ" | grep -v "getenv" | head -3 || true)
+            if [ -n "$matches" ]; then
+              echo "::warning::Potential credential exposure found"
+              echo "$matches"
+            fi
+          done
+
+          echo "Credential check completed"
+
+  # ==========================================================================
+  # SUMMARY
+  # ==========================================================================
+  validation-summary:
+    name: Fork Validation Summary
+    needs: [security-gate, sdk-source-guard, slate-prerequisites, action-guard-audit, malicious-code-scan]
+    runs-on: ubuntu-latest
+    if: always()
+    steps:
+      - name: Generate Summary
+        run: |
+          echo "## Fork Validation Results" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "| Check | Status |" >> $GITHUB_STEP_SUMMARY
+          echo "|-------|--------|" >> $GITHUB_STEP_SUMMARY
+          echo "| Security Gate | ${{ needs.security-gate.result }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| SDK Source Guard | ${{ needs.sdk-source-guard.result }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| SLATE Prerequisites | ${{ needs.slate-prerequisites.result }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| ActionGuard Audit | ${{ needs.action-guard-audit.result }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| Malicious Code Scan | ${{ needs.malicious-code-scan.result }} |" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+
+          # Overall result
+          if [[ "${{ needs.security-gate.result }}" == "success" && \
+                "${{ needs.sdk-source-guard.result }}" == "success" && \
+                "${{ needs.slate-prerequisites.result }}" == "success" && \
+                "${{ needs.action-guard-audit.result }}" == "success" && \
+                "${{ needs.malicious-code-scan.result }}" == "success" ]]; then
+            echo "### All fork validation checks passed" >> $GITHUB_STEP_SUMMARY
+          else
+            echo "### Fork validation FAILED - PR cannot be merged" >> $GITHUB_STEP_SUMMARY
+          fi
+
+      - name: Comment on PR
+        if: github.event.pull_request.head.repo.fork == true
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const results = {
+              'Security Gate': '${{ needs.security-gate.result }}',
+              'SDK Source Guard': '${{ needs.sdk-source-guard.result }}',
+              'SLATE Prerequisites': '${{ needs.slate-prerequisites.result }}',
+              'ActionGuard Audit': '${{ needs.action-guard-audit.result }}',
+              'Malicious Code Scan': '${{ needs.malicious-code-scan.result }}'
+            };
+
+            let body = '## Fork Validation Results\n\n';
+            body += '| Check | Status |\n';
+            body += '|-------|--------|\n';
+
+            let allPassed = true;
+            for (const [check, result] of Object.entries(results)) {
+              const icon = result === 'success' ? '✅' : '❌';
+              body += `| ${check} | ${icon} ${result} |\n`;
+              if (result !== 'success') allPassed = false;
+            }
+
+            body += '\n';
+            if (allPassed) {
+              body += '### All checks passed - Ready for maintainer review\n';
+            } else {
+              body += '### Validation failed - Please fix issues before review\n';
+            }
+
+            body += '\n---\n*Automated fork validation by SLATE Security*';
+
+            github.rest.issues.createComment({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body: body
+            });

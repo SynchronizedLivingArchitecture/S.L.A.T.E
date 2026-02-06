@@ -1,0 +1,135 @@
+# SLATE Configuration - AI-Optimized Format
+# Version: 2.1 | Updated: 2026-02-06
+# Format: YAML for minimal token overhead, maximum structure
+
+system:
+  name: S.L.A.T.E.
+  full: Synchronized Living Architecture for Transformation and Evolution
+  version: 2.4.0
+  progress: 92%
+  mode: active_development
+  security: local_only  # 127.0.0.1 ONLY
+
+# GitHub Integration
+github:
+  owner: SynchronizedLivingArchitecture
+  repo: S.L.A.T.E.
+  url: https://github.com/SynchronizedLivingArchitecture/S.L.A.T.E.
+
+  # Branch Protection
+  branch_protection:
+    main:
+      require_reviews: 1
+      require_code_owner_review: true
+      dismiss_stale_reviews: true
+      require_conversation_resolution: true
+      allow_force_push: false
+      allow_deletions: false
+
+  # Required Status Checks (all must pass for PR merge)
+  required_checks:
+    - CodeQL Advanced
+    - Python application
+    - SLATE Integration / SLATE Status Check
+    - SLATE Integration / Tech Tree Validation
+    - Fork Validation / Security Gate
+    - Fork Validation / SLATE Prerequisites
+    - Fork Validation / ActionGuard Audit
+    - Fork Validation / Malicious Code Scan
+
+  # Labels
+  labels:
+    - slate-task
+    - slate-autonomous
+    - priority:critical
+    - priority:high
+    - priority:medium
+    - priority:low
+
+  # Workflows
+  workflows:
+    ci: ci.yml
+    cd: cd.yml
+    slate: slate.yml
+    codeql: codeql.yml
+    release: release.yml
+    fork_validation: fork-validation.yml
+
+# Fork Security Configuration
+fork_security:
+  # Files that forks CANNOT modify (will fail validation)
+  protected_files:
+    - .github/workflows/*
+    - .github/CODEOWNERS
+    - aurora_core/action_guard.py
+    - aurora_core/sdk_source_guard.py
+
+  # Required for valid fork contribution
+  prerequisites:
+    - aurora_core/__init__.py
+    - aurora_core/slate_status.py
+    - current_tasks.json
+    - pyproject.toml
+    - CLAUDE.md
+
+  # Security scans applied to all fork PRs
+  security_scans:
+    - malicious_code_patterns
+    - credential_exposure
+    - network_binding_check  # Must be 127.0.0.1
+    - sdk_source_validation
+
+  # Dangerous patterns that fail validation
+  blocked_patterns:
+    - "0.0.0.0"            # Network binding violation
+    - "eval("              # Code injection risk
+    - "exec(os"            # System command injection
+    - "rm -rf /"           # Destructive command
+    - "base64.b64decode"   # Obfuscation (warning)
+
+# User Fork Management
+fork_manager:
+  script: aurora_core/slate_fork_manager.py
+  upstream: https://github.com/SynchronizedLivingArchitecture/S.L.A.T.E..git
+  local_config: .slate_fork/config.json
+  local_state: .slate_fork/state.json
+
+  # User workflow
+  workflow:
+    1_initialize: "python slate_fork_manager.py --init --name 'Name' --email 'email'"
+    2_setup_fork: "python slate_fork_manager.py --setup-fork <fork-url>"
+    3_validate: "python slate_fork_manager.py --validate"
+    4_contribute: "python slate_fork_manager.py --contribute 'branch' --title 'title'"
+    5_sync: "python slate_fork_manager.py --sync"
+
+# Release & Package System
+release:
+  version_source: pyproject.toml
+  current: 2.4.0
+  artifacts:
+    exe:
+      name: SLATEPI
+      platform: windows
+      workflow: cd.yml
+    pypi:
+      name: slate
+      registry: pypi
+      trusted_publisher: true
+    docker:
+      name: ghcr.io/synchronizedlivingarchitecture/s.l.a.t.e.
+      platforms: [linux/amd64]
+
+# Agents
+agents:
+  ALPHA: {role: coding, gpu: true}
+  BETA: {role: testing, gpu: true}
+  GAMMA: {role: planning, gpu: false}
+  DELTA: {role: external_bridge, gpu: false}
+
+# Routing
+routing:
+  implement|code|build|fix: ALPHA
+  test|validate|verify|coverage: BETA
+  analyze|plan|research|document: GAMMA
+  claude|mcp|sdk|integration: DELTA
+  complex|multi-step: COPILOT
