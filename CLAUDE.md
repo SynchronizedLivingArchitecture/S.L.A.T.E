@@ -271,3 +271,39 @@ Repository: https://github.com/SynchronizedLivingArchitecture/S.L.A.T.E.
 - Branch protection on `main` requires reviews and passing checks
 - CODEOWNERS enforces review requirements for critical paths
 - All PRs must pass SLATE compatibility checklist
+
+## Self-Hosted GitHub Actions Runners
+
+SLATE supports self-hosted runners for GPU-accelerated CI/CD:
+
+```powershell
+# Check runner status
+.\.venv\Scripts\python.exe aurora_core/slate_runner_manager.py --status
+
+# Download and setup
+.\.venv\Scripts\python.exe aurora_core/slate_runner_manager.py --download
+
+# Configure (get token from GitHub repo settings)
+.\.venv\Scripts\python.exe aurora_core/slate_runner_manager.py --configure --token YOUR_TOKEN
+
+# Start runner (interactive)
+.\.venv\Scripts\python.exe aurora_core/slate_runner_manager.py --start
+
+# Start as Windows service (persistent)
+.\.venv\Scripts\python.exe aurora_core/slate_runner_manager.py --start --service
+```
+
+**Runner Labels** (auto-detected):
+- `self-hosted`, `slate`, `gpu`, `windows`
+- `cuda`, `gpu-2` (based on GPU count)
+- `blackwell` / `ada-lovelace` / `ampere` (GPU architecture)
+
+**Key Files**:
+- `aurora_core/slate_runner_manager.py` - Runner management CLI
+- `.github/workflows/gpu-tests.yml` - GPU test workflow
+- `docs/wiki/Self-Hosted-Runners.md` - Full documentation
+
+**Get Registration Token**:
+1. Go to https://github.com/SynchronizedLivingArchitecture/S.L.A.T.E./settings/actions/runners
+2. Click "New self-hosted runner"
+3. Copy the token
