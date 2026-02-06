@@ -25,6 +25,9 @@ jobs:
     timeout-minutes: 5
     steps:
       - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
       - name: Ruff lint
         run: |
           pip install ruff --quiet 2>$null
@@ -35,8 +38,10 @@ jobs:
     name: Tests
     runs-on: [self-hosted, slate]
     timeout-minutes: 20
-    steps:
       - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
       - name: Install test deps
         run: pip install pytest pytest-cov pytest-asyncio --quiet 2>$null
         continue-on-error: true
@@ -50,6 +55,9 @@ jobs:
     timeout-minutes: 5
     steps:
       - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
       - name: Validate SDK
         run: |
           python -c "import slate; print(f'SDK v{slate.__version__}')"
@@ -74,6 +82,9 @@ jobs:
     timeout-minutes: 10
     steps:
       - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
       - name: Security scan
         run: |
           pip install bandit --quiet 2>$null

@@ -24,6 +24,9 @@ jobs:
     timeout-minutes: 5
     steps:
       - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
       - name: SLATE Status
         run: python slate/slate_status.py --quick
 
@@ -33,6 +36,9 @@ jobs:
     timeout-minutes: 5
     steps:
       - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
       - name: Import all modules
         run: |
           python -c @"
@@ -58,6 +64,9 @@ jobs:
     timeout-minutes: 5
     steps:
       - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
       - name: Validate tech tree
         run: |
           python -c @"
@@ -79,6 +88,9 @@ jobs:
     timeout-minutes: 5
     steps:
       - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
       - name: Test dashboard import
         run: |
           python -c "from agents.slate_dashboard_server import create_app; print('Dashboard import OK')"
@@ -90,6 +102,9 @@ jobs:
     timeout-minutes: 5
     steps:
       - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
       - name: Test agent imports
         run: |
           python -c "import agents; print('agents package OK')"
@@ -103,6 +118,9 @@ jobs:
     timeout-minutes: 5
     steps:
       - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
       - name: Validate task queue
         run: |
           python -c @"
