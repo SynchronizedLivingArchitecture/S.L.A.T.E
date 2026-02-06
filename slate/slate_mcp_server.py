@@ -110,7 +110,7 @@ def _load_json_file(filename: str) -> Any:
 @mcp.tool()
 def slate_get_status() -> Dict[str, Any]:
     """Get comprehensive SLATE system status including SDK, GPU, runner, and agent info."""
-    # Modified: 2026-02-06T10:00:00Z | Author: COPILOT | Change: Initial MCP tool
+    # Modified: 2026-02-06T22:30:00Z | Author: COPILOT | Change: Unified SLATE system check
     result = _run_slate_cmd(["slate/slate_status.py", "--quick"])
     gpu_info = _run_slate_cmd(["-c", (
         "import subprocess, json; "
@@ -239,26 +239,38 @@ print(json.dumps(info))
 @mcp.tool()
 def slate_agent_status() -> Dict[str, Any]:
     """Get status of all SLATE agents (ALPHA, BETA, GAMMA, DELTA)."""
-    # Modified: 2026-02-06T10:00:00Z | Author: COPILOT | Change: Initial MCP tool
+    # Modified: 2026-02-06T22:30:00Z | Author: COPILOT | Change: Check actual SLATE components
     agents = {}
-    agent_modules = {
-        "coordinator": "aurora_agent_coordinator",
-        "intelligence": "aurora_agent_intelligence",
-        "agent_v2": "aurora_agent_v2",
-        "cycle_evaluator": "aurora_cycle_evaluator",
-        "workspace_analyzer": "aurora_workspace_analyzer",
+
+    # Check core SLATE components that actually exist
+    components = {
+        "sdk": "slate.slate_sdk",
+        "status": "slate.slate_status",
+        "runtime": "slate.slate_runtime",
+        "runner_manager": "slate.slate_runner_manager",
+        "dashboard": "agents.slate_dashboard_server",
+        "mcp_server": "slate.slate_mcp_server",
+        "github_models": "slate.slate_github_models",
     }
 
-    for name, module in agent_modules.items():
-        result = _run_slate_cmd(["-c", f"import {module}; print('ok')"], timeout=10)
-        agents[name] = {"importable": result["success"]}
+    for name, module in components.items():
+        mod_path = WORKSPACE_ROOT / module.replace(".", "/") + ".py"
+        agents[name] = {"available": mod_path.exists()}
+
+    # Check dashboard running state
+    import urllib.request
+    try:
+        resp = urllib.request.urlopen("http://127.0.0.1:8080/api/health", timeout=3)
+        agents["dashboard"]["running"] = resp.status == 200
+    except Exception:
+        agents["dashboard"]["running"] = False
 
     # Load agent performance if available
     perf = _load_json_file("agent_performance.json")
     if perf:
         agents["performance"] = perf
 
-    return {"agents": agents, "agent_count": len(agent_modules)}
+    return {"agents": agents, "component_count": len(components)}
 
 
 @mcp.tool()
