@@ -17,6 +17,17 @@
 - [Ollama Setup](AI-Backends#ollama)
 - [Foundry Local](AI-Backends#foundry-local)
 
+## Packages & Dependencies
+- [Package Overview](Packages)
+- [Dependency Tiers](Packages#dependency-tiers)
+- [pyproject.toml](Packages#pyprojecttoml)
+- [Module Import Map](Packages#module-import-map)
+
+## Projects & Roadmap
+- [Project Board](Projects)
+- [Roadmap](Projects#roadmap)
+- [GitHub Labels](Projects#github-labels)
+
 ## Reference
 - [CLI Commands](CLI-Reference)
 - [Configuration](Configuration)

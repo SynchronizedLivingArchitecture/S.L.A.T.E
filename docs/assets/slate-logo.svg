@@ -1,0 +1,98 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 400" width="400" height="400">
+  <defs>
+    <linearGradient id="bgGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#0a0b0f;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#12131a;stop-opacity:1" />
+    </linearGradient>
+    <linearGradient id="ringGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#a78bfa;stop-opacity:1" />
+      <stop offset="50%" style="stop-color:#818cf8;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#6366f1;stop-opacity:1" />
+    </linearGradient>
+    <linearGradient id="coreGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#c4b5fd;stop-opacity:0.9" />
+      <stop offset="100%" style="stop-color:#a78bfa;stop-opacity:0.9" />
+    </linearGradient>
+    <linearGradient id="nodeGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" style="stop-color:#22c55e;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#16a34a;stop-opacity:1" />
+    </linearGradient>
+    <filter id="glow">
+      <feGaussianBlur stdDeviation="3" result="coloredBlur"/>
+      <feMerge>
+        <feMergeNode in="coloredBlur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+    <filter id="coreGlow">
+      <feGaussianBlur stdDeviation="8" result="coloredBlur"/>
+      <feMerge>
+        <feMergeNode in="coloredBlur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+  </defs>
+
+  <!-- Background circle -->
+  <circle cx="200" cy="200" r="190" fill="url(#bgGrad)" stroke="#1e1e2e" stroke-width="2"/>
+
+  <!-- Outer orbit ring -->
+  <circle cx="200" cy="200" r="145" fill="none" stroke="#a78bfa" stroke-width="1.5" stroke-opacity="0.2"/>
+
+  <!-- Middle orbit ring -->
+  <circle cx="200" cy="200" r="110" fill="none" stroke="#818cf8" stroke-width="1" stroke-opacity="0.15"/>
+
+  <!-- Inner orbit ring -->
+  <circle cx="200" cy="200" r="75" fill="none" stroke="#6366f1" stroke-width="1" stroke-opacity="0.1"/>
+
+  <!-- Connection lines from core to agent nodes -->
+  <line x1="200" y1="200" x2="200" y2="55" stroke="#a78bfa" stroke-width="1.5" stroke-opacity="0.3" filter="url(#glow)"/>
+  <line x1="200" y1="200" x2="338" y2="138" stroke="#818cf8" stroke-width="1.5" stroke-opacity="0.3" filter="url(#glow)"/>
+  <line x1="200" y1="200" x2="338" y2="262" stroke="#6366f1" stroke-width="1.5" stroke-opacity="0.3" filter="url(#glow)"/>
+  <line x1="200" y1="200" x2="200" y2="345" stroke="#a78bfa" stroke-width="1.5" stroke-opacity="0.3" filter="url(#glow)"/>
+  <line x1="200" y1="200" x2="62" y2="262" stroke="#818cf8" stroke-width="1.5" stroke-opacity="0.3" filter="url(#glow)"/>
+  <line x1="200" y1="200" x2="62" y2="138" stroke="#6366f1" stroke-width="1.5" stroke-opacity="0.3" filter="url(#glow)"/>
+
+  <!-- Central core -->
+  <circle cx="200" cy="200" r="42" fill="url(#coreGrad)" filter="url(#coreGlow)" opacity="0.85"/>
+  <circle cx="200" cy="200" r="32" fill="#0a0b0f" opacity="0.6"/>
+
+  <!-- S.L.A.T.E. text in core -->
+  <text x="200" y="196" text-anchor="middle" font-family="'Segoe UI', system-ui, sans-serif" font-size="14" font-weight="700" fill="#e2e8f0" letter-spacing="1.5">S.L.A.T.E.</text>
+  <text x="200" y="212" text-anchor="middle" font-family="'Segoe UI', system-ui, sans-serif" font-size="6.5" fill="#94a3b8" letter-spacing="0.5">SYNCHRONIZED LIVING</text>
+
+  <!-- Agent node: ALPHA (top) -->
+  <circle cx="200" cy="55" r="18" fill="#1a1a2e" stroke="url(#ringGrad)" stroke-width="2" filter="url(#glow)"/>
+  <text x="200" y="58" text-anchor="middle" font-family="'Segoe UI', system-ui, sans-serif" font-size="9" font-weight="600" fill="#a78bfa">α</text>
+
+  <!-- Agent node: BETA (top-right) -->
+  <circle cx="338" cy="138" r="18" fill="#1a1a2e" stroke="url(#ringGrad)" stroke-width="2" filter="url(#glow)"/>
+  <text x="338" y="141" text-anchor="middle" font-family="'Segoe UI', system-ui, sans-serif" font-size="9" font-weight="600" fill="#818cf8">β</text>
+
+  <!-- Agent node: GAMMA (bottom-right) -->
+  <circle cx="338" cy="262" r="18" fill="#1a1a2e" stroke="url(#ringGrad)" stroke-width="2" filter="url(#glow)"/>
+  <text x="338" y="265" text-anchor="middle" font-family="'Segoe UI', system-ui, sans-serif" font-size="9" font-weight="600" fill="#6366f1">γ</text>
+
+  <!-- Agent node: DELTA (bottom) -->
+  <circle cx="200" cy="345" r="18" fill="#1a1a2e" stroke="url(#ringGrad)" stroke-width="2" filter="url(#glow)"/>
+  <text x="200" y="348" text-anchor="middle" font-family="'Segoe UI', system-ui, sans-serif" font-size="9" font-weight="600" fill="#a78bfa">δ</text>
+
+  <!-- GPU node (bottom-left) -->
+  <circle cx="62" cy="262" r="14" fill="#0f1a0f" stroke="url(#nodeGrad)" stroke-width="2" filter="url(#glow)"/>
+  <text x="62" y="265" text-anchor="middle" font-family="'Segoe UI', system-ui, sans-serif" font-size="7" font-weight="600" fill="#22c55e">GPU</text>
+
+  <!-- ML node (top-left) -->
+  <circle cx="62" cy="138" r="14" fill="#0f1a0f" stroke="url(#nodeGrad)" stroke-width="2" filter="url(#glow)"/>
+  <text x="62" y="141" text-anchor="middle" font-family="'Segoe UI', system-ui, sans-serif" font-size="7" font-weight="600" fill="#22c55e">ML</text>
+
+  <!-- Orbital particles -->
+  <circle cx="280" cy="72" r="3" fill="#a78bfa" opacity="0.6">
+    <animateTransform attributeName="transform" type="rotate" from="0 200 200" to="360 200 200" dur="20s" repeatCount="indefinite"/>
+  </circle>
+  <circle cx="120" cy="328" r="2.5" fill="#818cf8" opacity="0.5">
+    <animateTransform attributeName="transform" type="rotate" from="180 200 200" to="540 200 200" dur="25s" repeatCount="indefinite"/>
+  </circle>
+  <circle cx="310" cy="310" r="2" fill="#6366f1" opacity="0.4">
+    <animateTransform attributeName="transform" type="rotate" from="90 200 200" to="450 200 200" dur="30s" repeatCount="indefinite"/>
+  </circle>
+</svg>

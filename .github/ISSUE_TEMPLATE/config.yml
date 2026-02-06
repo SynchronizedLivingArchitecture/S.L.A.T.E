@@ -1,0 +1,11 @@
+blank_issues_enabled: false
+contact_links:
+  - name: 📖 Documentation
+    url: https://github.com/SynchronizedLivingArchitecture/S.L.A.T.E./tree/main/docs/wiki
+    about: Check the SLATE wiki for guides and reference
+  - name: 💬 Discussions
+    url: https://github.com/SynchronizedLivingArchitecture/S.L.A.T.E./discussions
+    about: Ask questions and share ideas in GitHub Discussions
+  - name: 🔒 Security Vulnerability
+    url: https://github.com/SynchronizedLivingArchitecture/S.L.A.T.E./security/advisories/new
+    about: Report security vulnerabilities privately

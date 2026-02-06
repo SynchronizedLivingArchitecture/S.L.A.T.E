@@ -1,0 +1,56 @@
+# Modified: 2026-02-06T03:00:00Z | Author: COPILOT | Change: Dependabot config for SLATE
+version: 2
+updates:
+  # Python pip dependencies
+  - package-ecosystem: "pip"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+      day: "monday"
+      time: "06:00"
+      timezone: "America/New_York"
+    labels:
+      - "dependencies"
+      - "python"
+    commit-message:
+      prefix: "deps"
+      include: "scope"
+    open-pull-requests-limit: 10
+    reviewers:
+      - "SynchronizedLivingArchitecture"
+    groups:
+      ai-toolkit:
+        patterns:
+          - "transformers"
+          - "accelerate"
+          - "peft"
+          - "torch*"
+          - "bitsandbytes"
+      observability:
+        patterns:
+          - "opentelemetry*"
+      testing:
+        patterns:
+          - "pytest*"
+      web:
+        patterns:
+          - "aiohttp"
+          - "hypercorn"
+          - "quart"
+          - "fastapi"
+          - "uvicorn"
+
+  # GitHub Actions
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+      day: "monday"
+      time: "06:00"
+      timezone: "America/New_York"
+    labels:
+      - "dependencies"
+      - "github-actions"
+    commit-message:
+      prefix: "ci"
+    open-pull-requests-limit: 5
