@@ -1,0 +1,279 @@
+# GitHub Models Integration Workflow
+# Uses GitHub Models API for AI-powered code analysis on the self-hosted runner
+#
+# Models available: https://github.com/marketplace/models
+# Rate limits: Free tier - 15 rpm / 150 rpd for low-tier models
+
+name: GitHub Models
+
+on:
+  workflow_dispatch:
+    inputs:
+      task:
+        description: 'Task to perform'
+        required: true
+        type: choice
+        options:
+          - code-review
+          - generate-docs
+          - analyze-pr
+          - test-connection
+      model:
+        description: 'Model to use'
+        required: false
+        default: 'gpt-4o-mini'
+        type: choice
+        options:
+          - gpt-4o-mini
+          - gpt-4o
+          - mistral-large
+          - meta-llama-3.1-70b-instruct
+      target:
+        description: 'Target file or PR number'
+        required: false
+        type: string
+  pull_request:
+    types: [opened, synchronize]
+    paths:
+      - 'slate/**/*.py'
+      - 'agents/**/*.py'
+      - 'tests/**/*.py'
+
+concurrency:
+  group: github-models-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  SLATE_VERSION: "2.4.0"
+  DEFAULT_MODEL: "gpt-4o-mini"
+
+jobs:
+  # Test GitHub Models connection
+  test-connection:
+    name: Test GitHub Models
+    runs-on: [self-hosted, slate, gpu]
+    if: github.event.inputs.task == 'test-connection' || github.event_name == 'pull_request'
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Python
+        run: |
+          .\.venv\Scripts\Activate.ps1
+          pip install azure-ai-inference --quiet
+
+      - name: Test GitHub Models Connection
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          .\.venv\Scripts\python.exe -c "
+          from slate.slate_github_models import check_availability
+          import json
+          status = check_availability()
+          print(json.dumps(status, indent=2))
+          if not status['available']:
+              print(f'ERROR: {status.get(\"error\", \"Unknown error\")}')
+              exit(1)
+          print('GitHub Models connection successful!')
+          "
+
+      - name: List Available Models
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          .\.venv\Scripts\python.exe slate/slate_github_models.py --list-models
+
+  # AI Code Review on PRs
+  code-review:
+    name: AI Code Review
+    runs-on: [self-hosted, slate, gpu]
+    if: |
+      github.event.inputs.task == 'code-review' ||
+      (github.event_name == 'pull_request' && github.event.action == 'opened')
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup Environment
+        run: |
+          .\.venv\Scripts\Activate.ps1
+          pip install azure-ai-inference --quiet
+
+      - name: Get Changed Files
+        id: changes
+        run: |
+          $files = git diff --name-only origin/${{ github.base_ref }}...HEAD -- '*.py'
+          echo "files=$files" >> $env:GITHUB_OUTPUT
+          echo "Changed Python files:"
+          echo $files
+
+      - name: AI Code Review
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          $model = "${{ github.event.inputs.model || env.DEFAULT_MODEL }}"
+
+          .\.venv\Scripts\python.exe -c "
+          import os
+          from slate.slate_github_models import GitHubModelsClient
+
+          client = GitHubModelsClient(model='$model')
+
+          # Get diff
+          import subprocess
+          diff = subprocess.run(
+              ['git', 'diff', 'origin/${{ github.base_ref }}...HEAD', '--', '*.py'],
+              capture_output=True, text=True
+          ).stdout[:8000]  # Limit to 8k chars
+
+          if not diff.strip():
+              print('No Python changes to review')
+              exit(0)
+
+          response = client.chat(
+              prompt=f'''Review this code diff and provide feedback on:
+          1. Code quality and best practices
+          2. Potential bugs or issues
+          3. Performance concerns
+          4. Security considerations
+          5. Suggestions for improvement
+
+          Diff:
+          {diff}''',
+              system='You are a senior software engineer reviewing Python code. Be concise and actionable.',
+              max_tokens=2048,
+          )
+
+          print('## AI Code Review')
+          print()
+          print(response.content)
+          print()
+          print(f'Model: {response.model}')
+          print(f'Tokens: {response.usage[\"total_tokens\"]}')
+          "
+
+      - name: Post Review Comment
+        if: github.event_name == 'pull_request'
+        uses: actions/github-script@v7
+        with:
+          script: |
+            // Post summary as PR comment (optional)
+            console.log('Code review complete');
+
+  # Generate Documentation
+  generate-docs:
+    name: Generate Documentation
+    runs-on: [self-hosted, slate, gpu]
+    if: github.event.inputs.task == 'generate-docs'
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Environment
+        run: |
+          .\.venv\Scripts\Activate.ps1
+          pip install azure-ai-inference --quiet
+
+      - name: Generate Docs for Target
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          $target = "${{ github.event.inputs.target }}"
+          $model = "${{ github.event.inputs.model || env.DEFAULT_MODEL }}"
+
+          if (-not $target) {
+              echo "No target specified, using slate/slate_github_models.py"
+              $target = "slate/slate_github_models.py"
+          }
+
+          .\.venv\Scripts\python.exe -c "
+          from slate.slate_github_models import GitHubModelsClient
+          from pathlib import Path
+
+          target = '$target'
+          client = GitHubModelsClient(model='$model')
+
+          content = Path(target).read_text()[:6000]
+
+          response = client.chat(
+              prompt=f'''Generate comprehensive documentation for this Python module:
+
+          ```python
+          {content}
+          ```
+
+          Include:
+          1. Module overview
+          2. Class/function documentation
+          3. Usage examples
+          4. API reference''',
+              system='You are a technical writer. Generate clear, well-formatted Markdown documentation.',
+              max_tokens=3000,
+          )
+
+          print(response.content)
+          "
+
+  # Analyze PR
+  analyze-pr:
+    name: Analyze PR
+    runs-on: [self-hosted, slate, gpu]
+    if: github.event.inputs.task == 'analyze-pr'
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Environment
+        run: |
+          .\.venv\Scripts\Activate.ps1
+          pip install azure-ai-inference --quiet
+
+      - name: Analyze PR
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          $prNumber = "${{ github.event.inputs.target }}"
+          $model = "${{ github.event.inputs.model || env.DEFAULT_MODEL }}"
+
+          # Get PR info
+          $prInfo = gh pr view $prNumber --json title,body,files,commits
+
+          .\.venv\Scripts\python.exe -c "
+          import json
+          from slate.slate_github_models import GitHubModelsClient
+
+          pr_info = '''$prInfo'''
+          client = GitHubModelsClient(model='$model')
+
+          response = client.chat(
+              prompt=f'''Analyze this Pull Request and provide a summary:
+
+          {pr_info}
+
+          Include:
+          1. Summary of changes
+          2. Impact assessment
+          3. Risk analysis
+          4. Suggested reviewers (based on file types)
+          5. Merge readiness assessment''',
+              system='You are a senior developer analyzing PRs. Be thorough but concise.',
+              max_tokens=2000,
+          )
+
+          print('## PR Analysis')
+          print()
+          print(response.content)
+          "
+
+  # Summary
+  summary:
+    name: Workflow Summary
+    runs-on: [self-hosted, slate]
+    needs: [test-connection]
+    if: always()
+    steps:
+      - name: Generate Summary
+        run: |
+          echo "## GitHub Models Workflow Complete" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "- Task: ${{ github.event.inputs.task || 'pr-triggered' }}" >> $GITHUB_STEP_SUMMARY
+          echo "- Model: ${{ github.event.inputs.model || env.DEFAULT_MODEL }}" >> $GITHUB_STEP_SUMMARY
+          echo "- Status: ${{ needs.test-connection.result }}" >> $GITHUB_STEP_SUMMARY
