@@ -12,9 +12,12 @@ import argparse
 import json
 import subprocess
 import sys
+import shlex
 from datetime import datetime
 
-BLOCKED_COMMANDS = ["curl.exe", "Start-Sleep"]
+# Modified: 2026-02-06T12:40:00Z | Author: COPILOT | Change: Fixed shell injection and expanded blocked commands
+
+BLOCKED_COMMANDS = ["curl.exe", "Start-Sleep", "wget", "curl", "nc", "netcat", "rm", "sh", "bash"]
 LONG_RUNNING = {
     "pip install": {"timeout": 300, "background": True},
     "npm install": {"timeout": 180, "background": True},
@@ -51,11 +54,16 @@ def run_command(command, timeout=None, background=False):
         return {"success": False, "error": f"Blocked: {reason}"}
     config = get_command_config(command)
     timeout = timeout or config["timeout"]
+
     try:
+        # Use shlex to safely split the command and avoid shell=True (shell injection)
+        cmd_args = shlex.split(command)
+
         if background:
-            subprocess.Popen(command, shell=True, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+            subprocess.Popen(cmd_args, shell=False, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
             return {"success": True, "background": True}
-        result = subprocess.run(command, shell=True, capture_output=True, text=True, timeout=timeout)
+
+        result = subprocess.run(cmd_args, shell=False, capture_output=True, text=True, timeout=timeout)
         return {"success": result.returncode == 0, "output": result.stdout[:5000]}
     except subprocess.TimeoutExpired:
         return {"success": False, "error": f"Timeout after {timeout}s"}

@@ -25,7 +25,7 @@ def test_slate_benchmark_import():
 
 def test_slate_hardware_optimizer_import():
     from aurora_core import slate_hardware_optimizer
-    assert hasattr(slate_hardware_optimizer, 'detect_gpus')
+    assert hasattr(slate_hardware_optimizer, 'get_gpu_list')
 
 def test_slate_runtime_import():
     from aurora_core import slate_runtime

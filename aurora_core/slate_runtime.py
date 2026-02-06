@@ -19,6 +19,13 @@ import sys
 from datetime import datetime
 from pathlib import Path
 
+try:
+    from aurora_core.slate_utils import get_gpu_info, get_pytorch_info, check_ollama, is_venv
+except ImportError:
+    from slate_utils import get_gpu_info, get_pytorch_info, check_ollama, is_venv
+
+# Modified: 2026-02-06T12:20:00Z | Author: COPILOT | Change: Refactored to use slate_utils
+
 def check_integration(name, check_fn, details_fn=None):
     try:
         status = check_fn()
@@ -29,33 +36,24 @@ def check_integration(name, check_fn, details_fn=None):
 
 def check_python(): return sys.version_info >= (3, 11)
 def python_details(): return f"{sys.version_info.major}.{sys.version_info.minor}.{sys.version_info.micro}"
-def check_pytorch():
-    try: import torch; return True
-    except: return False
+
 def pytorch_details():
-    import torch
-    cuda = f", CUDA {torch.version.cuda}" if torch.cuda.is_available() else ", CPU"
-    return f"{torch.__version__}{cuda}"
-def check_ollama():
-    try: return subprocess.run(["ollama", "--version"], capture_output=True, timeout=5).returncode == 0
-    except: return False
-def check_gpu():
-    try:
-        r = subprocess.run(["nvidia-smi", "--query-gpu=name", "--format=csv,noheader"], capture_output=True, text=True, timeout=5)
-        return r.returncode == 0 and r.stdout.strip()
-    except: return False
+    info = get_pytorch_info()
+    if not info["installed"]: return "Not installed"
+    cuda = f", CUDA {info['cuda_version']}" if info['cuda_available'] else ", CPU"
+    return f"{info['version']}{cuda}"
+
 def check_transformers():
     try: import transformers; return True
     except: return False
-def check_venv(): return (Path.cwd() / ".venv").exists()
 
 INTEGRATIONS = [
     ("Python 3.11+", check_python, python_details),
-    ("Virtual Env", check_venv, None),
-    ("NVIDIA GPU", check_gpu, None),
-    ("PyTorch", check_pytorch, pytorch_details),
+    ("Virtual Env", is_venv, None),
+    ("NVIDIA GPU", lambda: get_gpu_info()["available"], None),
+    ("PyTorch", lambda: get_pytorch_info()["installed"], pytorch_details),
     ("Transformers", check_transformers, None),
-    ("Ollama", check_ollama, None),
+    ("Ollama", lambda: check_ollama()["available"], None),
 ]
 
 def check_all():

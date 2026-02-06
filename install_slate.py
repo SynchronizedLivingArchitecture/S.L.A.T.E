@@ -20,6 +20,15 @@ import subprocess
 import sys
 from pathlib import Path
 
+# Try to import from aurora_core if available
+try:
+    sys.path.append(str(Path(__file__).parent / "aurora_core"))
+    from slate_utils import get_gpu_info
+except ImportError:
+    get_gpu_info = None
+
+# Modified: 2026-02-06T12:50:00Z | Author: COPILOT | Change: Refactored to use slate_utils for hardware detection
+
 WORKSPACE_ROOT = Path(__file__).parent
 
 
@@ -103,40 +112,30 @@ def detect_hardware():
     """Detect system hardware."""
     print("[4/6] Detecting hardware...")
     
-    try:
-        result = subprocess.run(
-            ["nvidia-smi", "--query-gpu=name,compute_cap,memory.total", "--format=csv,noheader"],
-            capture_output=True,
-            text=True,
-            timeout=10
-        )
-        if result.returncode == 0 and result.stdout.strip():
-            gpus = result.stdout.strip().split("\n")
-            print(f"  ✓ Found {len(gpus)} NVIDIA GPU(s):")
-            for gpu in gpus:
-                parts = [p.strip() for p in gpu.split(",")]
-                if len(parts) >= 3:
-                    name, cc, mem = parts[0], parts[1], parts[2]
-                    if cc.startswith("12."):
-                        arch = "Blackwell"
-                    elif cc == "8.9":
-                        arch = "Ada Lovelace"
-                    elif cc.startswith("8."):
-                        arch = "Ampere"
-                    elif cc == "7.5":
-                        arch = "Turing"
-                    else:
-                        arch = "Unknown"
-                    print(f"      {name} ({arch}, CC {cc}, {mem})")
-            return True
-        else:
-            print("  ○ No NVIDIA GPU detected (CPU mode)")
-            return True
-    except FileNotFoundError:
-        print("  ○ nvidia-smi not found (CPU mode)")
+    if get_gpu_info is None:
+        print("  ○ GPU detection utilities not available (CPU mode)")
         return True
-    except Exception as e:
-        print(f"  ○ GPU detection skipped: {e}")
+
+    gpu_status = get_gpu_info()
+    if gpu_status["available"]:
+        print(f"  ✓ Found {gpu_status['count']} NVIDIA GPU(s):")
+        for gpu in gpu_status["gpus"]:
+            cc = gpu["compute_capability"]
+            if cc.startswith("12."):
+                arch = "Blackwell"
+            elif cc == "8.9":
+                arch = "Ada Lovelace"
+            elif cc.startswith("8."):
+                arch = "Ampere"
+            elif cc == "7.5":
+                arch = "Turing"
+            else:
+                arch = "Unknown"
+            print(f"      {gpu['name']} ({arch}, CC {cc}, {gpu['memory_total']})")
+        return True
+    else:
+        reason = gpu_status.get("reason", gpu_status.get("error", "Unknown reason"))
+        print(f"  ○ GPU detection: {reason} (CPU mode)")
         return True
 
 
