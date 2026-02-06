@@ -165,3 +165,49 @@ SLATE version is defined in:
 - `aurora_core/__init__.py` → `__version__ = "2.4.0"`
 
 The CI pipeline validates version consistency across these files.
+
+## SLATE Package Manager CLI
+
+SLATE includes a built-in package manager for managing versions, builds, and releases:
+
+```bash
+slate-package --status          # Show package/release status
+slate-package --bump patch      # Bump version (major|minor|patch)
+slate-package --build           # Build sdist + wheel
+slate-package --validate        # Validate release readiness
+slate-package --release 2.5.0   # Prepare release (dry run)
+slate-package --release 2.5.0 --go  # Apply release changes
+slate-package --deps            # Audit dependencies
+slate-package --changelog       # Show current changelog entry
+```
+
+## GitHub Packages
+
+SLATE packages are published to [GitHub Packages](https://github.com/orgs/SynchronizedLivingArchitecture/packages) on every release.
+
+### Installing from GitHub Packages
+
+```bash
+pip install slate --index-url https://pypi.pkg.github.com/SynchronizedLivingArchitecture/simple
+```
+
+### Publishing Workflow
+
+Package publishing is automated through two workflows:
+
+1. **`publish-package.yml`** — Triggered on release events; builds and uploads to GitHub Packages
+2. **`release.yml`** — Manual release with version validation, changelog extraction, package build, and GitHub Release creation
+
+See [Releases](Releases) for the full release process.
+
+## Package Build Artifacts
+
+Every release produces:
+
+| Artifact | Format | Description |
+|----------|--------|-------------|
+| `slate-{version}.tar.gz` | sdist | Source distribution |
+| `slate-{version}-py3-none-any.whl` | wheel | Built distribution (universal) |
+| `SLATEPI-{version}-win64.zip` | zip | Windows EXE bundle (via CD pipeline) |
+
+All artifacts are attached to the corresponding [GitHub Release](https://github.com/SynchronizedLivingArchitecture/S.L.A.T.E./releases).

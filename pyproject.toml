@@ -45,11 +45,21 @@ slate-status = "aurora_core.slate_status:main"
 slate-runtime = "aurora_core.slate_runtime:main"
 slate-benchmark = "aurora_core.slate_benchmark:main"
 slate-hardware = "aurora_core.slate_hardware_optimizer:main"
+slate-package = "aurora_core.slate_package_manager:main"
 
 [project.urls]
 Homepage = "https://github.com/SynchronizedLivingArchitecture/S.L.A.T.E."
 Repository = "https://github.com/SynchronizedLivingArchitecture/S.L.A.T.E."
 Issues = "https://github.com/SynchronizedLivingArchitecture/S.L.A.T.E./issues"
+Documentation = "https://github.com/SynchronizedLivingArchitecture/S.L.A.T.E./wiki"
+Changelog = "https://github.com/SynchronizedLivingArchitecture/S.L.A.T.E./blob/main/CHANGELOG.md"
+
+[tool.setuptools.packages.find]
+include = ["aurora_core*", "agents*", "aurora_slate*"]
+
+[tool.setuptools.package-data]
+"aurora_slate" = ["*.html", "*.css", "*.js", "*.svg"]
+"aurora_core" = ["*.json"]
 
 [tool.black]
 line-length = 100

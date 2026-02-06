@@ -1,0 +1,18 @@
+include LICENSE
+include README.md
+include CHANGELOG.md
+include pyproject.toml
+include requirements.txt
+
+recursive-include aurora_core *.py *.json
+recursive-include agents *.py
+recursive-include aurora_slate *.html *.css *.js *.svg
+recursive-include docs *.md *.svg
+
+exclude *.spec
+exclude *.exe
+recursive-exclude tests *
+recursive-exclude dist *
+recursive-exclude dist_v2 *
+recursive-exclude .slate_pids *
+recursive-exclude .slate_fork *
