@@ -20,6 +20,7 @@ SLATE is a local-first AI agent orchestration framework that:
 | [Agent System](Agents) | ALPHA, BETA, GAMMA, DELTA agents |
 | [AI Backends](AI-Backends) | Ollama, Foundry Local, external APIs |
 | [Packages](Packages) | Dependencies, modules, and packaging |
+| [Releases](Releases) | Release process, versioning, and changelog |
 | [Projects & Roadmap](Projects) | Project board, roadmap, and labels |
 | [CLI Reference](CLI-Reference) | Command-line tools and options |
 | [Configuration](Configuration) | Settings and customization |
