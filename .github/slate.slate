@@ -1,0 +1,17 @@
+# Modified: 2026-02-06T11:05:00Z | Author: COPILOT | Change: Created main configuration file
+version: "2.4.0"
+mode: local
+binding: 127.0.0.1
+agents:
+  ALPHA:
+    role: "Coding, Implementation"
+    target: "GPU"
+  BETA:
+    role: "Testing, Validation"
+    target: "GPU"
+  GAMMA:
+    role: "Planning, Research"
+    target: "CPU"
+  DELTA:
+    role: "External Integration"
+    target: "API"

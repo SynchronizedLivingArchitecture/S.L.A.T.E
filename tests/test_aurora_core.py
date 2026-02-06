@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-# Modified: 2026-02-06T10:10:00Z | Author: COPILOT | Change: Added test for slate_protocols
+# Modified: 2026-02-06T11:20:00Z | Author: COPILOT | Change: Added test for AI toolkit integration
 """Tests for aurora_core package."""
 
 import pytest
@@ -38,6 +38,10 @@ def test_slate_terminal_monitor_import():
 def test_slate_protocols_import():
     from aurora_core import slate_protocols
     assert hasattr(slate_protocols, 'main')
+
+def test_slate_ai_toolkit_integration_import():
+    from aurora_core import slate_ai_toolkit_integration
+    assert hasattr(slate_ai_toolkit_integration, 'main')
 
 def test_blocked_commands():
     from aurora_core.slate_terminal_monitor import is_blocked

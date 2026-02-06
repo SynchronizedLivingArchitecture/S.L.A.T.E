@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-# Modified: 2026-02-06T10:00:00Z | Author: COPILOT | Change: Created slate_protocols to automate system checks
+# Modified: 2026-02-06T11:15:00Z | Author: COPILOT | Change: Added terminal monitor and AI toolkit to protocols
 # ═══════════════════════════════════════════════════════════════════════════════
 # CELL: slate_protocols [python]
 # Purpose: Central runner for SLATE system protocols
@@ -45,6 +45,8 @@ def main():
         [sys.executable, str(base_dir / "aurora_core" / "slate_runtime.py"), "--check-all"],
         [sys.executable, str(base_dir / "aurora_core" / "slate_hardware_optimizer.py")],
         [sys.executable, str(base_dir / "aurora_core" / "slate_benchmark.py")],
+        [sys.executable, str(base_dir / "aurora_core" / "slate_terminal_monitor.py"), "--status"],
+        [sys.executable, str(base_dir / "aurora_core" / "slate_ai_toolkit_integration.py"), "--status"],
     ]
 
     for protocol in protocols:
