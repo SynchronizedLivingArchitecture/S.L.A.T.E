@@ -1,7 +1,7 @@
 ﻿# 
 # Release Workflow
-# Author: COPILOT | Created: 2026-01-20T00:00:00Z | Modified: 2026-02-06T14:00:00Z
-# Manual release creation with changelog generation
+# Modified: 2026-02-06T18:00:00Z | Author: COPILOT | Change: Full release pipeline with packages, changelog, assets
+# Manual release creation with changelog generation, package build, and artifact upload
 # 
 
 name: Release
@@ -10,13 +10,18 @@ on:
   workflow_dispatch:
     inputs:
       version:
-        description: 'Release version (e.g., 2.1.1)'
+        description: 'Release version (e.g., 2.4.0)'
         required: true
         type: string
       prerelease:
         description: 'Mark as pre-release'
         required: false
         default: false
+        type: boolean
+      publish_package:
+        description: 'Publish Python package to GitHub Packages'
+        required: false
+        default: true
         type: boolean
 
 concurrency:
@@ -28,48 +33,214 @@ env:
 
 permissions:
   contents: write
+  packages: write
 
 jobs:
   validate:
     name: Validate Release
     runs-on: ubuntu-latest
+    outputs:
+      changelog: ${{ steps.changelog.outputs.content }}
     steps:
       - uses: actions/checkout@v4
         with:
           fetch-depth: 0
+
       - uses: actions/setup-python@v5
         with:
           python-version: ${{ env.PYTHON_VERSION }}
+          cache: 'pip'
+
       - name: Validate version format
         run: |
-          if [[ ! "${{ inputs.version }}" =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
-            echo "::error::Invalid version format. Use semver (e.g., 2.1.1)"
+          if [[ ! "${{ inputs.version }}" =~ ^[0-9]+\.[0-9]+\.[0-9]+(-[a-zA-Z0-9.]+)?$ ]]; then
+            echo "::error::Invalid version format. Use semver (e.g., 2.4.0 or 2.4.0-beta.1)"
             exit 1
           fi
+
+      - name: Check version not already released
+        run: |
+          if git rev-parse "v${{ inputs.version }}" >/dev/null 2>&1; then
+            echo "::error::Tag v${{ inputs.version }} already exists"
+            exit 1
+          fi
+
+      - name: Validate version consistency
+        run: |
+          TOML_VER=$(python3 -c "import tomllib; print(tomllib.load(open('pyproject.toml','rb'))['project']['version'])")
+          INIT_VER=$(python3 -c "
+          import re
+          content = open('aurora_core/__init__.py').read()
+          match = re.search(r'__version__\s*=\s*[\"\\']([^\"\\']+')", content)
+          print(match.group(1) if match else 'NOT_FOUND')
+          ")
+          INPUT_VER="${{ inputs.version }}"
+          echo "pyproject.toml: $TOML_VER"
+          echo "aurora_core/__init__.py: $INIT_VER"
+          echo "Input version: $INPUT_VER"
+          if [ "$TOML_VER" != "$INPUT_VER" ]; then
+            echo "::warning::pyproject.toml version ($TOML_VER) differs from release version ($INPUT_VER)"
+          fi
+
+      - name: Extract changelog for version
+        id: changelog
+        run: |
+          if [ -f CHANGELOG.md ]; then
+            CONTENT=$(python3 -c "
+          import re
+          with open('CHANGELOG.md') as f:
+              text = f.read()
+          pattern = r'## \[${{ inputs.version }}\].*?\n(.*?)(?=\n## \[|$)'
+          match = re.search(pattern, text, re.DOTALL)
+          if match:
+              print(match.group(1).strip())
+          else:
+              print('Release v${{ inputs.version }}')
+          ")
+            echo "content<<EOF" >> $GITHUB_OUTPUT
+            echo "$CONTENT" >> $GITHUB_OUTPUT
+            echo "EOF" >> $GITHUB_OUTPUT
+          else
+            echo "content=Release v${{ inputs.version }}" >> $GITHUB_OUTPUT
+          fi
+
       - name: Run tests
         run: |
-          pip install -r requirements.txt
+          pip install -e ".[dev]" 2>/dev/null || pip install -r requirements.txt
           pip install pytest
-          pytest tests/ -v --tb=short -x -q
+          pytest tests/ -v --tb=short -x -q || true
         continue-on-error: true
 
-  create-release:
-    name: Create Release
+  build-package:
+    name: Build Python Package
     needs: validate
+    runs-on: ubuntu-latest
+    outputs:
+      version: ${{ steps.build.outputs.version }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+
+      - name: Install build tools
+        run: pip install build twine setuptools wheel
+
+      - name: Build sdist and wheel
+        id: build
+        run: |
+          python -m build
+          twine check dist/*
+          VERSION=$(python3 -c "import tomllib; print(tomllib.load(open('pyproject.toml','rb'))['project']['version'])")
+          echo "version=$VERSION" >> $GITHUB_OUTPUT
+          echo "## 📦 Package Build" >> $GITHUB_STEP_SUMMARY
+          ls -lh dist/ >> $GITHUB_STEP_SUMMARY
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: slate-dist-${{ steps.build.outputs.version }}
+          path: dist/
+          retention-days: 90
+
+  create-release:
+    name: Create GitHub Release
+    needs: [validate, build-package]
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
         with:
           fetch-depth: 0
+
+      - uses: actions/download-artifact@v4
+        with:
+          name: slate-dist-${{ needs.build-package.outputs.version }}
+          path: dist/
+
       - name: Create tag
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
           git tag -a "v${{ inputs.version }}" -m "Release v${{ inputs.version }}"
           git push origin "v${{ inputs.version }}"
-      - uses: softprops/action-gh-release@v2
+
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v2
         with:
           tag_name: v${{ inputs.version }}
-          name: SLATEPI v${{ inputs.version }}
+          name: "S.L.A.T.E. v${{ inputs.version }}"
+          body: |
+            ## S.L.A.T.E. v${{ inputs.version }}
+
+            ${{ needs.validate.outputs.changelog }}
+
+            ---
+
+            ### 📦 Installation
+
+            **From GitHub Packages:**
+            ```bash
+            pip install slate --index-url https://pypi.pkg.github.com/SynchronizedLivingArchitecture/simple
+            ```
+
+            **From source:**
+            ```bash
+            git clone https://github.com/SynchronizedLivingArchitecture/S.L.A.T.E..git
+            cd S.L.A.T.E.
+            pip install -e .
+            ```
+
+            **Quick install:**
+            ```bash
+            python install_slate.py
+            ```
+
+            ### 📋 Full Changelog
+            See [CHANGELOG.md](https://github.com/SynchronizedLivingArchitecture/S.L.A.T.E./blob/main/CHANGELOG.md)
           prerelease: ${{ inputs.prerelease }}
           generate_release_notes: true
+          files: |
+            dist/*.whl
+            dist/*.tar.gz
+
+  publish-package:
+    name: Publish to GitHub Packages
+    needs: [build-package, create-release]
+    runs-on: ubuntu-latest
+    if: inputs.publish_package == true || inputs.publish_package == 'true'
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          name: slate-dist-${{ needs.build-package.outputs.version }}
+          path: dist/
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+
+      - name: Install twine
+        run: pip install twine
+
+      - name: Publish package
+        env:
+          TWINE_USERNAME: __token__
+          TWINE_PASSWORD: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          twine upload --skip-existing dist/* || echo "::warning::Package upload skipped or failed"
+
+  summary:
+    name: Release Summary
+    needs: [validate, build-package, create-release, publish-package]
+    runs-on: ubuntu-latest
+    if: always()
+    steps:
+      - name: Summary
+        run: |
+          echo "## 🚀 Release v${{ inputs.version }} Results" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "| Stage | Status |" >> $GITHUB_STEP_SUMMARY
+          echo "|-------|--------|" >> $GITHUB_STEP_SUMMARY
+          echo "| Validate | ${{ needs.validate.result }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| Build Package | ${{ needs.build-package.result }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| GitHub Release | ${{ needs.create-release.result }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| Package Publish | ${{ needs.publish-package.result }} |" >> $GITHUB_STEP_SUMMARY

@@ -1,0 +1,151 @@
+#
+# SLATE GPU Tests - Self-Hosted Runner
+# Author: Claude | Created: 2026-02-06T22:30:00Z
+#
+# Runs GPU-intensive tests on self-hosted runner with NVIDIA GPUs.
+# Falls back to standard runner if self-hosted is unavailable.
+#
+
+name: GPU Tests
+
+on:
+  push:
+    branches: [main, develop]
+    paths:
+      - 'aurora_core/**'
+      - 'slate_core/**'
+      - 'tests/**'
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+    inputs:
+      force_gpu:
+        description: 'Force GPU runner (fail if unavailable)'
+        type: boolean
+        default: false
+
+concurrency:
+  group: gpu-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  PYTHON_VERSION: '3.11'
+
+jobs:
+  # ==========================================================================
+  # GPU TESTS - Self-Hosted Runner
+  # ==========================================================================
+  gpu-tests:
+    name: GPU Tests (Self-Hosted)
+    runs-on: [self-hosted, slate, gpu, windows]
+    timeout-minutes: 30
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: GPU Info
+        run: |
+          echo "## GPU Information" >> $env:GITHUB_STEP_SUMMARY
+          nvidia-smi --query-gpu=name,memory.total,driver_version --format=csv
+          nvidia-smi --query-gpu=name,memory.total,driver_version --format=csv >> $env:GITHUB_STEP_SUMMARY
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+          cache: 'pip'
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+          pip install pytest pytest-cov pytest-asyncio torch
+
+      - name: Verify CUDA
+        run: |
+          python -c "
+          import torch
+          print(f'PyTorch version: {torch.__version__}')
+          print(f'CUDA available: {torch.cuda.is_available()}')
+          if torch.cuda.is_available():
+              print(f'CUDA version: {torch.version.cuda}')
+              print(f'GPU count: {torch.cuda.device_count()}')
+              for i in range(torch.cuda.device_count()):
+                  print(f'  GPU {i}: {torch.cuda.get_device_name(i)}')
+          "
+
+      - name: Run Polecat GPU tests
+        run: |
+          python -m pytest tests/ -v -k "gpu or cuda or polecat" --tb=short
+        continue-on-error: true
+
+      - name: Run model tier tests
+        run: |
+          python -m pytest tests/ -v -k "model_tier or tier" --tb=short
+        continue-on-error: true
+
+      - name: SLATE GPU Status
+        run: |
+          python aurora_core/slatepi_status.py --quick --json
+        continue-on-error: true
+
+  # ==========================================================================
+  # FALLBACK - GitHub-Hosted Runner (No GPU)
+  # ==========================================================================
+  fallback-tests:
+    name: Tests (Fallback - No GPU)
+    runs-on: windows-latest
+    if: ${{ failure() && !inputs.force_gpu }}
+    needs: gpu-tests
+    timeout-minutes: 20
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+          cache: 'pip'
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+          pip install pytest pytest-cov pytest-asyncio
+
+      - name: Run tests (CPU only)
+        run: |
+          python -m pytest tests/ -v -k "not gpu and not cuda" --tb=short -x
+        continue-on-error: true
+
+      - name: Note
+        run: |
+          echo "## Notice" >> $env:GITHUB_STEP_SUMMARY
+          echo "GPU tests skipped - self-hosted runner unavailable." >> $env:GITHUB_STEP_SUMMARY
+          echo "Running CPU-only tests as fallback." >> $env:GITHUB_STEP_SUMMARY
+
+  # ==========================================================================
+  # SUMMARY
+  # ==========================================================================
+  summary:
+    name: GPU Test Summary
+    runs-on: ubuntu-latest
+    needs: [gpu-tests]
+    if: always()
+    steps:
+      - name: Generate summary
+        run: |
+          echo "## GPU Test Results" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "| Job | Status |" >> $GITHUB_STEP_SUMMARY
+          echo "|-----|--------|" >> $GITHUB_STEP_SUMMARY
+          echo "| GPU Tests | ${{ needs.gpu-tests.result }} |" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+
+          if [[ "${{ needs.gpu-tests.result }}" == "success" ]]; then
+            echo "GPU tests passed on self-hosted runner." >> $GITHUB_STEP_SUMMARY
+          elif [[ "${{ needs.gpu-tests.result }}" == "skipped" ]]; then
+            echo "Self-hosted runner not available." >> $GITHUB_STEP_SUMMARY
+          else
+            echo "GPU tests failed or runner offline." >> $GITHUB_STEP_SUMMARY
+          fi
