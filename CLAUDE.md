@@ -2,49 +2,160 @@
 
 **S.L.A.T.E.** = Synchronized Living Architecture for Transformation and Evolution
 
+**Constitution**: `.specify/memory/constitution.md` — Supersedes all other practices
 Last updated: 2026-02-06
+
+---
+
+## Quick Start (5 Minutes)
+
+```powershell
+# Clone and install
+git clone https://github.com/SynchronizedLivingArchitecture/S.L.A.T.E..git
+cd S.L.A.T.E.
+python install_slate.py
+
+# Verify installation
+.\.venv\Scripts\python.exe aurora_core/slate_sdk.py --verify
+
+# Start dashboard
+.\.venv\Scripts\python.exe agents/aurora_dashboard_server.py
+```
+
+**With self-hosted runner:**
+```powershell
+python install_slate.py --runner --runner-token YOUR_TOKEN
+```
+
+---
+
+## SLATE SDK
+
+The SDK provides unified setup, configuration, and integration. Always use the SDK for system operations.
+
+### CLI Commands
+
+```powershell
+# Full setup (creates venv, installs deps, configures system)
+python aurora_core/slate_sdk.py --setup
+
+# Setup with runner
+python aurora_core/slate_sdk.py --setup --runner --runner-token YOUR_TOKEN
+
+# Check status (human-readable)
+python aurora_core/slate_sdk.py --status
+
+# Check status (JSON for scripts)
+python aurora_core/slate_sdk.py --status --json
+
+# Verify installation
+python aurora_core/slate_sdk.py --verify
+
+# Integrate git remotes
+python aurora_core/slate_sdk.py --integrate-git
+
+# Integrate runner
+python aurora_core/slate_sdk.py --integrate-runner
+```
+
+### Python API
+
+```python
+from aurora_core.slate_sdk import SlateSDK
+
+sdk = SlateSDK()
+
+# Full setup
+result = sdk.setup(include_runner=True)
+
+# Get status
+status = sdk.get_status()
+
+# Verify installation
+verification = sdk.verify()
+```
+
+---
 
 ## Architecture
 
-SLATE uses a **GitHub-centric architecture** with a self-hosted runner for GPU-accelerated CI/CD:
+SLATE uses a **GitHub-centric architecture** with self-hosted runners for GPU-accelerated CI/CD:
 
 ```
 GitHub Repository (S.L.A.T.E.)
          │
-         ▼
-  Self-Hosted Runner
-  (2x RTX 5070 Ti)
+    ┌────┴────┐
+    ▼         ▼
+  Cloud     Self-Hosted
+  Runner     Runner
+             (2x RTX 5070 Ti)
          │
          ▼
-   Workflow Jobs
-   (tests, builds)
+   GPU Workloads
+   (tests, AI, builds)
 ```
+
+### Dual-Repository Model
+
+| Repository | Purpose | Branch |
+|------------|---------|--------|
+| **S.L.A.T.E.** | Main product - stable releases | `main` |
+| **S.L.A.T.E.-BETA** | Development fork - active work | feature branches |
+
+---
 
 ## Technologies
 
-- Python 3.11+
+- Python 3.11+ (backend)
+- Vanilla JavaScript + D3.js v7 (frontend)
 - FastAPI (dashboard on port 8080)
 - GitHub Actions (CI/CD)
 - Self-hosted runner (GPU compute)
+
+### Local AI Providers (FREE - No Cloud Costs)
+
+| Provider | Port | Models | Status |
+|----------|------|--------|--------|
+| Ollama | 11434 | mistral-nemo, llama3.2, phi | Active |
+| Foundry Local | 5272 | Phi-3, Mistral-7B (ONNX) | Active |
+
+**Security**: ActionGuard blocks ALL paid cloud APIs. Only localhost AI is allowed.
+
+---
 
 ## Project Structure
 
 ```text
 aurora_core/           # Core SLATE modules
+  slate_sdk.py         # Unified SDK (setup, status, verify)
   slate_status.py      # System status checker
   slate_runner_manager.py    # GitHub runner management
   slate_github_integration.py  # GitHub API integration
+  slate_fork_manager.py      # Fork contribution workflow
+  slate_project_manager.py   # GitHub Projects integration
+  unified_ai_backend.py      # AI routing (Ollama, Foundry)
+  action_guard.py            # Security validation
+  sdk_source_guard.py        # Package trust verification
+agents/                # Agent implementations
+  aurora_dashboard_server.py  # Dashboard server
+slate_core/            # Shared infrastructure
+specs/                 # Feature specifications
+tests/                 # Test suite
 .github/
   workflows/           # GitHub Actions workflows
-tests/                 # Test suite
-specs/                 # Specifications
+  projects.json        # GitHub Projects configuration
 ```
+
+---
 
 ## Commands
 
 ```powershell
-# Check SLATE status
+# SLATE Status
 .\.venv\Scripts\python.exe aurora_core/slate_status.py --quick
+
+# SDK Status
+.\.venv\Scripts\python.exe aurora_core/slate_sdk.py --status
 
 # Run tests
 .\.venv\Scripts\python.exe -m pytest tests/ -v
@@ -52,47 +163,130 @@ specs/                 # Specifications
 # Lint
 ruff check .
 
-# Check GitHub integration
-.\.venv\Scripts\python.exe aurora_core/slate_github_integration.py --status
+# Start dashboard
+.\.venv\Scripts\python.exe agents/aurora_dashboard_server.py
+
+# Check AI backends
+.\.venv\Scripts\python.exe aurora_core/unified_ai_backend.py --status
 ```
 
-## GitHub Runner
+---
 
-SLATE runs on a self-hosted GitHub Actions runner with GPU support.
+## Self-Hosted Runner (Standard Protocol)
 
-### Status Check
+SLATE operations use local GPU runners for CI/CD. **This is standard protocol.**
+
+### Current Runner
+
+- **Name**: `slate-DESKTOP-R3UD82D`
+- **Status**: Online
+- **Labels**: `self-hosted`, `slate`, `gpu`, `windows`, `cuda`, `gpu-2`, `blackwell`
+- **Hardware**: 2x RTX 5070 Ti (CUDA compute)
+
+### Runner Management
 
 ```powershell
+# Check status
 .\.venv\Scripts\python.exe aurora_core/slate_runner_manager.py --status
-```
-
-### Setup
-
-```powershell
-# Download runner
-.\.venv\Scripts\python.exe aurora_core/slate_runner_manager.py --download
-
-# Configure (get token from GitHub repo settings)
-.\.venv\Scripts\python.exe aurora_core/slate_runner_manager.py --configure --token YOUR_TOKEN
 
 # Start runner
 .\.venv\Scripts\python.exe aurora_core/slate_runner_manager.py --start
+
+# Stop runner
+.\.venv\Scripts\python.exe aurora_core/slate_runner_manager.py --stop
+
+# Install as Windows service
+.\.venv\Scripts\python.exe aurora_core/slate_runner_manager.py --install-service
 ```
 
-### Runner Labels
-
-Auto-detected labels:
-- `self-hosted`, `slate`, `gpu`, `windows`
-- `cuda`, `gpu-2` (GPU count)
-- `blackwell` (RTX 50 series)
-
-### Get Token
+### Get Runner Token
 
 1. Go to https://github.com/SynchronizedLivingArchitecture/S.L.A.T.E./settings/actions/runners
 2. Click "New self-hosted runner"
 3. Copy the token
+4. Run: `python aurora_core/slate_sdk.py --setup --runner --runner-token YOUR_TOKEN`
 
-## Development Workflow
+### Runner Labels (Auto-Detected)
+
+| Label | Meaning |
+|-------|---------|
+| `self-hosted` | Not GitHub-hosted |
+| `slate` | SLATE system runner |
+| `gpu` | GPU available |
+| `windows` | Windows OS |
+| `cuda` | CUDA compute capable |
+| `gpu-2` | 2 GPUs detected |
+| `blackwell` | RTX 50 series |
+
+---
+
+## GitHub Projects Integration
+
+SLATE syncs tasks to GitHub Projects for planning and tracking.
+
+### Commands
+
+```powershell
+# List projects
+.\.venv\Scripts\python.exe aurora_core/slate_project_manager.py --list
+
+# Create development project
+.\.venv\Scripts\python.exe aurora_core/slate_project_manager.py --create --template development
+
+# Sync tasks to project
+.\.venv\Scripts\python.exe aurora_core/slate_project_manager.py --sync --project 1
+```
+
+### Project Templates
+
+| Template | Description |
+|----------|-------------|
+| `development` | Sprint board with status, priority, agent fields |
+| `roadmap` | Timeline view for milestones |
+| `sprint` | 2-week sprint with story points |
+
+---
+
+## SLATE Protocol Automation
+
+Automated workflows for sync, validate, and deploy operations.
+
+### Workflows
+
+| Workflow | Trigger | Purpose |
+|----------|---------|---------|
+| `self-hosted-runner.yml` | push, PR | GPU-enabled tests and builds |
+| `slate-protocol.yml` | manual, nightly | Sync, validate, deploy |
+
+### Protocol Commands
+
+```powershell
+# Trigger validation
+gh workflow run slate-protocol.yml -f operation=validate
+
+# Trigger sync
+gh workflow run slate-protocol.yml -f operation=sync
+
+# Trigger deploy
+gh workflow run slate-protocol.yml -f operation=deploy
+```
+
+---
+
+## Git Integration
+
+### Configure Remotes
+
+```powershell
+# Automatic (recommended)
+python aurora_core/slate_sdk.py --integrate-git
+
+# Manual
+git remote set-url origin https://github.com/SynchronizedLivingArchitecture/S.L.A.T.E..git
+git remote add beta https://github.com/SynchronizedLivingArchitecture/S.L.A.T.E.-BETA.git
+```
+
+### Development Workflow
 
 ```powershell
 # Create feature branch
@@ -102,22 +296,68 @@ git checkout -b feature/my-feature
 git add .
 git commit -m "feat: description"
 
-# Push to origin
+# Push to origin (triggers CI on self-hosted runner)
 git push origin HEAD
 
 # Create PR on GitHub
+gh pr create --title "feat: description" --body "..."
 ```
+
+---
+
+## Agent System
+
+| Agent | Role | Preference |
+|-------|------|------------|
+| ALPHA | Coding & implementation | GPU-preferred |
+| BETA | Testing & validation | GPU-preferred |
+| GAMMA | Planning & triage | CPU-preferred |
+| DELTA | Claude Code bridge | CLI-based |
+
+Tasks use `assigned_to` field for routing. `assigned_to: "auto"` uses ML-based smart routing.
+
+---
 
 ## Security
 
-- All servers bind to `127.0.0.1` only
-- No external network calls
+- **All servers bind to `127.0.0.1` only** — never `0.0.0.0`
+- No external network calls unless explicitly requested
+- ActionGuard validates all agent actions
 - GitHub runner executes trusted workflows only
+- SDK Source Guard blocks untrusted packages
 
-## GitHub Integration
+---
 
-Repository: https://github.com/SynchronizedLivingArchitecture/S.L.A.T.E.
+## Code Style
 
-- Branch protection on `main`
-- CODEOWNERS enforces review requirements
-- All PRs must pass CI checks
+- Python: Type hints required. Google-style docstrings.
+- Imports: Add `WORKSPACE_ROOT` to `sys.path` when importing cross-module.
+- UI: Glassmorphism theme (75% opacity, muted pastels).
+- Task files: Use `slate_core/file_lock.py` for `current_tasks.json`.
+
+---
+
+## Test-Driven Development (Constitution Mandate)
+
+All code changes must be accompanied by tests. Target 50%+ coverage.
+
+```text
+1. WRITE TEST → failing test defining expected behavior
+2. RUN TEST → verify it fails (red)
+3. IMPLEMENT → minimum code to pass
+4. RUN TEST → verify it passes (green)
+5. REFACTOR → clean up while keeping tests green
+```
+
+---
+
+## Resources
+
+- **Repository**: https://github.com/SynchronizedLivingArchitecture/S.L.A.T.E.
+- **Wiki**: https://github.com/SynchronizedLivingArchitecture/S.L.A.T.E./wiki
+- **Issues**: https://github.com/SynchronizedLivingArchitecture/S.L.A.T.E./issues
+- **Projects**: https://github.com/orgs/SynchronizedLivingArchitecture/projects
+
+---
+
+*S.L.A.T.E. - Local AI, Unlimited Potential*

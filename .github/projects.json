@@ -1,0 +1,82 @@
+{
+  "projects": [],
+  "templates": {
+    "development": {
+      "title": "SLATE Development",
+      "description": "Active development tasks and features for S.L.A.T.E.",
+      "fields": [
+        {"name": "Status", "type": "single_select", "options": ["Backlog", "Ready", "In Progress", "In Review", "Done"]},
+        {"name": "Priority", "type": "single_select", "options": ["Critical", "High", "Medium", "Low"]},
+        {"name": "Agent", "type": "single_select", "options": ["ALPHA", "BETA", "GAMMA", "DELTA", "COPILOT", "Auto"]},
+        {"name": "Sprint", "type": "iteration"},
+        {"name": "Effort", "type": "number"},
+        {"name": "Due Date", "type": "date"}
+      ],
+      "views": [
+        {"name": "Board", "layout": "board", "group_by": "Status"},
+        {"name": "By Agent", "layout": "board", "group_by": "Agent"},
+        {"name": "Backlog", "layout": "table", "filter": "status:Backlog"},
+        {"name": "Roadmap", "layout": "roadmap", "date_field": "Due Date"}
+      ]
+    },
+    "roadmap": {
+      "title": "SLATE Roadmap",
+      "description": "Long-term planning and milestones for S.L.A.T.E.",
+      "fields": [
+        {"name": "Status", "type": "single_select", "options": ["Planning", "In Progress", "Complete", "Deferred"]},
+        {"name": "Quarter", "type": "single_select", "options": ["Q1 2026", "Q2 2026", "Q3 2026", "Q4 2026"]},
+        {"name": "Category", "type": "single_select", "options": ["Feature", "Infrastructure", "Performance", "Security", "Documentation"]},
+        {"name": "Target Version", "type": "text"},
+        {"name": "Start Date", "type": "date"},
+        {"name": "End Date", "type": "date"}
+      ],
+      "views": [
+        {"name": "Timeline", "layout": "roadmap", "date_field": "Start Date"},
+        {"name": "By Quarter", "layout": "board", "group_by": "Quarter"},
+        {"name": "By Category", "layout": "table", "group_by": "Category"}
+      ]
+    },
+    "sprint": {
+      "title": "SLATE Sprint",
+      "description": "Current sprint planning and tracking",
+      "fields": [
+        {"name": "Status", "type": "single_select", "options": ["To Do", "In Progress", "Review", "Done"]},
+        {"name": "Story Points", "type": "number"},
+        {"name": "Assignee", "type": "single_select", "options": ["ALPHA", "BETA", "GAMMA", "DELTA"]},
+        {"name": "Sprint Goal", "type": "text"}
+      ],
+      "views": [
+        {"name": "Sprint Board", "layout": "board", "group_by": "Status"},
+        {"name": "Burndown", "layout": "table"}
+      ]
+    }
+  },
+  "mappings": {
+    "status": {
+      "pending": "Backlog",
+      "ready": "Ready",
+      "in_progress": "In Progress",
+      "review": "In Review",
+      "completed": "Done",
+      "blocked": "Backlog",
+      "failed": "Backlog"
+    },
+    "priority": {
+      "urgent": "Critical",
+      "critical": "Critical",
+      "high": "High",
+      "medium": "Medium",
+      "low": "Low"
+    },
+    "agent": {
+      "ALPHA": "ALPHA",
+      "BETA": "BETA",
+      "GAMMA": "GAMMA",
+      "DELTA": "DELTA",
+      "COPILOT": "COPILOT",
+      "auto": "Auto"
+    }
+  },
+  "last_sync": null,
+  "sync_errors": []
+}
