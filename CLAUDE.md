@@ -188,11 +188,70 @@ All code changes must be accompanied by tests. Target 50%+ coverage for `aurora_
 5. REFACTOR → clean up while keeping tests green
 ```
 
+## Dual-Repository System
+
+SLATE uses a dual-repo model for development and distribution:
+
+```
+SLATE (origin)         = Main repository (the product)
+       ↑
+       │ contribute-to-main.yml
+       │
+SLATE-BETA (beta)      = Developer fork (where development happens)
+```
+
+### Git Remote Configuration
+
+```powershell
+# Check remotes
+git remote -v
+# Should show:
+# origin  https://github.com/SynchronizedLivingArchitecture/S.L.A.T.E..git
+# beta    https://github.com/SynchronizedLivingArchitecture/S.L.A.T.E.-BETA.git
+```
+
+### Development Workflow (BETA → SLATE)
+
+1. **Develop on BETA branch**
+   ```powershell
+   git checkout -b feature/my-feature
+   # Make changes, commit
+   ```
+
+2. **Sync BETA with SLATE main** (get latest)
+   ```powershell
+   git fetch origin
+   git merge origin/main
+   ```
+
+3. **Push to BETA**
+   ```powershell
+   git push beta HEAD:main
+   ```
+
+4. **Contribute to SLATE main**
+   - Run the `contribute-to-main.yml` workflow on BETA
+   - OR push directly if you have access:
+   ```powershell
+   git push origin HEAD:main
+   ```
+
+### Required Setup
+
+1. **MAIN_REPO_TOKEN** secret on BETA repo
+   - Settings → Secrets → Actions → Add `MAIN_REPO_TOKEN`
+   - Use a PAT with `repo` and `workflow` scope
+
+2. **GitHub CLI with workflow scope**
+   ```powershell
+   gh auth login --scopes workflow
+   ```
+
 ## Fork Contributions
 
 SLATE uses a secure fork validation system for external contributions:
 
-1. Fork the repository
+1. Fork the repository from https://github.com/SynchronizedLivingArchitecture/S.L.A.T.E.
 2. Create a local SLATE installation with your own git
 3. Run `python aurora_core/slate_fork_manager.py --init` to set up
 4. Make changes following SLATE prerequisites
