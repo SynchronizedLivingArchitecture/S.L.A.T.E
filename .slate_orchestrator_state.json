@@ -1,11 +1,11 @@
 {
   "status": "running",
-  "started_at": "2026-02-06T22:21:22.676257+00:00",
+  "started_at": "2026-02-06T22:29:10.315660+00:00",
   "services": {
-    "runner": true,
+    "runner": false,
     "dashboard": true,
     "workflow_monitor": true
   },
-  "pid": 10320,
-  "updated_at": "2026-02-06T22:21:22.676257+00:00"
+  "pid": 62176,
+  "updated_at": "2026-02-06T22:29:10.315660+00:00"
 }

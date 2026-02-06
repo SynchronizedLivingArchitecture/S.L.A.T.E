@@ -9,8 +9,20 @@
     {
       "name": "slate-sdk",
       "version": "1.0.0",
-      "source": ".",
-      "description": "SLATE orchestration, workflow management, and AI tools for Claude Code"
+      "source": {
+        "source": "github",
+        "repo": "SynchronizedLivingArchitecture/S.L.A.T.E",
+        "ref": "feature/workflow-management"
+      },
+      "description": "SLATE orchestration, workflow management, and AI tools for Claude Code",
+      "author": {
+        "name": "SynchronizedLivingArchitecture"
+      },
+      "license": "MIT",
+      "keywords": ["slate", "ai", "orchestration", "agents", "workflow", "automation"],
+      "skills": "./skills/",
+      "commands": ["./commands/slate-help.md"],
+      "strict": false
     }
   ]
 }

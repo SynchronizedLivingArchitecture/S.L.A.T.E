@@ -44,8 +44,8 @@ SLATE auto-detects your hardware and configures:
 
 ## Getting Help
 
-- [GitHub Issues](https://github.com/SynchronizedLivingArchitecture/S.L.A.T.E./issues) - Bug reports and feature requests
-- [Discussions](https://github.com/SynchronizedLivingArchitecture/S.L.A.T.E./discussions) - Questions and community support
+- [GitHub Issues](https://github.com/SynchronizedLivingArchitecture/S.L.A.T.E/issues) - Bug reports and feature requests
+- [Discussions](https://github.com/SynchronizedLivingArchitecture/S.L.A.T.E/discussions) - Questions and community support
 
 ## Version
 

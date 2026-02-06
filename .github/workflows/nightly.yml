@@ -1,4 +1,4 @@
-﻿# Modified: 2026-02-06T23:00:00Z | Author: COPILOT | Change: Windows self-hosted runner with checkout path fix
+﻿# Modified: 2026-02-07T00:00:00Z | Author: COPILOT | Change: Simplified after repo rename (removed trailing dot)
 name: SLATE Nightly
 
 on:
@@ -12,7 +12,6 @@ permissions:
 defaults:
   run:
     shell: pwsh
-    working-directory: slate-build
 
 jobs:
   full-test-suite:
@@ -21,8 +20,6 @@ jobs:
     timeout-minutes: 30
     steps:
       - uses: actions/checkout@v4
-        with:
-          path: slate-build
       - name: Install test deps
         run: pip install pytest pytest-cov pytest-asyncio --quiet 2>$null
         continue-on-error: true
@@ -36,8 +33,6 @@ jobs:
     timeout-minutes: 10
     steps:
       - uses: actions/checkout@v4
-        with:
-          path: slate-build
       - name: SLATE status
         run: python slate/slate_status.py --quick
       - name: Validate task queue
@@ -63,8 +58,6 @@ jobs:
     timeout-minutes: 5
     steps:
       - uses: actions/checkout@v4
-        with:
-          path: slate-build
       - name: Audit all modules
         run: |
           python -c @"
@@ -90,8 +83,6 @@ jobs:
     timeout-minutes: 5
     steps:
       - uses: actions/checkout@v4
-        with:
-          path: slate-build
       - name: Check outdated packages
         run: pip list --outdated 2>$null | Select-Object -First 20
         continue-on-error: true
@@ -114,7 +105,6 @@ jobs:
     if: always()
     steps:
       - name: Generate summary
-        working-directory: .
         run: |
           "## Nightly Health Summary" | Out-File -Append $env:GITHUB_STEP_SUMMARY
           "| Check | Status |" | Out-File -Append $env:GITHUB_STEP_SUMMARY

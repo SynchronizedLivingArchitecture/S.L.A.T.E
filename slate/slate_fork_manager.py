@@ -42,12 +42,12 @@ logger = logging.getLogger("slate.fork_manager")
 # Modified: 2026-02-08T00:00:00Z | Author: COPILOT | Change: Add BETA repo constants
 # ═══════════════════════════════════════════════════════════════════════════════
 
-SLATE_UPSTREAM = "https://github.com/SynchronizedLivingArchitecture/S.L.A.T.E..git"
-SLATE_UPSTREAM_SSH = "git@github.com:SynchronizedLivingArchitecture/S.L.A.T.E..git"
+SLATE_UPSTREAM = "https://github.com/SynchronizedLivingArchitecture/S.L.A.T.E.git"
+SLATE_UPSTREAM_SSH = "git@github.com:SynchronizedLivingArchitecture/S.L.A.T.E.git"
 
 # Beta repo for user testing / fork template
-SLATE_BETA_REPO = "https://github.com/SynchronizedLivingArchitecture/S.L.A.T.E.-BETA.git"
-SLATE_BETA_REPO_SSH = "git@github.com:SynchronizedLivingArchitecture/S.L.A.T.E.-BETA.git"
+SLATE_BETA_REPO = "https://github.com/SynchronizedLivingArchitecture/S.L.A.T.E-BETA.git"
+SLATE_BETA_REPO_SSH = "git@github.com:SynchronizedLivingArchitecture/S.L.A.T.E-BETA.git"
 SLATE_BETA_OWNER = "SynchronizedLivingArchitecture"
 SLATE_BETA_NAME = "S.L.A.T.E.-BETA"
 
@@ -637,7 +637,7 @@ Examples:
   python slate_fork_manager.py --init --name "Your Name" --email "you@example.com"
 
   # Set up your GitHub fork
-  python slate_fork_manager.py --setup-fork https://github.com/yourusername/S.L.A.T.E..git
+  python slate_fork_manager.py --setup-fork https://github.com/yourusername/S.L.A.T.E.git
 
   # Validate your workspace
   python slate_fork_manager.py --validate

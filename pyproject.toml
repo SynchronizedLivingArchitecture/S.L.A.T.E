@@ -47,9 +47,9 @@ slate-benchmark = "slate.slate_benchmark:main"
 slate-hardware = "slate.slate_hardware_optimizer:main"
 
 [project.urls]
-Homepage = "https://github.com/SynchronizedLivingArchitecture/S.L.A.T.E."
-Repository = "https://github.com/SynchronizedLivingArchitecture/S.L.A.T.E."
-Issues = "https://github.com/SynchronizedLivingArchitecture/S.L.A.T.E./issues"
+Homepage = "https://github.com/SynchronizedLivingArchitecture/S.L.A.T.E"
+Repository = "https://github.com/SynchronizedLivingArchitecture/S.L.A.T.E"
+Issues = "https://github.com/SynchronizedLivingArchitecture/S.L.A.T.E/issues"
 
 [tool.black]
 line-length = 100

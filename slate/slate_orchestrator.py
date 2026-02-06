@@ -108,29 +108,40 @@ class SlateOrchestrator:
             print("  [!] Runner not installed at", self.runner_dir)
             return False
 
-        # Check if runner is already running
+        # FIRST: Check if runner process is already running locally
+        try:
+            proc_check = subprocess.run(
+                ["powershell", "-Command",
+                 "Get-Process -Name 'Runner.Listener' -ErrorAction SilentlyContinue | Select-Object Id"],
+                capture_output=True, text=True, timeout=5
+            )
+            if proc_check.returncode == 0 and proc_check.stdout.strip() and "Id" in proc_check.stdout:
+                print("  [OK] Runner process already running")
+                return True
+        except Exception:
+            pass
+
+        # SECOND: Check GitHub API for runner status
         try:
             from slate.slate_runner_manager import SlateRunnerManager
             manager = SlateRunnerManager()
             detection = manager.detect()
 
-            # Check GitHub API for runner status
             gh = detection.get("github", {})
             if gh.get("authenticated"):
-                import subprocess
                 gh_cli = manager.gh_cli
                 result = subprocess.run(
-                    [gh_cli, "api", "repos/SynchronizedLivingArchitecture/S.L.A.T.E./actions/runners",
+                    [gh_cli, "api", "repos/SynchronizedLivingArchitecture/S.L.A.T.E/actions/runners",
                      "--jq", ".runners[] | select(.name==\"slate-DESKTOP-R3UD82D\") | .status"],
                     capture_output=True, text=True, timeout=10, cwd=str(self.workspace)
                 )
                 if result.returncode == 0 and "online" in result.stdout:
-                    print("  [OK] Runner already online")
+                    print("  [OK] Runner already online (GitHub)")
                     return True
         except Exception:
             pass
 
-        # Start runner process
+        # Start runner process (only if not already running)
         try:
             if os.name == "nt":
                 # Windows: start in background
@@ -358,7 +369,7 @@ class SlateOrchestrator:
             gh_cli = manager.gh_cli
 
             check = subprocess.run(
-                [gh_cli, "api", "repos/SynchronizedLivingArchitecture/S.L.A.T.E./actions/runners",
+                [gh_cli, "api", "repos/SynchronizedLivingArchitecture/S.L.A.T.E/actions/runners",
                  "--jq", ".runners[0] | {status, busy}"],
                 capture_output=True, text=True, timeout=10, cwd=str(self.workspace)
             )

@@ -40,5 +40,5 @@ Quick reference for all SLATE plugin commands.
 ```
 
 ## Getting Help
-- GitHub Issues: https://github.com/SynchronizedLivingArchitecture/S.L.A.T.E./issues
+- GitHub Issues: https://github.com/SynchronizedLivingArchitecture/S.L.A.T.E/issues
 - Documentation: See CLAUDE.md in project root

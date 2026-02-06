@@ -1,4 +1,4 @@
-﻿# Modified: 2026-02-06T23:00:00Z | Author: COPILOT | Change: Windows self-hosted runner with checkout path fix
+﻿# Modified: 2026-02-07T00:00:00Z | Author: COPILOT | Change: Simplified after repo rename (removed trailing dot)
 name: SLATE CI
 
 on:
@@ -19,7 +19,6 @@ permissions:
 defaults:
   run:
     shell: pwsh
-    working-directory: slate-build
 
 jobs:
   lint:
@@ -28,8 +27,6 @@ jobs:
     timeout-minutes: 5
     steps:
       - uses: actions/checkout@v4
-        with:
-          path: slate-build
       - name: Ruff lint
         run: |
           pip install ruff --quiet 2>$null
@@ -45,8 +42,6 @@ jobs:
     timeout-minutes: 20
     steps:
       - uses: actions/checkout@v4
-        with:
-          path: slate-build
       - name: Install test deps
         run: pip install pytest pytest-cov pytest-asyncio --quiet 2>$null
         continue-on-error: true
@@ -60,8 +55,6 @@ jobs:
     timeout-minutes: 5
     steps:
       - uses: actions/checkout@v4
-        with:
-          path: slate-build
       - name: Verify SDK imports
         run: |
           python -c "import slate; print(f'SDK v{slate.__version__}')"
@@ -86,8 +79,6 @@ jobs:
     timeout-minutes: 10
     steps:
       - uses: actions/checkout@v4
-        with:
-          path: slate-build
       - name: Bandit scan
         run: |
           pip install bandit --quiet 2>$null
@@ -100,8 +91,6 @@ jobs:
     timeout-minutes: 5
     steps:
       - uses: actions/checkout@v4
-        with:
-          path: slate-build
       - name: Validate Tech Tree
         run: |
           python -c @"
@@ -143,7 +132,6 @@ jobs:
     if: always()
     steps:
       - name: Generate summary
-        working-directory: .
         run: |
           "## SLATE CI Summary" | Out-File -Append $env:GITHUB_STEP_SUMMARY
           "| Job | Status |" | Out-File -Append $env:GITHUB_STEP_SUMMARY

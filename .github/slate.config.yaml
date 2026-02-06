@@ -104,7 +104,7 @@ fork_security:
 # User Fork Management
 fork_manager:
   script: slate/slate_fork_manager.py
-  upstream: https://github.com/SynchronizedLivingArchitecture/S.L.A.T.E..git
+  upstream: https://github.com/SynchronizedLivingArchitecture/S.L.A.T.E.git
   local_config: .slate_fork/config.json
   local_state: .slate_fork/state.json
 

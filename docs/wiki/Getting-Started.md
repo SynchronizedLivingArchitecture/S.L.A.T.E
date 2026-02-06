@@ -19,8 +19,8 @@ This guide will walk you through installing and setting up SLATE on your system.
 ### Step 1: Clone the Repository
 
 ```bash
-git clone https://github.com/SynchronizedLivingArchitecture/S.L.A.T.E..git
-cd S.L.A.T.E.
+git clone https://github.com/SynchronizedLivingArchitecture/S.L.A.T.E.git
+cd S.L.A.T.E
 ```
 
 ### Step 2: Create Virtual Environment

@@ -76,13 +76,31 @@ app = FastAPI(
     version="2.4.0"
 )
 
-# CORS for local development only
+# CORS for local development and VSCode webviews
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://127.0.0.1:8080", "http://localhost:8080"],
-    allow_methods=["GET", "POST", "PUT", "DELETE"],
+    allow_origins=["*"],  # Allow all origins for VSCode webview compatibility
+    allow_credentials=True,
+    allow_methods=["*"],
     allow_headers=["*"],
+    expose_headers=["*"],
 )
+
+# Custom headers middleware for VSCode webview compatibility
+from starlette.middleware.base import BaseHTTPMiddleware
+from starlette.responses import Response
+
+class VSCodeCompatMiddleware(BaseHTTPMiddleware):
+    async def dispatch(self, request: Request, call_next):
+        response: Response = await call_next(request)
+        # Add headers for VSCode webview compatibility
+        response.headers["X-Content-Type-Options"] = "nosniff"
+        response.headers["Cache-Control"] = "no-cache, no-store, must-revalidate"
+        response.headers["Pragma"] = "no-cache"
+        response.headers["Expires"] = "0"
+        return response
+
+app.add_middleware(VSCodeCompatMiddleware)
 
 # WebSocket connection manager
 class ConnectionManager:
@@ -177,7 +195,7 @@ async def api_runner():
         try:
             gh_cli = get_gh_cli()
             result = subprocess.run(
-                [gh_cli, "api", "repos/SynchronizedLivingArchitecture/S.L.A.T.E./actions/runners",
+                [gh_cli, "api", "repos/SynchronizedLivingArchitecture/S.L.A.T.E/actions/runners",
                  "--jq", ".runners[0]"],
                 capture_output=True, text=True, timeout=10, cwd=str(WORKSPACE_ROOT)
             )
@@ -378,6 +396,8 @@ DASHBOARD_HTML = """
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self' http://127.0.0.1:* ws://127.0.0.1:*; style-src 'self' 'unsafe-inline'; script-src 'self' 'unsafe-inline'; connect-src 'self' http://127.0.0.1:* ws://127.0.0.1:*; img-src 'self' data:;">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <title>S.L.A.T.E. Dashboard</title>
     <style>
         :root {
@@ -1072,10 +1092,30 @@ DASHBOARD_HTML = """
             }
         }
 
-        // Initialize
-        connectWebSocket();
+        // Initial status fetch (works even without WebSocket)
+        async function fetchInitialStatus() {
+            try {
+                const res = await fetch('/api/orchestrator');
+                const data = await res.json();
+                updateStatus(data);
+            } catch (e) {
+                console.log('Initial status fetch failed, will retry');
+            }
+        }
+
+        // Initialize - fetch data immediately, then connect WebSocket
+        fetchInitialStatus();
         refreshAll();
-        setInterval(refreshAll, 30000);
+
+        // Try WebSocket, but polling will keep working regardless
+        try {
+            connectWebSocket();
+        } catch (e) {
+            console.log('WebSocket failed, using polling only');
+        }
+
+        // More frequent polling for VSCode webview compatibility (every 10s)
+        setInterval(refreshAll, 10000);
     </script>
 </body>
 </html>

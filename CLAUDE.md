@@ -13,6 +13,63 @@ Last updated: 2026-02-06
 - **Foundry Local** (ONNX-optimized local inference) - localhost:5272
 - ChromaDB (local vector store for RAG memory)
 
+## Claude Code Integration
+
+SLATE provides slash commands and MCP tools for Claude Code integration.
+
+### Slash Commands (Project-Level)
+
+Commands are defined in `.claude/commands/` and available when working in this project:
+
+| Command | Description |
+|---------|-------------|
+| `/slate [start\|stop\|status]` | Manage SLATE orchestrator |
+| `/slate-status` | Check system and service status |
+| `/slate-workflow` | Manage task workflow queue |
+| `/slate-runner` | Manage GitHub Actions runner |
+| `/slate-help` | Show all available commands |
+
+### MCP Server Setup
+
+The SLATE MCP server provides AI tools. Add to `~/.claude/config.json`:
+
+```json
+{
+  "mcpServers": {
+    "slate": {
+      "command": "E:\\11132025\\.venv\\Scripts\\python.exe",
+      "args": ["E:\\11132025\\slate\\mcp_server.py"],
+      "env": {
+        "SLATE_WORKSPACE": "E:\\11132025",
+        "PYTHONPATH": "E:\\11132025"
+      }
+    }
+  }
+}
+```
+
+### MCP Tools
+
+| Tool | Description |
+|------|-------------|
+| `slate_status` | Check all services and GPU status |
+| `slate_workflow` | Manage task queue |
+| `slate_orchestrator` | Start/stop services |
+| `slate_runner` | Manage GitHub runner |
+| `slate_ai` | Execute AI tasks via local LLMs |
+
+### Structure
+
+```text
+.claude/commands/     # Claude Code slash commands
+  slate.md            # /slate command
+  slate-status.md     # /slate-status command
+  slate-workflow.md   # /slate-workflow command
+  slate-runner.md     # /slate-runner command
+  slate-help.md       # /slate-help command
+slate/mcp_server.py   # MCP server implementation
+```
+
 ## Local AI Providers (FREE - No Cloud Costs)
 
 | Provider | Port | Models | Status |
@@ -77,6 +134,10 @@ slate_core/        # Shared infrastructure (agents, locks, memory, GPU scheduler
 specs/             # Active specifications
 src/               # Source code (backend/frontend)
 tests/             # Test suite
+skills/            # Claude Code skill definitions
+commands/          # Claude Code command help
+hooks/             # Claude Code automation hooks
+.claude-plugin/    # Claude Code plugin manifest
 .specify/          # Constitution, memory, feedback
 .slate_tech_tree/  # Tech tree state (tech_tree.json)
 .slate_changes/    # Detected code changes and snapshots
@@ -206,8 +267,8 @@ SLATE-BETA (beta)      = Developer fork (where development happens)
 # Check remotes
 git remote -v
 # Should show:
-# origin  https://github.com/SynchronizedLivingArchitecture/S.L.A.T.E..git
-# beta    https://github.com/SynchronizedLivingArchitecture/S.L.A.T.E.-BETA.git
+# origin  https://github.com/SynchronizedLivingArchitecture/S.L.A.T.E.git
+# beta    https://github.com/SynchronizedLivingArchitecture/S.L.A.T.E-BETA.git
 ```
 
 ### Development Workflow (BETA → SLATE)

@@ -29,26 +29,26 @@ SLATE-BETA (Development)     SLATE (Public)           User Forks
 
 ### 1. Fork the Public Repository
 
-Fork from: https://github.com/SynchronizedLivingArchitecture/S.L.A.T.E.
+Fork from: https://github.com/SynchronizedLivingArchitecture/S.L.A.T.E
 
 ### 2. Clone Your Fork
 
 ```bash
-git clone https://github.com/YOUR-USERNAME/S.L.A.T.E..git
-cd S.L.A.T.E.
+git clone https://github.com/YOUR-USERNAME/S.L.A.T.E.git
+cd S.L.A.T.E
 ```
 
 ### 3. Set Up Remotes
 
 ```bash
 # Add upstream (public SLATE)
-git remote add upstream https://github.com/SynchronizedLivingArchitecture/S.L.A.T.E..git
+git remote add upstream https://github.com/SynchronizedLivingArchitecture/S.L.A.T.E.git
 
 # Verify remotes
 git remote -v
-# origin    https://github.com/YOUR-USERNAME/S.L.A.T.E..git (fetch)
-# origin    https://github.com/YOUR-USERNAME/S.L.A.T.E..git (push)
-# upstream  https://github.com/SynchronizedLivingArchitecture/S.L.A.T.E..git (fetch)
+# origin    https://github.com/YOUR-USERNAME/S.L.A.T.E.git (fetch)
+# origin    https://github.com/YOUR-USERNAME/S.L.A.T.E.git (push)
+# upstream  https://github.com/SynchronizedLivingArchitecture/S.L.A.T.E.git (fetch)
 ```
 
 ### 4. Initialize Your SLATE
@@ -66,7 +66,7 @@ pip install -e ".[dev]"
 python slate/slate_fork_manager.py --init --name "Your Name" --email "your@email.com"
 
 # Set up your fork URL
-python slate/slate_fork_manager.py --setup-fork https://github.com/YOUR-USERNAME/S.L.A.T.E..git
+python slate/slate_fork_manager.py --setup-fork https://github.com/YOUR-USERNAME/S.L.A.T.E.git
 ```
 
 ## Making Contributions

@@ -92,8 +92,8 @@ SLATE is a **local-only** system. All contributions must:
 
 ## Getting Help
 
-- Check the [wiki](https://github.com/SynchronizedLivingArchitecture/S.L.A.T.E./wiki)
-- Open an [issue](https://github.com/SynchronizedLivingArchitecture/S.L.A.T.E./issues)
+- Check the [wiki](https://github.com/SynchronizedLivingArchitecture/S.L.A.T.E/wiki)
+- Open an [issue](https://github.com/SynchronizedLivingArchitecture/S.L.A.T.E/issues)
 - Read `CLAUDE.md` for project guidelines
 
 ## License

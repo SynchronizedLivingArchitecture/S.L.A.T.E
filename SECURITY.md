@@ -27,7 +27,7 @@ S.L.A.T.E. (Synchronized Living Architecture for Transformation and Evolution) o
 **DO NOT** create a public GitHub issue for security vulnerabilities.
 
 Instead:
-1. Use GitHub's private vulnerability reporting: [Report a vulnerability](https://github.com/SynchronizedLivingArchitecture/S.L.A.T.E./security/advisories/new)
+1. Use GitHub's private vulnerability reporting: [Report a vulnerability](https://github.com/SynchronizedLivingArchitecture/S.L.A.T.E/security/advisories/new)
 2. Email: security@synchronizedliving.dev (if available)
 
 ### What to Include

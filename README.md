@@ -12,8 +12,8 @@
   <a href="https://opensource.org/licenses/MIT"><img src="https://img.shields.io/badge/License-MIT-yellow.svg" alt="License: MIT"></a>
   <a href="https://www.python.org/downloads/"><img src="https://img.shields.io/badge/python-3.11+-blue.svg" alt="Python 3.11+"></a>
   <a href="https://pytorch.org/"><img src="https://img.shields.io/badge/PyTorch-2.7+-ee4c2c.svg" alt="PyTorch 2.7+"></a>
-  <a href="https://github.com/SynchronizedLivingArchitecture/S.L.A.T.E./actions"><img src="https://img.shields.io/badge/build-passing-brightgreen.svg" alt="Build Status"></a>
-  <a href="https://github.com/SynchronizedLivingArchitecture/S.L.A.T.E./wiki"><img src="https://img.shields.io/badge/docs-wiki-blue.svg" alt="Documentation"></a>
+  <a href="https://github.com/SynchronizedLivingArchitecture/S.L.A.T.E/actions"><img src="https://img.shields.io/badge/build-passing-brightgreen.svg" alt="Build Status"></a>
+  <a href="https://github.com/SynchronizedLivingArchitecture/S.L.A.T.E/wiki"><img src="https://img.shields.io/badge/docs-wiki-blue.svg" alt="Documentation"></a>
 </p>
 
 <p align="center">
@@ -109,8 +109,8 @@ SLATE is a local-first AI orchestration system that:
 ### 1. Clone and Setup
 
 ```bash
-git clone https://github.com/SynchronizedLivingArchitecture/S.L.A.T.E..git
-cd S.L.A.T.E.
+git clone https://github.com/SynchronizedLivingArchitecture/S.L.A.T.E.git
+cd S.L.A.T.E
 
 # Create virtual environment
 python -m venv .venv
@@ -536,11 +536,11 @@ SLATE-BETA (beta)      = Developer fork
 # Verify remotes
 git remote -v
 # Should show:
-# origin  https://github.com/SynchronizedLivingArchitecture/S.L.A.T.E..git
-# beta    https://github.com/SynchronizedLivingArchitecture/S.L.A.T.E.-BETA.git
+# origin  https://github.com/SynchronizedLivingArchitecture/S.L.A.T.E.git
+# beta    https://github.com/SynchronizedLivingArchitecture/S.L.A.T.E-BETA.git
 
 # Add beta remote if missing
-git remote add beta https://github.com/SynchronizedLivingArchitecture/S.L.A.T.E.-BETA.git
+git remote add beta https://github.com/SynchronizedLivingArchitecture/S.L.A.T.E-BETA.git
 ```
 
 ### Development Workflow
@@ -601,7 +601,7 @@ External contributors use a secure fork validation system:
 ```bash
 # 1. Fork the repository on GitHub
 # 2. Clone your fork
-git clone https://github.com/YOUR-USERNAME/S.L.A.T.E..git
+git clone https://github.com/YOUR-USERNAME/S.L.A.T.E.git
 
 # 3. Initialize SLATE workspace
 python slate/slate_fork_manager.py --init --name "Your Name" --email "you@example.com"
@@ -633,10 +633,10 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 ## Links
 
-- [GitHub Repository](https://github.com/SynchronizedLivingArchitecture/S.L.A.T.E.)
-- [Wiki Documentation](https://github.com/SynchronizedLivingArchitecture/S.L.A.T.E./wiki)
-- [Issue Tracker](https://github.com/SynchronizedLivingArchitecture/S.L.A.T.E./issues)
-- [Discussions](https://github.com/SynchronizedLivingArchitecture/S.L.A.T.E./discussions)
+- [GitHub Repository](https://github.com/SynchronizedLivingArchitecture/S.L.A.T.E)
+- [Wiki Documentation](https://github.com/SynchronizedLivingArchitecture/S.L.A.T.E/wiki)
+- [Issue Tracker](https://github.com/SynchronizedLivingArchitecture/S.L.A.T.E/issues)
+- [Discussions](https://github.com/SynchronizedLivingArchitecture/S.L.A.T.E/discussions)
 
 ---
 
