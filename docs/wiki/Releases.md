@@ -47,7 +47,7 @@ slate-package --release 2.5.0 --go
 ```bash
 git add -A
 git commit -m "release: v2.5.0"
-git push origin 001-data-viz-dashboard
+git push origin main
 ```
 
 ### 3. Trigger GitHub Release

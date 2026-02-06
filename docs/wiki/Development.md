@@ -238,9 +238,8 @@ tests/                # Test suite
 docs/                 # Documentation
   wiki/
 
-specs/                # Feature specifications
-  001-*/
-  002-*/
+specs/                # Feature specifications (numbered for ordering)
+  NNN-feature-name/   # e.g., 001-user-auth/, 002-dashboard/
 ```
 
 ## Adding New Features

@@ -287,10 +287,23 @@ git remote set-url origin https://github.com/SynchronizedLivingArchitecture/S.L.
 git remote add beta https://github.com/SynchronizedLivingArchitecture/S.L.A.T.E.-BETA.git
 ```
 
+### Branch Naming Convention (Enforced)
+
+All branches **must** follow this naming convention:
+
+| Prefix | Purpose | Example |
+|--------|---------|---------|
+| `feature/` | New features | `feature/user-auth` |
+| `bugfix/` | Bug fixes | `bugfix/login-crash` |
+| `refactor/` | Code refactoring | `refactor/api-cleanup` |
+| `docs/` | Documentation | `docs/api-reference` |
+
+**Prohibited patterns:** `001-*`, `002-*`, numbered prefixes, generic names.
+
 ### Development Workflow
 
 ```powershell
-# Create feature branch
+# Create branch (use correct prefix!)
 git checkout -b feature/my-feature
 
 # Make changes, commit

@@ -21,11 +21,29 @@ Thank you for your interest in contributing to S.L.A.T.E. (Synchronized Living A
 Your Fork → Feature Branch → Validate → PR → Review → Merge
 ```
 
-### 1. Create a Feature Branch
+### 1. Create a Branch (Required Naming Convention)
+
+All branches **must** follow the SLATE naming convention:
+
+| Prefix | Purpose | Example |
+|--------|---------|---------|
+| `feature/` | New features | `feature/user-auth` |
+| `bugfix/` | Bug fixes | `bugfix/login-crash` |
+| `refactor/` | Code refactoring | `refactor/api-cleanup` |
+| `docs/` | Documentation | `docs/api-reference` |
 
 ```bash
+# Examples
 git checkout -b feature/your-feature-name
+git checkout -b bugfix/issue-123-fix
+git checkout -b refactor/database-layer
+git checkout -b docs/installation-guide
 ```
+
+**Do NOT use:**
+- Numbered prefixes (`001-`, `002-`)
+- Underscores in branch names
+- Generic names (`my-branch`, `test`, `fix`)
 
 ### 2. Make Changes
 

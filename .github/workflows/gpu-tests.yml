@@ -10,7 +10,7 @@ name: GPU Tests
 
 on:
   push:
-    branches: [main, develop]
+    branches: [main, develop, 'feature/*', 'bugfix/*', 'refactor/*']
     paths:
       - 'slate/**'
       - 'slate_core/**'

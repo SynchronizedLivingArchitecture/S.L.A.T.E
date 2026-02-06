@@ -9,7 +9,7 @@ name: SLATE Integration
 
 on:
   push:
-    branches: [main, develop, '001-*', '002-*', '003-*', '004-*']
+    branches: [main, develop, 'feature/*', 'bugfix/*', 'refactor/*', 'docs/*']
     paths:
       - 'slate/**'
       - 'agents/**'

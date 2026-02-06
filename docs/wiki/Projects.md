@@ -124,7 +124,7 @@ SLATE uses a structured label system synced via [label-sync.yml](../../.github/w
 
 1. **Find an issue** — Browse [open issues](https://github.com/SynchronizedLivingArchitecture/S.L.A.T.E./issues) or the project board
 2. **Claim it** — Comment to get assigned
-3. **Branch** — Create from `001-data-viz-dashboard` (current dev branch)
+3. **Branch** — Create from `main` using `feature/your-feature-name` convention
 4. **Develop** — Follow the [Contributor Guide](Contributor-Guide)
 5. **PR** — Use the PR template, reference the issue
 6. **Review** — CI runs automatically, then human review

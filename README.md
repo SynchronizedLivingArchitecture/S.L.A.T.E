@@ -193,9 +193,15 @@ Available tools: `slate_get_status`, `slate_run_check`, `slate_list_tasks`,
 ## Contributing
 
 1. Fork the repository
-2. Create a feature branch (`git checkout -b feature/amazing-feature`)
+2. Create a branch following the naming convention:
+   - `feature/description` - New features
+   - `bugfix/description` - Bug fixes
+   - `refactor/description` - Code refactoring
+   - `docs/description` - Documentation updates
 3. Write tests for new functionality
-4. Submit a pull request
+4. Submit a pull request to `main`
+
+See [CONTRIBUTING.md](CONTRIBUTING.md) for detailed guidelines.
 
 ## License
 

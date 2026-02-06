@@ -14,7 +14,7 @@
 - **Type**: Local-first AI agent orchestration framework
 - **Language**: Python 3.11+
 - **Repository**: `SynchronizedLivingArchitecture/S.L.A.T.E.`
-- **Branch Strategy**: `main` (stable), feature branches off `main`
+- **Branch Strategy**: `main` (stable), branches must use prefixes: `feature/`, `bugfix/`, `refactor/`, `docs/`
 - **License**: MIT
 
 ## Architecture

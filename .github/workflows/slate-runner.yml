@@ -13,7 +13,7 @@ name: "SLATE Runner: Full System"
 
 on:
   push:
-    branches: [main, "001-data-viz-dashboard"]
+    branches: [main, 'feature/*', 'bugfix/*', 'refactor/*']
     paths:
       - "slate/**"
       - "agents/**"
