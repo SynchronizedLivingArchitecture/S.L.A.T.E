@@ -1,0 +1,667 @@
+{
+	"version": "2.0.0",
+	"tasks": [
+		// ========================================
+		// AUTO-START ON FOLDER OPEN
+		// ========================================
+		{
+			"label": "SLATEPI: Auto-Start Dashboard",
+			"type": "shell",
+			"command": "${workspaceFolder}/.venv/Scripts/python.exe",
+			"args": ["${workspaceFolder}/agents/aurora_dashboard_server.py"],
+			"isBackground": true,
+			"problemMatcher": {
+				"pattern": {
+					"regexp": "^$"
+				},
+				"background": {
+					"activeOnStart": true,
+					"beginsPattern": ".",
+					"endsPattern": "Uvicorn running|Application startup complete|SLATEPI Dashboard"
+				}
+			},
+			"presentation": {
+				"reveal": "silent",
+				"panel": "dedicated",
+				"showReuseMessage": false
+			},
+			"runOptions": {
+				"runOn": "folderOpen"
+			}
+		},
+
+		// ========================================
+		// CORE SLATEPI CONTROLS (Primary)
+		// ========================================
+		{
+			"label": "SLATEPI: Start",
+			"type": "shell",
+			"command": "${workspaceFolder}/.venv/Scripts/python.exe",
+			"args": ["${workspaceFolder}/slatepi_startup.py"],
+			"isBackground": false,
+			"problemMatcher": [],
+			"presentation": {
+				"reveal": "always",
+				"panel": "dedicated",
+				"focus": true
+			},
+			"group": {
+				"kind": "build",
+				"isDefault": true
+			}
+		},
+		{
+			"label": "SLATEPI: Stop",
+			"type": "shell",
+			"command": "${workspaceFolder}/.venv/Scripts/python.exe",
+			"args": ["${workspaceFolder}/slatepi_startup.py", "--stop"],
+			"isBackground": false,
+			"problemMatcher": [],
+			"presentation": {
+				"reveal": "always",
+				"panel": "dedicated"
+			}
+		},
+		{
+			"label": "SLATEPI: Status",
+			"type": "shell",
+			"command": "${workspaceFolder}/.venv/Scripts/python.exe",
+			"args": ["${workspaceFolder}/slatepi_startup.py", "--status"],
+			"isBackground": false,
+			"problemMatcher": [],
+			"presentation": {
+				"reveal": "always",
+				"panel": "dedicated"
+			}
+		},
+
+		// ========================================
+		// DASHBOARD & UI
+		// ========================================
+		{
+			"label": "SLATEPI: Dashboard",
+			"type": "shell",
+			"command": "${workspaceFolder}/.venv/Scripts/python.exe",
+			"args": ["${workspaceFolder}/agents/aurora_dashboard_server.py"],
+			"isBackground": true,
+			"problemMatcher": [],
+			"presentation": {
+				"reveal": "always",
+				"panel": "dedicated"
+			}
+		},
+		{
+			"label": "SLATEPI: Open Dashboard",
+			"type": "process",
+			"command": "cmd",
+			"args": ["/c", "start", "http://localhost:8080"],
+			"presentation": {
+				"reveal": "never",
+				"panel": "shared"
+			},
+			"problemMatcher": []
+		},
+
+		// ========================================
+		// DISCORD BOT
+		// ========================================
+		{
+			"label": "SLATEPI: Discord Bot",
+			"type": "shell",
+			"command": "${workspaceFolder}/.venv/Scripts/python.exe",
+			"args": ["${workspaceFolder}/aurora_core/slatepi_discord_bot.py", "--start"],
+			"isBackground": true,
+			"problemMatcher": [],
+			"presentation": {
+				"reveal": "always",
+				"panel": "dedicated"
+			}
+		},
+		{
+			"label": "SLATEPI: Discord Bot Status",
+			"type": "shell",
+			"command": "${workspaceFolder}/.venv/Scripts/python.exe",
+			"args": ["${workspaceFolder}/aurora_core/slatepi_discord_bot.py", "--status"],
+			"isBackground": false,
+			"problemMatcher": [],
+			"presentation": {
+				"reveal": "always",
+				"panel": "shared"
+			}
+		},
+
+		// ========================================
+		// AVATAR / VOICE SYSTEM
+		// ========================================
+		{
+			"label": "SLATEPI: Avatar Server",
+			"type": "shell",
+			"command": "${workspaceFolder}/.venv/Scripts/python.exe",
+			"args": ["${workspaceFolder}/agents/slatepi_avatar_server.py"],
+			"isBackground": true,
+			"problemMatcher": [],
+			"presentation": {
+				"reveal": "always",
+				"panel": "dedicated"
+			}
+		},
+		{
+			"label": "SLATEPI: Open Avatar",
+			"type": "process",
+			"command": "cmd",
+			"args": ["/c", "start", "http://localhost:5000"],
+			"presentation": {
+				"reveal": "never",
+				"panel": "shared"
+			},
+			"problemMatcher": []
+		},
+		{
+			"label": "SLATEPI: Voice Test",
+			"type": "shell",
+			"command": "${workspaceFolder}/.venv/Scripts/python.exe",
+			"args": ["${workspaceFolder}/aurora_core/slatepi_voice.py", "--test"],
+			"isBackground": false,
+			"problemMatcher": [],
+			"presentation": {
+				"reveal": "always",
+				"panel": "dedicated"
+			}
+		},
+
+		// ========================================
+		// AGENT SYSTEM
+		// ========================================
+		{
+			"label": "SLATEPI: Agent System",
+			"type": "shell",
+			"command": "powershell",
+			"args": [
+				"-ExecutionPolicy", "Bypass",
+				"-File", "${workspaceFolder}/caduceus/agents/launch_agent_system.ps1"
+			],
+			"isBackground": true,
+			"problemMatcher": [],
+			"presentation": {
+				"reveal": "always",
+				"panel": "dedicated",
+				"focus": true
+			},
+			"group": {
+				"kind": "test",
+				"isDefault": true
+			}
+		},
+		{
+			"label": "SLATEPI: Setup Models",
+			"type": "shell",
+			"command": "${workspaceFolder}/.venv/Scripts/python.exe",
+			"args": ["${workspaceFolder}/caduceus/agents/setup_local_models.py"],
+			"presentation": {
+				"reveal": "always",
+				"panel": "dedicated"
+			},
+			"group": "build"
+		},
+
+		// ========================================
+		// OLLAMA & AI
+		// ========================================
+		{
+			"label": "SLATEPI: Ollama (Dual GPU)",
+			"type": "shell",
+			"command": "powershell",
+			"args": [
+				"-ExecutionPolicy", "Bypass",
+				"-Command", "Stop-Process -Name ollama -ErrorAction SilentlyContinue; $env:OLLAMA_NUM_GPU='2'; ollama serve"
+			],
+			"isBackground": true,
+			"problemMatcher": [],
+			"presentation": {
+				"reveal": "always",
+				"panel": "dedicated",
+				"focus": true
+			}
+		},
+
+		// ========================================
+		// WORKFLOW MANAGEMENT
+		// ========================================
+		{
+			"label": "SLATEPI: Continue Workflow",
+			"type": "shell",
+			"command": "py",
+			"args": ["aurora_workflow.py", "--continue"],
+			"problemMatcher": [],
+			"presentation": {
+				"reveal": "always",
+				"panel": "shared",
+				"focus": true,
+				"clear": true
+			}
+		},
+		{
+			"label": "SLATEPI: Workflow Status",
+			"type": "shell",
+			"command": "py",
+			"args": ["aurora_workflow.py", "--status"],
+			"problemMatcher": [],
+			"presentation": {
+				"reveal": "always",
+				"panel": "shared",
+				"focus": true,
+				"clear": true
+			}
+		},
+
+		// ========================================
+		// EXECUTABLE & GAME SYSTEM
+		// ========================================
+		{
+			"label": "SLATEPI: Launch EXE",
+			"type": "shell",
+			"command": "${workspaceFolder}\\dist_v2\\SLATEPI\\SLATEPI.exe",
+			"isBackground": true,
+			"group": "test",
+			"presentation": {
+				"reveal": "always",
+				"panel": "dedicated"
+			}
+		},
+		{
+			"label": "SLATEPI: Game System",
+			"type": "shell",
+			"command": "py",
+			"args": ["caduceus/agents/launch_full_system.py"],
+			"isBackground": true,
+			"problemMatcher": [],
+			"presentation": {
+				"reveal": "always",
+				"panel": "dedicated"
+			},
+			"group": "test"
+		},
+
+		// ========================================
+		// LINUX / WSL
+		// ========================================
+		{
+			"label": "SLATEPI: Autonomous Linux",
+			"type": "shell",
+			"command": "wsl",
+			"args": [
+				"--cd", "/mnt/e/11132025",
+				"bash", "launch_autonomous_linux.sh"
+			],
+			"isBackground": true,
+			"problemMatcher": [],
+			"presentation": {
+				"reveal": "always",
+				"panel": "dedicated",
+				"focus": true
+			},
+			"group": "test"
+		},
+
+		// ========================================
+		// INTEGRATED AUTONOMOUS LOOP (Tech Tree + Agents + Copilot)
+		// ========================================
+		{
+			"label": "SLATEPI: Integrated Autonomous",
+			"type": "shell",
+			"command": "${workspaceFolder}/.venv/Scripts/python.exe",
+			"args": [
+				"${workspaceFolder}/aurora_core/integrated_autonomous_loop.py",
+				"--max", "100"
+			],
+			"isBackground": true,
+			"problemMatcher": [],
+			"presentation": {
+				"reveal": "always",
+				"panel": "dedicated",
+				"focus": true
+			},
+			"group": "test"
+		},
+		{
+			"label": "SLATEPI: Integrated Status",
+			"type": "shell",
+			"command": "${workspaceFolder}/.venv/Scripts/python.exe",
+			"args": [
+				"${workspaceFolder}/aurora_core/integrated_autonomous_loop.py",
+				"--status"
+			],
+			"isBackground": false,
+			"problemMatcher": [],
+			"presentation": {
+				"reveal": "always",
+				"panel": "dedicated",
+				"focus": true
+			}
+		},
+		{
+			"label": "SLATEPI: Generate Tech Tree Tasks",
+			"type": "shell",
+			"command": "${workspaceFolder}/.venv/Scripts/python.exe",
+			"args": [
+				"${workspaceFolder}/aurora_core/integrated_autonomous_loop.py",
+				"--generate"
+			],
+			"isBackground": false,
+			"problemMatcher": []
+		},
+
+		// ========================================
+		// COPILOT AUTONOMOUS RUNNER
+		// ========================================
+		{
+			"label": "SLATEPI: Copilot Autonomous",
+			"type": "shell",
+			"command": "${workspaceFolder}/.venv/Scripts/python.exe",
+			"args": [
+				"${workspaceFolder}/aurora_core/copilot_slatepi_runner.py",
+				"--start",
+				"--max-tasks", "50"
+			],
+			"isBackground": true,
+			"problemMatcher": [],
+			"presentation": {
+				"reveal": "always",
+				"panel": "dedicated",
+				"focus": true
+			},
+			"group": "test"
+		},
+		{
+			"label": "SLATEPI: Copilot Autonomous (Quick)",
+			"type": "shell",
+			"command": "${workspaceFolder}/.venv/Scripts/python.exe",
+			"args": [
+				"${workspaceFolder}/aurora_core/copilot_slatepi_runner.py",
+				"--start",
+				"--max-tasks", "10",
+				"--stop-on-empty"
+			],
+			"isBackground": false,
+			"problemMatcher": [],
+			"presentation": {
+				"reveal": "always",
+				"panel": "dedicated",
+				"focus": true
+			}
+		},
+		{
+			"label": "SLATEPI: Copilot Runner Status",
+			"type": "shell",
+			"command": "${workspaceFolder}/.venv/Scripts/python.exe",
+			"args": [
+				"${workspaceFolder}/aurora_core/copilot_slatepi_runner.py",
+				"--status"
+			],
+			"isBackground": false,
+			"problemMatcher": [],
+			"presentation": {
+				"reveal": "always",
+				"panel": "dedicated"
+			}
+		},
+		{
+			"label": "SLATEPI: Copilot Runner Stop",
+			"type": "shell",
+			"command": "${workspaceFolder}/.venv/Scripts/python.exe",
+			"args": [
+				"${workspaceFolder}/aurora_core/copilot_slatepi_runner.py",
+				"--stop"
+			],
+			"isBackground": false,
+			"problemMatcher": [],
+			"presentation": {
+				"reveal": "always",
+				"panel": "dedicated"
+			}
+		},
+
+		// ========================================
+		// UNIFIED AUTONOMOUS SYSTEM (Claude CLI + Copilot CLI + Local AI)
+		// ========================================
+		{
+			"label": "SLATEPI: Unified Autonomous",
+			"type": "shell",
+			"command": "${workspaceFolder}/.venv/Scripts/python.exe",
+			"args": [
+				"${workspaceFolder}/aurora_core/slatepi_unified_autonomous.py",
+				"--run",
+				"--max", "50"
+			],
+			"isBackground": true,
+			"problemMatcher": [],
+			"presentation": {
+				"reveal": "always",
+				"panel": "dedicated",
+				"focus": true
+			},
+			"group": "test"
+		},
+		{
+			"label": "SLATEPI: Unified Status",
+			"type": "shell",
+			"command": "${workspaceFolder}/.venv/Scripts/python.exe",
+			"args": [
+				"${workspaceFolder}/aurora_core/slatepi_unified_autonomous.py",
+				"--status"
+			],
+			"isBackground": false,
+			"problemMatcher": [],
+			"presentation": {
+				"reveal": "always",
+				"panel": "dedicated"
+			}
+		},
+		{
+			"label": "SLATEPI: Unified Discover",
+			"type": "shell",
+			"command": "${workspaceFolder}/.venv/Scripts/python.exe",
+			"args": [
+				"${workspaceFolder}/aurora_core/slatepi_unified_autonomous.py",
+				"--discover"
+			],
+			"isBackground": false,
+			"problemMatcher": [],
+			"presentation": {
+				"reveal": "always",
+				"panel": "dedicated"
+			}
+		},
+		{
+			"label": "SLATEPI: Unified Single Task",
+			"type": "shell",
+			"command": "${workspaceFolder}/.venv/Scripts/python.exe",
+			"args": [
+				"${workspaceFolder}/aurora_core/slatepi_unified_autonomous.py",
+				"--single"
+			],
+			"isBackground": false,
+			"problemMatcher": [],
+			"presentation": {
+				"reveal": "always",
+				"panel": "dedicated"
+			}
+		},
+
+		// ========================================
+		// ML ORCHESTRATOR
+		// ========================================
+		{
+			"label": "SLATEPI: ML Orchestrator (Start)",
+			"type": "shell",
+			"command": "${workspaceFolder}/.venv/Scripts/python.exe",
+			"args": [
+				"${workspaceFolder}/aurora_core/ml_orchestrator.py",
+				"--start"
+			],
+			"isBackground": true,
+			"problemMatcher": [],
+			"presentation": {
+				"reveal": "always",
+				"panel": "dedicated",
+				"focus": true
+			},
+			"group": "test"
+		},
+		{
+			"label": "SLATEPI: ML Train Now",
+			"type": "shell",
+			"command": "${workspaceFolder}/.venv/Scripts/python.exe",
+			"args": [
+				"${workspaceFolder}/aurora_core/ml_orchestrator.py",
+				"--train-now"
+			],
+			"isBackground": false,
+			"problemMatcher": [],
+			"presentation": {
+				"reveal": "always",
+				"panel": "dedicated",
+				"focus": true
+			}
+		},
+		{
+			"label": "SLATEPI: ML Index Now",
+			"type": "shell",
+			"command": "${workspaceFolder}/.venv/Scripts/python.exe",
+			"args": [
+				"${workspaceFolder}/aurora_core/ml_orchestrator.py",
+				"--index-now"
+			],
+			"isBackground": false,
+			"problemMatcher": [],
+			"presentation": {
+				"reveal": "always",
+				"panel": "dedicated",
+				"focus": true
+			}
+		},
+		{
+			"label": "SLATEPI: ML Status",
+			"type": "shell",
+			"command": "${workspaceFolder}/.venv/Scripts/python.exe",
+			"args": [
+				"${workspaceFolder}/aurora_core/ml_orchestrator.py",
+				"--status"
+			],
+			"isBackground": false,
+			"problemMatcher": [],
+			"presentation": {
+				"reveal": "always",
+				"panel": "dedicated"
+			}
+		},
+		{
+			"label": "SLATEPI: ML Benchmarks",
+			"type": "shell",
+			"command": "${workspaceFolder}/.venv/Scripts/python.exe",
+			"args": [
+				"${workspaceFolder}/aurora_core/ml_orchestrator.py",
+				"--benchmarks"
+			],
+			"isBackground": false,
+			"problemMatcher": [],
+			"presentation": {
+				"reveal": "always",
+				"panel": "dedicated"
+			}
+		},
+		// ========================================
+		// RELEASE & PACKAGE MANAGEMENT
+		// ========================================
+		{
+			"label": "SLATEPI: Release Status",
+			"type": "shell",
+			"command": "${workspaceFolder}/.venv/Scripts/python.exe",
+			"args": [
+				"${workspaceFolder}/slate/slate_release_runner.py",
+				"--status"
+			],
+			"isBackground": false,
+			"problemMatcher": [],
+			"presentation": {
+				"reveal": "always",
+				"panel": "dedicated"
+			}
+		},
+		{
+			"label": "SLATEPI: Package Status",
+			"type": "shell",
+			"command": "${workspaceFolder}/.venv/Scripts/python.exe",
+			"args": [
+				"${workspaceFolder}/slate/slate_package_manager.py",
+				"--status"
+			],
+			"isBackground": false,
+			"problemMatcher": [],
+			"presentation": {
+				"reveal": "always",
+				"panel": "dedicated"
+			}
+		},
+		{
+			"label": "SLATEPI: Package Validate",
+			"type": "shell",
+			"command": "${workspaceFolder}/.venv/Scripts/python.exe",
+			"args": [
+				"${workspaceFolder}/slate/slate_package_manager.py",
+				"--validate"
+			],
+			"isBackground": false,
+			"problemMatcher": [],
+			"presentation": {
+				"reveal": "always",
+				"panel": "dedicated"
+			}
+		},
+		{
+			"label": "SLATEPI: Build Package",
+			"type": "shell",
+			"command": "${workspaceFolder}/.venv/Scripts/python.exe",
+			"args": [
+				"${workspaceFolder}/slate/slate_release_runner.py",
+				"--build"
+			],
+			"isBackground": false,
+			"problemMatcher": [],
+			"presentation": {
+				"reveal": "always",
+				"panel": "dedicated"
+			}
+		},
+		{
+			"label": "SLATEPI: List Releases",
+			"type": "shell",
+			"command": "${workspaceFolder}/.venv/Scripts/python.exe",
+			"args": [
+				"${workspaceFolder}/slate/slate_release_runner.py",
+				"--list-releases"
+			],
+			"isBackground": false,
+			"problemMatcher": [],
+			"presentation": {
+				"reveal": "always",
+				"panel": "dedicated"
+			}
+		},
+		{
+			"label": "SLATEPI: Publish Package",
+			"type": "shell",
+			"command": "${workspaceFolder}/.venv/Scripts/python.exe",
+			"args": [
+				"${workspaceFolder}/slate/slate_release_runner.py",
+				"--publish"
+			],
+			"isBackground": false,
+			"problemMatcher": [],
+			"presentation": {
+				"reveal": "always",
+				"panel": "dedicated"
+			}
+		}
+	]
+}

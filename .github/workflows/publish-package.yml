@@ -41,7 +41,7 @@ permissions:
 jobs:
   build:
     name: Build Package
-    runs-on: ubuntu-latest
+    runs-on: [self-hosted, slate, windows]
     outputs:
       version: ${{ steps.meta.outputs.version }}
       wheel: ${{ steps.meta.outputs.wheel }}
@@ -75,12 +75,12 @@ jobs:
           TOML_VER=$(python3 -c "import tomllib; print(tomllib.load(open('pyproject.toml','rb'))['project']['version'])")
           INIT_VER=$(python3 -c "
           import re
-          content = open('aurora_core/__init__.py').read()
-          match = re.search(r'__version__\s*=\s*[\"\\']([^\"\\']+')", content)
+          content = open('slate/__init__.py').read()
+          match = re.search(r'__version__\s*=\s*["\\']([^"\\']+')", content)
           print(match.group(1) if match else 'NOT_FOUND')
           ")
           echo "pyproject.toml: $TOML_VER"
-          echo "aurora_core/__init__.py: $INIT_VER"
+          echo "slate/__init__.py: $INIT_VER"
           if [ "$TOML_VER" != "$INIT_VER" ]; then
             echo "::error::Version mismatch: pyproject.toml=$TOML_VER vs __init__.py=$INIT_VER"
             exit 1
@@ -104,8 +104,8 @@ jobs:
       - name: Run package smoke tests
         run: |
           pip install dist/*.whl
-          python -c "import aurora_core; print(f'SLATE v{aurora_core.__version__} imported OK')"
-          python -c "from aurora_core import slate_status; print('slate_status module OK')"
+          python -c "import slate; print(f'SLATE v{slate.__version__} imported OK')"
+          python -c "from slate import slate_status; print('slate_status module OK')"
 
       - uses: actions/upload-artifact@v4
         with:
@@ -116,7 +116,7 @@ jobs:
   publish-github:
     name: Publish to GitHub Packages
     needs: build
-    runs-on: ubuntu-latest
+    runs-on: [self-hosted, slate, windows]
     if: |
       (github.event_name == 'release') ||
       (github.event_name == 'workflow_dispatch' && inputs.target != 'pypi' && inputs.dry_run != true)
@@ -158,7 +158,7 @@ jobs:
   publish-pypi:
     name: Publish to PyPI
     needs: build
-    runs-on: ubuntu-latest
+    runs-on: [self-hosted, slate, windows]
     if: |
       github.event_name == 'workflow_dispatch' && 
       (inputs.target == 'pypi' || inputs.target == 'both') && 
@@ -180,7 +180,7 @@ jobs:
   summary:
     name: Publish Summary
     needs: [build, publish-github, publish-pypi]
-    runs-on: ubuntu-latest
+    runs-on: [self-hosted, slate, windows]
     if: always()
     steps:
       - name: Summary

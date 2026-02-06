@@ -32,7 +32,7 @@ permissions:
 jobs:
   version:
     name: Determine Version
-    runs-on: ubuntu-latest
+    runs-on: [self-hosted, slate, windows]
     outputs:
       version: ${{ steps.ver.outputs.version }}
       is_tag: ${{ steps.ver.outputs.is_tag }}
@@ -52,7 +52,7 @@ jobs:
   build-exe:
     name: Build Windows EXE
     needs: version
-    runs-on: windows-latest
+    runs-on: [self-hosted, slate, windows]
     if: ${{ github.event.inputs.build_exe != 'false' }}
     timeout-minutes: 30
     steps:
@@ -90,7 +90,7 @@ jobs:
   release:
     name: Create Release
     needs: [version, build-exe]
-    runs-on: ubuntu-latest
+    runs-on: [self-hosted, slate, windows]
     if: startsWith(github.ref, 'refs/tags/v')
     steps:
       - uses: actions/checkout@v4
@@ -111,7 +111,7 @@ jobs:
   build-package:
     name: Build Python Package
     needs: version
-    runs-on: ubuntu-latest
+    runs-on: [self-hosted, slate, windows]
     if: startsWith(github.ref, 'refs/tags/v')
     steps:
       - uses: actions/checkout@v4
@@ -139,7 +139,7 @@ jobs:
   publish-package:
     name: Publish to GitHub Packages
     needs: [version, build-package]
-    runs-on: ubuntu-latest
+    runs-on: [self-hosted, slate, windows]
     if: startsWith(github.ref, 'refs/tags/v')
     permissions:
       packages: write
@@ -162,7 +162,7 @@ jobs:
   summary:
     name: CD Summary
     needs: [version, build-exe, release, build-package, publish-package]
-    runs-on: ubuntu-latest
+    runs-on: [self-hosted, slate, windows]
     if: always()
     steps:
       - name: Summary

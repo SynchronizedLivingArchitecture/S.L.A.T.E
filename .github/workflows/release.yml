@@ -38,7 +38,7 @@ permissions:
 jobs:
   validate:
     name: Validate Release
-    runs-on: ubuntu-latest
+    runs-on: [self-hosted, slate, windows]
     outputs:
       changelog: ${{ steps.changelog.outputs.content }}
     steps:
@@ -70,13 +70,13 @@ jobs:
           TOML_VER=$(python3 -c "import tomllib; print(tomllib.load(open('pyproject.toml','rb'))['project']['version'])")
           INIT_VER=$(python3 -c "
           import re
-          content = open('aurora_core/__init__.py').read()
-          match = re.search(r'__version__\s*=\s*[\"\\']([^\"\\']+')", content)
+          content = open('slate/__init__.py').read()
+          match = re.search(r'__version__\s*=\s*["\\']([^"\\']+')", content)
           print(match.group(1) if match else 'NOT_FOUND')
           ")
           INPUT_VER="${{ inputs.version }}"
           echo "pyproject.toml: $TOML_VER"
-          echo "aurora_core/__init__.py: $INIT_VER"
+          echo "slate/__init__.py: $INIT_VER"
           echo "Input version: $INPUT_VER"
           if [ "$TOML_VER" != "$INPUT_VER" ]; then
             echo "::warning::pyproject.toml version ($TOML_VER) differs from release version ($INPUT_VER)"
@@ -114,7 +114,7 @@ jobs:
   build-package:
     name: Build Python Package
     needs: validate
-    runs-on: ubuntu-latest
+    runs-on: [self-hosted, slate, windows]
     outputs:
       version: ${{ steps.build.outputs.version }}
     steps:
@@ -146,7 +146,7 @@ jobs:
   create-release:
     name: Create GitHub Release
     needs: [validate, build-package]
-    runs-on: ubuntu-latest
+    runs-on: [self-hosted, slate, windows]
     steps:
       - uses: actions/checkout@v4
         with:
@@ -206,7 +206,7 @@ jobs:
   publish-package:
     name: Publish to GitHub Packages
     needs: [build-package, create-release]
-    runs-on: ubuntu-latest
+    runs-on: [self-hosted, slate, windows]
     if: inputs.publish_package == true || inputs.publish_package == 'true'
     steps:
       - uses: actions/download-artifact@v4
@@ -231,7 +231,7 @@ jobs:
   summary:
     name: Release Summary
     needs: [validate, build-package, create-release, publish-package]
-    runs-on: ubuntu-latest
+    runs-on: [self-hosted, slate, windows]
     if: always()
     steps:
       - name: Summary
