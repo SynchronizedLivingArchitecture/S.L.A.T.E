@@ -1,6 +1,4 @@
-﻿# Modified: 2026-02-06T23:00:00Z | Author: COPILOT | Change: Target self-hosted runner
-# SLATE Pull Request Checks — runs on local self-hosted runner
-
+﻿# Modified: 2026-02-06T23:00:00Z | Author: COPILOT | Change: Windows self-hosted runner with checkout path fix
 name: SLATE PR Check
 
 on:
@@ -16,6 +14,11 @@ permissions:
   contents: read
   pull-requests: write
 
+defaults:
+  run:
+    shell: pwsh
+    working-directory: slate-build
+
 jobs:
   quality:
     name: Code Quality
@@ -23,12 +26,13 @@ jobs:
     timeout-minutes: 5
     steps:
       - uses: actions/checkout@v4
+        with:
+          path: slate-build
       - name: Ruff lint
         run: |
-          pip install ruff --quiet 2>/dev/null || true
-          ruff check slate/ agents/ --output-format=github || true
-      - name: Format check
-        run: ruff format --check slate/ agents/ --diff || true
+          pip install ruff --quiet 2>$null
+          ruff check slate/ agents/ --output-format=github
+        continue-on-error: true
 
   tests:
     name: Tests
@@ -36,8 +40,11 @@ jobs:
     timeout-minutes: 20
     steps:
       - uses: actions/checkout@v4
+        with:
+          path: slate-build
       - name: Install test deps
-        run: pip install pytest pytest-cov pytest-asyncio --quiet 2>/dev/null || true
+        run: pip install pytest pytest-cov pytest-asyncio --quiet 2>$null
+        continue-on-error: true
       - name: Run tests
         run: python -m pytest tests/ -v --tb=short --ignore=tests/integration/ -x
         continue-on-error: true
@@ -48,6 +55,8 @@ jobs:
     timeout-minutes: 5
     steps:
       - uses: actions/checkout@v4
+        with:
+          path: slate-build
       - name: Validate SDK
         run: |
           python -c "import slate; print(f'SDK v{slate.__version__}')"
@@ -56,7 +65,7 @@ jobs:
           python -c "import slate.slate_hardware_optimizer; print('hardware_optimizer OK')"
       - name: Version sync check
         run: |
-          python -c "
+          python -c @"
           import tomllib
           with open('pyproject.toml', 'rb') as f:
               c = tomllib.load(f)
@@ -64,7 +73,7 @@ jobs:
           import slate
           assert slate.__version__ == v, f'Mismatch: {slate.__version__} != {v}'
           print(f'Version sync OK: {v}')
-          "
+          "@
 
   security:
     name: Security
@@ -72,10 +81,13 @@ jobs:
     timeout-minutes: 10
     steps:
       - uses: actions/checkout@v4
+        with:
+          path: slate-build
       - name: Security scan
         run: |
-          pip install bandit --quiet 2>/dev/null || true
-          bandit -r slate/ agents/ -ll -ii -x "**/test*" || true
+          pip install bandit --quiet 2>$null
+          bandit -r slate/ agents/ -ll -ii -x "**/test*"
+        continue-on-error: true
 
   summary:
     name: PR Summary
@@ -84,11 +96,12 @@ jobs:
     if: always()
     steps:
       - name: Generate summary
+        working-directory: .
         run: |
-          echo "## PR Check Summary" >> $GITHUB_STEP_SUMMARY
-          echo "| Check | Status |" >> $GITHUB_STEP_SUMMARY
-          echo "|-------|--------|" >> $GITHUB_STEP_SUMMARY
-          echo "| Code Quality | ${{ needs.quality.result }} |" >> $GITHUB_STEP_SUMMARY
-          echo "| Tests | ${{ needs.tests.result }} |" >> $GITHUB_STEP_SUMMARY
-          echo "| SDK Validation | ${{ needs.sdk-check.result }} |" >> $GITHUB_STEP_SUMMARY
-          echo "| Security | ${{ needs.security.result }} |" >> $GITHUB_STEP_SUMMARY
+          "## PR Check Summary" | Out-File -Append $env:GITHUB_STEP_SUMMARY
+          "| Check | Status |" | Out-File -Append $env:GITHUB_STEP_SUMMARY
+          "|-------|--------|" | Out-File -Append $env:GITHUB_STEP_SUMMARY
+          "| Code Quality | ${{ needs.quality.result }} |" | Out-File -Append $env:GITHUB_STEP_SUMMARY
+          "| Tests | ${{ needs.tests.result }} |" | Out-File -Append $env:GITHUB_STEP_SUMMARY
+          "| SDK Validation | ${{ needs.sdk-check.result }} |" | Out-File -Append $env:GITHUB_STEP_SUMMARY
+          "| Security | ${{ needs.security.result }} |" | Out-File -Append $env:GITHUB_STEP_SUMMARY

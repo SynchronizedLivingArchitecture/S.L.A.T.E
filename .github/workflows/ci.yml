@@ -1,17 +1,10 @@
-﻿# Modified: 2026-02-06T23:00:00Z | Author: COPILOT | Change: Target self-hosted runner, streamline deps
-# SLATE CI Pipeline — runs on local self-hosted runner with GPU access
-
+﻿# Modified: 2026-02-06T23:00:00Z | Author: COPILOT | Change: Windows self-hosted runner with checkout path fix
 name: SLATE CI
 
 on:
   push:
     branches: [main, develop, 'feature/*']
-    paths-ignore:
-      - '*.md'
-      - 'docs/**'
-      - '.github/*.md'
-      - '.specify/**'
-      - 'specs/**'
+    paths-ignore: ['*.md', 'docs/**', '.github/*.md', 'specs/**']
   pull_request:
     branches: [main, develop]
   workflow_dispatch:
@@ -23,6 +16,11 @@ concurrency:
 permissions:
   contents: read
 
+defaults:
+  run:
+    shell: pwsh
+    working-directory: slate-build
+
 jobs:
   lint:
     name: Lint & Format
@@ -30,12 +28,16 @@ jobs:
     timeout-minutes: 5
     steps:
       - uses: actions/checkout@v4
+        with:
+          path: slate-build
       - name: Ruff lint
         run: |
-          pip install ruff --quiet 2>/dev/null || true
-          ruff check slate/ agents/ --output-format=github || true
+          pip install ruff --quiet 2>$null
+          ruff check slate/ agents/ --output-format=github
+        continue-on-error: true
       - name: Ruff format check
-        run: ruff format --check slate/ agents/ --diff || true
+        run: ruff format --check slate/ agents/ --diff
+        continue-on-error: true
 
   unit-tests:
     name: Unit Tests
@@ -43,13 +45,13 @@ jobs:
     timeout-minutes: 20
     steps:
       - uses: actions/checkout@v4
+        with:
+          path: slate-build
       - name: Install test deps
-        run: pip install pytest pytest-cov pytest-asyncio --quiet 2>/dev/null || true
+        run: pip install pytest pytest-cov pytest-asyncio --quiet 2>$null
+        continue-on-error: true
       - name: Run tests
         run: python -m pytest tests/ -v --tb=short --ignore=tests/integration/ -x
-        continue-on-error: true
-      - name: Generate coverage
-        run: python -m pytest tests/ --cov=slate --cov-report=xml --cov-report=term-missing -q
         continue-on-error: true
 
   sdk-validation:
@@ -58,6 +60,8 @@ jobs:
     timeout-minutes: 5
     steps:
       - uses: actions/checkout@v4
+        with:
+          path: slate-build
       - name: Verify SDK imports
         run: |
           python -c "import slate; print(f'SDK v{slate.__version__}')"
@@ -66,7 +70,7 @@ jobs:
           python -c "import slate.slate_hardware_optimizer; print('hardware_optimizer OK')"
       - name: Version sync
         run: |
-          python -c "
+          python -c @"
           import tomllib
           with open('pyproject.toml', 'rb') as f:
               c = tomllib.load(f)
@@ -74,7 +78,7 @@ jobs:
           import slate
           assert slate.__version__ == v, f'Mismatch: {slate.__version__} != {v}'
           print(f'Version sync OK: {v}')
-          "
+          "@
 
   security:
     name: Security Scan
@@ -82,10 +86,13 @@ jobs:
     timeout-minutes: 10
     steps:
       - uses: actions/checkout@v4
+        with:
+          path: slate-build
       - name: Bandit scan
         run: |
-          pip install bandit --quiet 2>/dev/null || true
-          bandit -r slate/ agents/ -ll -ii -x "**/test*" || true
+          pip install bandit --quiet 2>$null
+          bandit -r slate/ agents/ -ll -ii -x "**/test*"
+        continue-on-error: true
 
   slate-checks:
     name: SLATE Quick Checks
@@ -93,19 +100,21 @@ jobs:
     timeout-minutes: 5
     steps:
       - uses: actions/checkout@v4
+        with:
+          path: slate-build
       - name: Validate Tech Tree
         run: |
-          python -c "
+          python -c @"
           import json
           with open('.slate_tech_tree/tech_tree.json', 'r') as f:
               tree = json.load(f)
           nodes = tree.get('nodes', [])
           completed = sum(1 for n in nodes if n.get('status') == 'complete')
           print(f'Tech Tree: {completed}/{len(nodes)} complete')
-          "
+          "@
       - name: Validate Task Queue
         run: |
-          python -c "
+          python -c @"
           import json
           with open('current_tasks.json', 'r') as f:
               data = json.load(f)
@@ -115,17 +124,17 @@ jobs:
               print(f'Task Queue: {pending} pending tasks')
           else:
               print('Task queue OK')
-          "
+          "@
       - name: Validate pyproject.toml
         run: |
-          python -c "
+          python -c @"
           import tomllib
           with open('pyproject.toml', 'rb') as f:
               config = tomllib.load(f)
           name = config['project']['name']
           ver = config['project']['version']
           print(f'Project: {name} v{ver}')
-          "
+          "@
 
   summary:
     name: CI Summary
@@ -134,12 +143,13 @@ jobs:
     if: always()
     steps:
       - name: Generate summary
+        working-directory: .
         run: |
-          echo "## SLATE CI Summary" >> $GITHUB_STEP_SUMMARY
-          echo "| Job | Status |" >> $GITHUB_STEP_SUMMARY
-          echo "|-----|--------|" >> $GITHUB_STEP_SUMMARY
-          echo "| Lint | ${{ needs.lint.result }} |" >> $GITHUB_STEP_SUMMARY
-          echo "| Unit Tests | ${{ needs.unit-tests.result }} |" >> $GITHUB_STEP_SUMMARY
-          echo "| SDK Validation | ${{ needs.sdk-validation.result }} |" >> $GITHUB_STEP_SUMMARY
-          echo "| Security | ${{ needs.security.result }} |" >> $GITHUB_STEP_SUMMARY
-          echo "| SLATE Checks | ${{ needs.slate-checks.result }} |" >> $GITHUB_STEP_SUMMARY
+          "## SLATE CI Summary" | Out-File -Append $env:GITHUB_STEP_SUMMARY
+          "| Job | Status |" | Out-File -Append $env:GITHUB_STEP_SUMMARY
+          "|-----|--------|" | Out-File -Append $env:GITHUB_STEP_SUMMARY
+          "| Lint | ${{ needs.lint.result }} |" | Out-File -Append $env:GITHUB_STEP_SUMMARY
+          "| Unit Tests | ${{ needs.unit-tests.result }} |" | Out-File -Append $env:GITHUB_STEP_SUMMARY
+          "| SDK Validation | ${{ needs.sdk-validation.result }} |" | Out-File -Append $env:GITHUB_STEP_SUMMARY
+          "| Security | ${{ needs.security.result }} |" | Out-File -Append $env:GITHUB_STEP_SUMMARY
+          "| SLATE Checks | ${{ needs.slate-checks.result }} |" | Out-File -Append $env:GITHUB_STEP_SUMMARY

@@ -1,6 +1,4 @@
-﻿# Modified: 2026-02-06T23:00:00Z | Author: COPILOT | Change: Target self-hosted runner
-# SLATE Nightly Health Checks — runs on local self-hosted runner
-
+﻿# Modified: 2026-02-06T23:00:00Z | Author: COPILOT | Change: Windows self-hosted runner with checkout path fix
 name: SLATE Nightly
 
 on:
@@ -11,6 +9,11 @@ on:
 permissions:
   contents: read
 
+defaults:
+  run:
+    shell: pwsh
+    working-directory: slate-build
+
 jobs:
   full-test-suite:
     name: Full Test Suite
@@ -18,8 +21,11 @@ jobs:
     timeout-minutes: 30
     steps:
       - uses: actions/checkout@v4
+        with:
+          path: slate-build
       - name: Install test deps
-        run: pip install pytest pytest-cov pytest-asyncio --quiet 2>/dev/null || true
+        run: pip install pytest pytest-cov pytest-asyncio --quiet 2>$null
+        continue-on-error: true
       - name: Run full tests with coverage
         run: python -m pytest tests/ -v --tb=long --cov=slate --cov-report=term-missing
         continue-on-error: true
@@ -30,11 +36,13 @@ jobs:
     timeout-minutes: 10
     steps:
       - uses: actions/checkout@v4
+        with:
+          path: slate-build
       - name: SLATE status
         run: python slate/slate_status.py --quick
       - name: Validate task queue
         run: |
-          python -c "
+          python -c @"
           import json, pathlib
           p = pathlib.Path('current_tasks.json')
           if p.exists():
@@ -47,7 +55,7 @@ jobs:
                   print(f'  [{status}] {title}')
           else:
               print('No task queue found')
-          "
+          "@
 
   sdk-import-audit:
     name: SDK Import Audit
@@ -55,15 +63,16 @@ jobs:
     timeout-minutes: 5
     steps:
       - uses: actions/checkout@v4
+        with:
+          path: slate-build
       - name: Audit all modules
         run: |
-          python -c "
+          python -c @"
           import importlib, pathlib, sys
           ok, fail = [], []
           for f in sorted(pathlib.Path('slate').glob('*.py')):
               mod = f.stem
-              if mod.startswith('_'):
-                  continue
+              if mod.startswith('_'): continue
               try:
                   importlib.import_module(f'slate.{mod}')
                   ok.append(mod)
@@ -71,10 +80,9 @@ jobs:
               except Exception as e:
                   fail.append((mod, str(e)))
                   print(f'  FAIL: slate.{mod}: {e}')
-          print(f'\nAudit: {len(ok)} OK, {len(fail)} failed')
-          if fail:
-              sys.exit(1)
-          "
+          print(f'Audit: {len(ok)} OK, {len(fail)} failed')
+          if fail: sys.exit(1)
+          "@
 
   dependency-check:
     name: Dependency Check
@@ -82,11 +90,14 @@ jobs:
     timeout-minutes: 5
     steps:
       - uses: actions/checkout@v4
+        with:
+          path: slate-build
       - name: Check outdated packages
-        run: pip list --outdated 2>/dev/null | head -20 || true
+        run: pip list --outdated 2>$null | Select-Object -First 20
+        continue-on-error: true
       - name: Validate requirements
         run: |
-          python -c "
+          python -c @"
           import pathlib
           req = pathlib.Path('requirements.txt')
           if req.exists():
@@ -94,7 +105,7 @@ jobs:
               print(f'Requirements: {len(lines)} packages')
               for l in lines[:10]:
                   print(f'  {l}')
-          "
+          "@
 
   summary:
     name: Nightly Summary
@@ -103,13 +114,13 @@ jobs:
     if: always()
     steps:
       - name: Generate summary
+        working-directory: .
         run: |
-          echo "## Nightly Health Summary" >> $GITHUB_STEP_SUMMARY
-          echo "| Check | Status |" >> $GITHUB_STEP_SUMMARY
-          echo "|-------|--------|" >> $GITHUB_STEP_SUMMARY
-          echo "| Full Tests | ${{ needs.full-test-suite.result }} |" >> $GITHUB_STEP_SUMMARY
-          echo "| SLATE Health | ${{ needs.slate-health.result }} |" >> $GITHUB_STEP_SUMMARY
-          echo "| SDK Import Audit | ${{ needs.sdk-import-audit.result }} |" >> $GITHUB_STEP_SUMMARY
-          echo "| Dependency Check | ${{ needs.dependency-check.result }} |" >> $GITHUB_STEP_SUMMARY
-          echo "" >> $GITHUB_STEP_SUMMARY
-          echo "_Run at $(date -u '+%Y-%m-%d %H:%M UTC')_" >> $GITHUB_STEP_SUMMARY
+          "## Nightly Health Summary" | Out-File -Append $env:GITHUB_STEP_SUMMARY
+          "| Check | Status |" | Out-File -Append $env:GITHUB_STEP_SUMMARY
+          "|-------|--------|" | Out-File -Append $env:GITHUB_STEP_SUMMARY
+          "| Full Tests | ${{ needs.full-test-suite.result }} |" | Out-File -Append $env:GITHUB_STEP_SUMMARY
+          "| SLATE Health | ${{ needs.slate-health.result }} |" | Out-File -Append $env:GITHUB_STEP_SUMMARY
+          "| SDK Import Audit | ${{ needs.sdk-import-audit.result }} |" | Out-File -Append $env:GITHUB_STEP_SUMMARY
+          "| Dependency Check | ${{ needs.dependency-check.result }} |" | Out-File -Append $env:GITHUB_STEP_SUMMARY
+          "Run at $(Get-Date -Format 'yyyy-MM-dd HH:mm UTC')" | Out-File -Append $env:GITHUB_STEP_SUMMARY
