@@ -8,6 +8,10 @@
 
 > A local-only AI agent orchestration system with automatic hardware detection and optimization.
 
+This is an experimental layer built between AI / and software. 
+- THIS IS NOT SUITABLE FOR PRODUCTION - 
+- USE AT OWN RISK 
+
 ## Features
 
 - **🔒 Local-Only**: All operations run on 127.0.0.1 - your data never leaves your machine
