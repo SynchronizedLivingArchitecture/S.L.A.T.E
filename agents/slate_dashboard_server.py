@@ -77,6 +77,13 @@ try:
 except ImportError:
     print("[WARN] Install API not available")
 
+# GitHub Models API
+try:
+    from agents.github_models_api import add_github_models_endpoints
+    add_github_models_endpoints(app)
+except ImportError:
+    print("[WARN] GitHub Models API not available")
+
 
 # ─── Core API Endpoints ─────────────────────────────────────────────────────────
 
@@ -480,6 +487,44 @@ body {
     <div class="panel-body" id="gpu-list">
       <div class="gpu-card">
         <div class="gpu-name">Loading GPU info...</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- GitHub Models Panel -->
+  <div class="panel">
+    <div class="panel-header">
+      <h2>GitHub Models</h2>
+      <span id="models-indicator" class="badge neutral">--</span>
+    </div>
+    <div class="panel-body">
+      <div class="status-row">
+        <span class="status-label">Token Set</span>
+        <span class="status-value" id="models-token">--</span>
+      </div>
+      <div class="status-row">
+        <span class="status-label">SDK Installed</span>
+        <span class="status-value" id="models-sdk">--</span>
+      </div>
+      <div class="status-row">
+        <span class="status-label">Connection</span>
+        <span class="status-value" id="models-connection">--</span>
+      </div>
+      <div class="status-row">
+        <span class="status-label">Models Available</span>
+        <span class="status-value" id="models-count">--</span>
+      </div>
+      <div style="margin-top: 1rem;">
+        <select id="model-select" class="btn btn-secondary" style="width: 100%; padding: 0.5rem;">
+          <option value="gpt-4o-mini">gpt-4o-mini (OpenAI)</option>
+          <option value="gpt-4o">gpt-4o (OpenAI)</option>
+          <option value="mistral-large">mistral-large (Mistral AI)</option>
+          <option value="meta-llama-3.1-70b-instruct">llama-3.1-70b (Meta)</option>
+        </select>
+      </div>
+      <div class="btn-group">
+        <button class="btn btn-primary" onclick="testGitHubModels()">Test Connection</button>
+        <button class="btn btn-secondary" onclick="openModelsMarketplace()">View Models</button>
       </div>
     </div>
   </div>

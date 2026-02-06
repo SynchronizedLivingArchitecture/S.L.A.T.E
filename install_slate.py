@@ -545,11 +545,11 @@ def step_ai_agents(tracker, args):
     warnings = []
 
     # 1. Verify MCP server exists
-    mcp_server = WORKSPACE_ROOT / "aurora_core" / "slate_mcp_server.py"
+    mcp_server = WORKSPACE_ROOT / "slate" / "slate_mcp_server.py"
     if mcp_server.exists():
         configured.append("MCP server")
     else:
-        warnings.append("MCP server not found (aurora_core/slate_mcp_server.py)")
+        warnings.append("MCP server not found (slate/slate_mcp_server.py)")
 
     tracker.update_progress("ai_agents", 25, "Checking Copilot agent")
 
@@ -757,7 +757,7 @@ def print_completion(success: bool, tracker=None):
         print("    Copilot:  .github/copilot-instructions.md (auto-loaded)")
         print("    MCP:      .vscode/mcp.json (Copilot Chat MCP tools)")
         print("    Claude:   CLAUDE.md + .claude/skills/ (5 skills)")
-        print("    Verify:   python aurora_core/slate_mcp_server.py --verify")
+        print("    Verify:   python slate/slate_mcp_server.py --verify")
         print()
     else:
         print("  Troubleshooting:")

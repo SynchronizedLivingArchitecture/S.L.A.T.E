@@ -364,7 +364,7 @@ All code changes must be accompanied by tests. Target 50%+ coverage.
 ## MCP Server Integration (Claude + Copilot)
 
 SLATE provides a Model Context Protocol (MCP) server that exposes system tools to
-AI assistants. The server is at `aurora_core/slate_mcp_server.py`.
+AI assistants. The server is at `slate/slate_mcp_server.py`.
 
 ### MCP Tools Available
 
@@ -391,13 +391,13 @@ AI assistants. The server is at `aurora_core/slate_mcp_server.py`.
 
 ```powershell
 # stdio mode (for VS Code Copilot / Claude Desktop)
-.\.venv\Scripts\python.exe aurora_core/slate_mcp_server.py
+..\.venv\Scripts\python.exe slate/slate_mcp_server.py
 
 # SSE mode (for web clients)
-.\.venv\Scripts\python.exe aurora_core/slate_mcp_server.py --sse --port 6274
+..\.venv\Scripts\python.exe slate/slate_mcp_server.py --sse --port 6274
 
 # Verify tools are registered
-.\.venv\Scripts\python.exe aurora_core/slate_mcp_server.py --verify
+..\.venv\Scripts\python.exe slate/slate_mcp_server.py --verify
 ```
 
 ### Claude Desktop Configuration
@@ -409,7 +409,7 @@ Add to `%APPDATA%/Claude/claude_desktop_config.json`:
   "mcpServers": {
     "slate-system": {
       "command": "C:/path/to/S.L.A.T.E./.venv/Scripts/python.exe",
-      "args": ["C:/path/to/S.L.A.T.E./aurora_core/slate_mcp_server.py"]
+      "args": ["C:/path/to/S.L.A.T.E./slate/slate_mcp_server.py"]
     }
   }
 }
@@ -454,7 +454,7 @@ SLATE maintains full GitHub integration for project management:
 | **Copilot Agent** | ✅ | `.github/copilot-instructions.md` |
 | **Copilot MCP Server** | ✅ | `.vscode/mcp.json` |
 | **Claude Skills** | ✅ | `.claude/skills/` |
-| **Claude MCP Config** | ✅ | `aurora_core/slate_mcp_server.py` |
+| **Claude MCP Config** | ✅ | `slate/slate_mcp_server.py` |
 
 ---
 

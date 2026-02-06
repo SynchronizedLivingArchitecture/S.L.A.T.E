@@ -15,7 +15,7 @@
 /requirements.txt                @SynchronizedLivingArchitecture/slate-security
 
 # MCP Server - Critical integration point
-/aurora_core/slate_mcp_server.py @SynchronizedLivingArchitecture/slate-maintainers
+/slate/slate_mcp_server.py       @SynchronizedLivingArchitecture/slate-maintainers
 /.claude/                        @SynchronizedLivingArchitecture/slate-maintainers
 /.vscode/mcp.json                @SynchronizedLivingArchitecture/slate-maintainers
 
