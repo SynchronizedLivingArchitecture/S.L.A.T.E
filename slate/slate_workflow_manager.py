@@ -26,7 +26,7 @@ import subprocess
 WORKSPACE_ROOT = Path(__file__).parent.parent
 sys.path.insert(0, str(WORKSPACE_ROOT))
 
-from slate_core.file_lock import FileLock
+import filelock
 
 
 class SlateWorkflowManager:
@@ -62,13 +62,15 @@ class SlateWorkflowManager:
         if not self.TASK_FILE.exists():
             return {"tasks": [], "created_at": datetime.now(timezone.utc).isoformat()}
 
-        with FileLock(str(self.TASK_FILE)):
+        lock = filelock.FileLock(str(self.TASK_FILE) + ".lock", timeout=10)
+        with lock:
             return json.loads(self.TASK_FILE.read_text(encoding="utf-8"))
 
     def _save_tasks(self, data: Dict[str, Any]):
         """Save tasks with file locking."""
         data["last_updated"] = datetime.now(timezone.utc).isoformat()
-        with FileLock(str(self.TASK_FILE)):
+        lock = filelock.FileLock(str(self.TASK_FILE) + ".lock", timeout=10)
+        with lock:
             self.TASK_FILE.write_text(json.dumps(data, indent=2), encoding="utf-8")
 
     def _archive_tasks(self, tasks: List[Dict[str, Any]], reason: str):
@@ -524,7 +526,7 @@ class SlateWorkflowManager:
         print(f"\nCan Accept New Tasks: {'Yes' if analysis['can_accept_new'] else 'NO'}")
 
         if analysis["needs_attention"]:
-            print("\n⚠️  Issues Found:")
+            print("\n[!] Issues Found:")
             if analysis["stale"]:
                 print(f"  - {len(analysis['stale'])} stale tasks (in-progress > {self.STALE_HOURS}h)")
             if analysis["abandoned"]:
@@ -537,9 +539,9 @@ class SlateWorkflowManager:
                 print(f"  - {len(analysis['duplicates'])} duplicate tasks")
 
         if analysis["recommendations"]:
-            print("\n📋 Recommendations:")
+            print("\n[>] Recommendations:")
             for rec in analysis["recommendations"]:
-                print(f"  → {rec}")
+                print(f"  - {rec}")
 
         print("\n" + "=" * 60)
 
@@ -593,9 +595,9 @@ def main():
             print(json.dumps(result, indent=2))
         else:
             if result["can_accept_new"]:
-                print("✅ Workflow ready for new tasks")
+                print("[OK] Workflow ready for new tasks")
             else:
-                print("❌ Cannot accept new tasks")
+                print("[X] Cannot accept new tasks")
                 print(f"   In progress: {result['in_progress_count']}/{result['max_allowed']}")
                 if result["action_required"]:
                     print(f"   Action: {result['action_required']}")
