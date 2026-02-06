@@ -66,10 +66,13 @@ htmlcov/
 .slate_specs/
 .slate_task_archive/
 .slate_traces/
+.slate_fork/
+.slate_tech_tree/
 .tools/
 slate_logs/
 slate_memory/
-slate_memory/
+aurora_logs/
+aurora_core/
 
 # Runtime state files
 vscode_errors.json
