@@ -117,7 +117,7 @@ Prefixes: `feat`, `fix`, `docs`, `refactor`, `test`, `ci`, `chore`
 
 - **GPUs**: 2x NVIDIA GeForce RTX 5070 Ti (Blackwell)
 - **Labels**: `self-hosted, slate, gpu, windows, cuda, gpu-2, multi-gpu, blackwell`
-- **Directory**: `C:\actions-runner`
+- **Directory**: `E:\11132025\actions-runner`
 - **CUDA_VISIBLE_DEVICES**: `0,1`
 
 ## MCP Server

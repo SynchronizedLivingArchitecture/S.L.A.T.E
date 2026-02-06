@@ -23,7 +23,7 @@ github:
   runner:
     name: slate-DESKTOP-R3UD82D
     labels: [self-hosted, slate, gpu, windows, cuda, blackwell]
-    directory: C:/actions-runner
+    directory: E:/11132025/actions-runner
 
   # Branch Protection
   branch_protection:

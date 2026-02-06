@@ -55,7 +55,8 @@ RUNNER_BASE_URL = "https://github.com/actions/runner/releases/download"
 
 SLATE_REPO = "SynchronizedLivingArchitecture/S.L.A.T.E."
 
-DEFAULT_RUNNER_DIR = Path("C:/actions-runner") if platform.system() == "Windows" else Path.home() / "actions-runner"
+# Modified: 2026-02-07T04:00:00Z | Author: COPILOT | Change: Use WORKSPACE_ROOT for runner dir
+DEFAULT_RUNNER_DIR = WORKSPACE_ROOT / "actions-runner"
 
 RUNNER_LABELS = [
     "self-hosted",

@@ -22,6 +22,9 @@ import sys
 from datetime import datetime
 from pathlib import Path
 
+# Modified: 2026-02-07T04:00:00Z | Author: COPILOT | Change: Add WORKSPACE_ROOT for runner dir
+WORKSPACE_ROOT = Path(__file__).parent.parent
+
 try:
     import psutil
     HAS_PSUTIL = True
@@ -86,7 +89,7 @@ def get_system_info():
 
 def get_runner_info():
     """Check GitHub Actions self-hosted runner status."""
-    runner_dir = Path("C:/actions-runner") if os.name == "nt" else Path.home() / "actions-runner"
+    runner_dir = WORKSPACE_ROOT / "actions-runner"
     runner_config = runner_dir / ".runner"
     slate_config = runner_dir / ".slate_runner_config.json"
 

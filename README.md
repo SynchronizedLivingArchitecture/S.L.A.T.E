@@ -1,11 +1,5 @@
-<h1 align="center">
-  <img src="https://img.shields.io/badge/S.L.A.T.E.-7aa2f7?style=for-the-badge&logo=data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyNCAyNCI+PHBhdGggZmlsbD0iI2ZmZiIgZD0iTTMgMTNoMnYtMkgzdjJ6bTAgNGgydi0ySDN2MnptMC04aDJ2LTJIM3Yyek03IDEzaDEwdi0ySDd2MnptMCA0aDEwdi0ySDd2MnptMC04aDEwdi0ySDd2MnptMTIgMTJoMlYzaC0ydjE4eiIvPjwvc3ZnPg==" alt="SLATE" height="40">
-</h1>
-
-<h3 align="center">Synchronized Living Architecture for Transformation and Evolution</h3>
-
 <p align="center">
-  <strong>Synchronized Living Architecture for Transformation and Evolution</strong>
+  <img src="docs/assets/slate-logo-banner.svg" alt="S.L.A.T.E. — Synchronized Living Architecture for Transformation and Evolution" width="800">
 </p>
 
 <p align="center">
@@ -13,6 +7,7 @@
   <a href="https://www.python.org/downloads/"><img src="https://img.shields.io/badge/python-3.11+-blue.svg" alt="Python 3.11+"></a>
   <a href="https://github.com/SynchronizedLivingArchitecture/S.L.A.T.E./actions"><img src="https://github.com/SynchronizedLivingArchitecture/S.L.A.T.E./actions/workflows/ci.yml/badge.svg" alt="CI Status"></a>
   <a href="https://github.com/SynchronizedLivingArchitecture/S.L.A.T.E./wiki"><img src="https://img.shields.io/badge/docs-wiki-blue.svg" alt="Documentation"></a>
+  <a href="https://github.com/SynchronizedLivingArchitecture/S.L.A.T.E./releases"><img src="https://img.shields.io/github/v/release/SynchronizedLivingArchitecture/S.L.A.T.E.?include_prereleases&label=release&color=7c3aed" alt="Release"></a>
 </p>
 
 <p align="center">
@@ -145,6 +140,16 @@ Copilot automatically loads SLATE context when the workspace is open:
 - **`.claude/skills/`** — 5 domain skills (status, tasks, agents, benchmark, traces)
 - **MCP server** — same server works with Claude Desktop via `claude_desktop_config.json`
 
+### VS Code Integration
+
+SLATE ships with full VS Code workspace configuration:
+
+- **Extensions** (`.vscode/extensions.json`): Copilot, Copilot Chat, GitHub Actions, PR & Issues, Python, Pylance, Debugpy
+- **MCP Tools** (`.vscode/mcp.json`): 8 SLATE tools available in Copilot Chat
+- **Tasks** (`.vscode/tasks.json`): Build, run, and test tasks
+
+Verify your setup: `python slate/slate_sdk.py --integrate-vscode`
+
 ### MCP Server
 
 ```bash
@@ -182,6 +187,8 @@ Available tools: `slate_get_status`, `slate_run_check`, `slate_list_tasks`,
 | Copilot Agent | `.github/copilot-instructions.md` |
 | Claude Plugin | `CLAUDE.md` + `.claude/skills/` |
 | MCP Server | `slate/slate_mcp_server.py` |
+| VS Code Extensions | `.vscode/extensions.json` |
+| VS Code MCP Tools | `.vscode/mcp.json` |
 
 ## Contributing
 
@@ -203,5 +210,7 @@ MIT License - see [LICENSE](LICENSE) for details.
 ---
 
 <p align="center">
-  <strong>S.L.A.T.E.</strong> - Synchronized Living Architecture for Transformation and Evolution
+  <img src="docs/assets/slate-logo.svg" alt="S.L.A.T.E." width="80">
+  <br>
+  <strong>S.L.A.T.E.</strong> — Synchronized Living Architecture for Transformation and Evolution
 </p>

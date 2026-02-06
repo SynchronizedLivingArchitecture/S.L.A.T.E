@@ -3,7 +3,7 @@
 
 $ErrorActionPreference = "Stop"
 
-$RUNNER_DIR = "E:\actions-runner"
+$RUNNER_DIR = "E:\11132025\actions-runner"
 $WORK_DIR = "E:\11132025"
 $REPO_URL = "https://github.com/SynchronizedLivingArchitecture/S.L.A.T.E."
 
