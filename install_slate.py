@@ -37,6 +37,7 @@ import argparse
 import importlib
 import json
 import os
+import shutil
 import subprocess
 import sys
 import time
@@ -536,10 +537,10 @@ def step_runner_setup(tracker, args):
 
 
 def step_ai_agents(tracker, args):
-    """Step 10: Configure AI agent integrations (Copilot + Claude)."""
-    # Modified: 2026-02-06T10:15:00Z | Author: COPILOT | Change: AI agent setup step
+    """Step 10: Configure AI agent integrations (Copilot + Claude + VS Code)."""
+    # Modified: 2026-02-06T23:30:00Z | Author: COPILOT | Change: Add VS Code extension validation
     tracker.start_step("ai_agents")
-    tracker.update_progress("ai_agents", 10, "Checking AI agent configurations")
+    tracker.update_progress("ai_agents", 5, "Checking AI agent configurations")
 
     configured = []
     warnings = []
@@ -614,7 +615,55 @@ def step_ai_agents(tracker, args):
                 else:
                     warnings.append("MCP SDK install failed — run: pip install mcp")
 
-    # 7. Verify GitHub integrations config
+    # 7. Verify VS Code integration
+    tracker.update_progress("ai_agents", 85, "Checking VS Code extensions")
+
+    # 7a. Check VS Code CLI is available
+    code_exe = shutil.which("code")
+    if code_exe:
+        configured.append("VS Code CLI")
+
+        # 7b. Check installed extensions
+        required_extensions = [
+            "github.copilot",
+            "github.copilot-chat",
+            "github.vscode-github-actions",
+            "github.vscode-pull-request-github",
+            "ms-python.python",
+            "ms-python.vscode-pylance",
+        ]
+        try:
+            ext_result = _run_cmd([code_exe, "--list-extensions"], timeout=15)
+            if ext_result.returncode == 0:
+                installed_exts = ext_result.stdout.strip().lower().splitlines()
+                missing_exts = [
+                    ext for ext in required_extensions
+                    if ext.lower() not in installed_exts
+                ]
+                if not missing_exts:
+                    configured.append(f"VS Code extensions ({len(required_extensions)} required)")
+                else:
+                    warnings.append(
+                        f"Missing VS Code extensions: {', '.join(missing_exts)}"
+                    )
+        except Exception:
+            warnings.append("Could not check VS Code extensions")
+    else:
+        warnings.append("VS Code CLI not found (install VS Code and add to PATH)")
+
+    # 7c. Check VS Code extensions.json
+    extensions_json = WORKSPACE_ROOT / ".vscode" / "extensions.json"
+    if extensions_json.exists():
+        configured.append("VS Code extensions.json")
+    else:
+        warnings.append(".vscode/extensions.json missing")
+
+    # 7d. Check VS Code tasks.json
+    tasks_json = WORKSPACE_ROOT / ".vscode" / "tasks.json"
+    if tasks_json.exists():
+        configured.append("VS Code tasks.json")
+
+    # 8. Verify GitHub integrations config
     tracker.update_progress("ai_agents", 90, "Verifying GitHub integrations")
     github_files = {
         "Actions workflows": WORKSPACE_ROOT / ".github" / "workflows",

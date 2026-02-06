@@ -504,7 +504,16 @@ class SlateSDK:
             "value": self.state.runner_status,
         })
 
-        all_passed = all(c["passed"] for c in checks if c["check"] != "self_hosted_runner")
+        # VS Code integration
+        # Modified: 2026-02-06T23:30:00Z | Author: COPILOT | Change: Add VS Code verification
+        vscode_result = self._check_vscode()
+        checks.append({
+            "check": "vscode_integration",
+            "passed": vscode_result["vscode_installed"] and vscode_result["extensions_json"],
+            "value": f"{vscode_result['extensions_installed']}/{vscode_result['extensions_required']} extensions" if vscode_result["vscode_installed"] else "VS Code not found",
+        })
+
+        all_passed = all(c["passed"] for c in checks if c["check"] not in ("self_hosted_runner", "vscode_integration"))
 
         return {
             "verified": all_passed,
@@ -582,6 +591,78 @@ class SlateSDK:
                 "error": str(e),
             }
 
+    # ─── VS Code Integration ──────────────────────────────────────────────────
+    # Modified: 2026-02-06T23:30:00Z | Author: COPILOT | Change: Add VS Code integration verification
+
+    REQUIRED_EXTENSIONS = [
+        "github.copilot",
+        "github.copilot-chat",
+        "github.vscode-github-actions",
+        "github.vscode-pull-request-github",
+        "ms-python.python",
+        "ms-python.vscode-pylance",
+        "ms-python.debugpy",
+    ]
+
+    def _check_vscode(self) -> Dict[str, Any]:
+        """Check VS Code installation and extension status."""
+        result = {
+            "vscode_installed": False,
+            "extensions_json": False,
+            "mcp_json": False,
+            "tasks_json": False,
+            "extensions_installed": 0,
+            "extensions_required": len(self.REQUIRED_EXTENSIONS),
+            "extensions_missing": [],
+        }
+
+        # Check VS Code CLI
+        code_path = shutil.which("code")
+        result["vscode_installed"] = code_path is not None
+
+        # Check workspace config files
+        result["extensions_json"] = (self.workspace / ".vscode" / "extensions.json").exists()
+        result["mcp_json"] = (self.workspace / ".vscode" / "mcp.json").exists()
+        result["tasks_json"] = (self.workspace / ".vscode" / "tasks.json").exists()
+
+        # Check installed extensions
+        if code_path:
+            try:
+                success, stdout, _ = self._run_cmd([code_path, "--list-extensions"], timeout=15)
+                if success:
+                    installed = [e.strip().lower() for e in stdout.strip().splitlines()]
+                    missing = [
+                        ext for ext in self.REQUIRED_EXTENSIONS
+                        if ext.lower() not in installed
+                    ]
+                    result["extensions_installed"] = len(self.REQUIRED_EXTENSIONS) - len(missing)
+                    result["extensions_missing"] = missing
+            except Exception:
+                pass
+
+        return result
+
+    def integrate_vscode(self) -> Dict[str, Any]:
+        """Verify and report VS Code integration status."""
+        result = self._check_vscode()
+
+        actions = []
+        if not result["vscode_installed"]:
+            actions.append("Install VS Code and add 'code' to PATH")
+        if not result["extensions_json"]:
+            actions.append("Create .vscode/extensions.json with required extensions")
+        if not result["mcp_json"]:
+            actions.append("Create .vscode/mcp.json with SLATE MCP server config")
+        if result["extensions_missing"]:
+            for ext in result["extensions_missing"]:
+                actions.append(f"Install extension: code --install-extension {ext}")
+
+        return {
+            "success": len(actions) == 0,
+            "checks": result,
+            "actions": actions,
+        }
+
 
 # ═══════════════════════════════════════════════════════════════════════════════
 # CELL: cli
@@ -620,6 +701,7 @@ Examples:
     parser.add_argument("--configure", action="store_true", help="Interactive configuration")
     parser.add_argument("--integrate-git", action="store_true", help="Setup git integration")
     parser.add_argument("--integrate-runner", action="store_true", help="Setup runner integration")
+    parser.add_argument("--integrate-vscode", action="store_true", help="Verify VS Code integration")
     parser.add_argument("--runner", action="store_true", help="Include runner in setup")
     parser.add_argument("--runner-token", type=str, help="GitHub token for runner")
     parser.add_argument("--json", action="store_true", dest="json_output", help="JSON output")
@@ -699,6 +781,35 @@ Examples:
                     print("\n  Instructions:")
                     for inst in result["instructions"]:
                         print(f"    {inst}")
+
+    elif args.integrate_vscode:
+        result = sdk.integrate_vscode()
+        if args.json_output:
+            print(json.dumps(result, indent=2))
+        else:
+            print("\n[SLATE SDK] VS Code Integration")
+            print("=" * 50)
+            checks = result["checks"]
+            status = "[OK]" if checks["vscode_installed"] else "[--]"
+            print(f"  {status} VS Code CLI: {'Installed' if checks['vscode_installed'] else 'Not found'}")
+            status = "[OK]" if checks["extensions_json"] else "[--]"
+            print(f"  {status} extensions.json: {'Found' if checks['extensions_json'] else 'Missing'}")
+            status = "[OK]" if checks["mcp_json"] else "[--]"
+            print(f"  {status} mcp.json: {'Found' if checks['mcp_json'] else 'Missing'}")
+            status = "[OK]" if checks["tasks_json"] else "[--]"
+            print(f"  {status} tasks.json: {'Found' if checks['tasks_json'] else 'Missing'}")
+            ext_ok = checks["extensions_installed"] == checks["extensions_required"]
+            status = "[OK]" if ext_ok else "[--]"
+            print(f"  {status} Extensions: {checks['extensions_installed']}/{checks['extensions_required']} installed")
+            if checks["extensions_missing"]:
+                for ext in checks["extensions_missing"]:
+                    print(f"        Missing: {ext}")
+            if result["actions"]:
+                print("\n  Required actions:")
+                for i, action in enumerate(result["actions"], 1):
+                    print(f"    {i}. {action}")
+            else:
+                print("\n  ✓ VS Code fully configured")
 
     else:
         parser.print_help()

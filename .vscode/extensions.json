@@ -1,10 +1,23 @@
 {
+  // Modified: 2026-02-06T23:30:00Z | Author: COPILOT | Change: Add GitHub Actions, PR/Issues, and dev tool extensions
   "recommendations": [
+    // AI & Copilot
     "github.copilot",
     "github.copilot-chat",
+
+    // GitHub Integration
+    "github.vscode-github-actions",
+    "github.vscode-pull-request-github",
+
+    // Python
     "ms-python.python",
     "ms-python.vscode-pylance",
     "ms-python.debugpy",
+
+    // Testing & Quality
+    "ms-python.pytest-adapter",
+
+    // SLATE
     "slate-ai.slate"
   ]
 }

@@ -31,6 +31,7 @@ env/
 .vscode/
 !.vscode/mcp.json
 !.vscode/extensions.json
+!.vscode/tasks.json
 *.swp
 *.swo
 *~

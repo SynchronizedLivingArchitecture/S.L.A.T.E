@@ -1,5 +1,5 @@
 # S.L.A.T.E. Copilot Agent Instructions
-# Modified: 2026-02-06T10:15:00Z | Author: COPILOT | Change: Full agent definition with SLATE context
+# Modified: 2026-02-06T23:30:00Z | Author: COPILOT | Change: Add VS Code integration section and extension dependencies
 # ═══════════════════════════════════════════════════════════════════════════════
 #
 # This file configures GitHub Copilot as a SLATE-aware coding agent.
@@ -46,7 +46,7 @@ GitHub Actions runner with 2x NVIDIA RTX 5070 Ti GPUs.
 | `slate/slate_mcp_server.py` | MCP server for AI assistants |
 | `slate/action_guard.py` | Security validation |
 | `agents/slate_dashboard_server.py` | FastAPI dashboard |
-| `install_slate.py` | 11-step installation script |
+| `install_slate.py` | 12-step installation script |
 | `clean_tasks.json` | Active task queue |
 
 ## Coding Conventions
@@ -127,6 +127,32 @@ The server provides: `slate_get_status`, `slate_run_check`, `slate_list_tasks`,
 `slate_gpu_info`, `slate_agent_status`, `slate_runner_status`, `slate_search_code`,
 `slate_dashboard_url`.
 
+## VS Code Integration
+
+SLATE is designed as a VS Code-first development environment. The workspace
+ships with full editor configuration so contributors have the correct tools
+from the first open.
+
+### Required Extensions (`.vscode/extensions.json`)
+
+| Extension | ID | Purpose |
+|-----------|----|--------|
+| GitHub Copilot | `github.copilot` | AI code completion |
+| Copilot Chat | `github.copilot-chat` | Agent chat + MCP tools |
+| GitHub Actions | `github.vscode-github-actions` | Workflow authoring, run monitoring |
+| GitHub Pull Requests | `github.vscode-pull-request-github` | PR review, issue management |
+| Python | `ms-python.python` | Language support, debugging |
+| Pylance | `ms-python.vscode-pylance` | Type checking, IntelliSense |
+| Debugpy | `ms-python.debugpy` | Python debugging |
+
+### Workspace Config Files
+
+| File | Purpose |
+|------|---------|
+| `.vscode/extensions.json` | Extension recommendations (prompted on open) |
+| `.vscode/mcp.json` | MCP server registration for Copilot Chat |
+| `.vscode/tasks.json` | Build, run, and test tasks |
+
 ## GitHub Integrations
 
 | Integration | Status | Config |
@@ -144,6 +170,9 @@ The server provides: `slate_get_status`, `slate_run_check`, `slate_list_tasks`,
 | Security Advisories | Active | `.github/SECURITY.md` |
 | Funding | Active | `.github/FUNDING.yml` |
 | Wiki | Active | `docs/wiki/` (14 pages) |
+| VS Code Extensions | Active | `.vscode/extensions.json` |
+| VS Code MCP Tools | Active | `.vscode/mcp.json` |
+| VS Code Tasks | Active | `.vscode/tasks.json` |
 
 ## Test-Driven Development
 
