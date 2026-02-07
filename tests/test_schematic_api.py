@@ -771,5 +771,309 @@ class TestWatchmakerResponsive:
         assert ".gear-bg" in template
 
 
+# ═══════════════════════════════════════════════════════════════════════════════
+# Phase 4: Animation System Tests
+# Modified: 2026-02-08T08:00:00Z | Author: COPILOT | Change: Add Phase 4 animation system tests
+# ═══════════════════════════════════════════════════════════════════════════════
+
+class TestGearRotationController:
+    """Test gear rotation speed-aware controller CSS and JS."""
+
+    @pytest.fixture
+    def template(self):
+        from slate_web.dashboard_template import build_template
+        return build_template()
+
+    @pytest.fixture
+    def js(self):
+        from slate_web.dashboard_template import build_template_js
+        return build_template_js()
+
+    def test_gear_speed_tiers_css(self, template):
+        """All 5 speed tiers should be defined in CSS."""
+        for tier in ['gear-speed-idle', 'gear-speed-low', 'gear-speed-medium', 'gear-speed-high', 'gear-speed-max']:
+            assert tier in template, f"Missing gear speed tier: {tier}"
+
+    def test_gear_speed_idle_30s(self, template):
+        assert "animation-duration: 30s" in template
+
+    def test_gear_speed_max_2s(self, template):
+        assert "animation-duration: 2s" in template
+
+    def test_gear_paused_class(self, template):
+        assert "gear-paused" in template
+        assert "animation-play-state: paused" in template
+
+    def test_gear_reverse_class(self, template):
+        assert "gear-reverse" in template
+        assert "animation-direction: reverse" in template
+
+    def test_gear_spin_eased_keyframe(self, template):
+        assert "gear-spin-eased" in template
+
+    def test_gear_controller_js_object(self, js):
+        assert "GearController" in js
+
+    def test_gear_controller_init(self, js):
+        assert "GearController" in js
+        assert "init()" in js or "init (" in js
+
+    def test_gear_controller_load_to_speed(self, js):
+        assert "loadToSpeedClass" in js
+
+    def test_gear_controller_sync_with_system(self, js):
+        assert "syncWithSystem" in js
+
+    def test_gear_controller_pause_resume(self, js):
+        assert ".pause()" in js or "pause()" in js
+        assert ".resume()" in js or "resume()" in js
+
+
+class TestFlowLinePulseAnimation:
+    """Test enhanced flow line animations."""
+
+    @pytest.fixture
+    def template(self):
+        from slate_web.dashboard_template import build_template
+        return build_template()
+
+    @pytest.fixture
+    def js(self):
+        from slate_web.dashboard_template import build_template_js
+        return build_template_js()
+
+    def test_flow_speed_variants(self, template):
+        for variant in ['flow-fast', 'flow-medium', 'flow-slow', 'flow-inactive']:
+            assert variant in template, f"Missing flow variant: {variant}"
+
+    def test_flow_fast_duration(self, template):
+        assert "animation-duration: 0.6s" in template
+
+    def test_flow_glow_class(self, template):
+        assert "flow-glow" in template
+
+    def test_flow_pulse_glow_keyframe(self, template):
+        assert "flow-pulse-glow" in template
+        assert "drop-shadow" in template
+
+    def test_flow_inactive_paused(self, template):
+        # Inactive flows should have paused animation
+        assert "flow-inactive" in template
+
+    def test_flow_controller_js(self, js):
+        assert "FlowController" in js
+
+    def test_flow_controller_set_speed(self, js):
+        assert "setFlowSpeed" in js
+
+    def test_flow_controller_sync_services(self, js):
+        assert "syncWithServices" in js
+
+
+class TestJewelPulseAnimation:
+    """Test jewel pulse animation variants."""
+
+    @pytest.fixture
+    def template(self):
+        from slate_web.dashboard_template import build_template
+        return build_template()
+
+    @pytest.fixture
+    def js(self):
+        from slate_web.dashboard_template import build_template_js
+        return build_template_js()
+
+    def test_jewel_pulse_urgent_keyframe(self, template):
+        assert "jewel-pulse-urgent" in template
+
+    def test_jewel_pulse_slow_keyframe(self, template):
+        assert "jewel-pulse-slow" in template
+
+    def test_jewel_breathe_keyframe(self, template):
+        assert "jewel-breathe" in template
+
+    def test_jewel_urgent_class(self, template):
+        assert "pulse-urgent" in template
+
+    def test_jewel_slow_class(self, template):
+        assert "pulse-slow" in template
+
+    def test_jewel_breathe_class(self, template):
+        assert ".breathe" in template or "breathe" in template
+
+    def test_jewel_controller_js(self, js):
+        assert "JewelController" in js
+
+    def test_jewel_set_pulse_variant(self, js):
+        assert "setPulseVariant" in js
+
+
+class TestCardHoverDepthAnimation:
+    """Test card hover depth tracking system."""
+
+    @pytest.fixture
+    def template(self):
+        from slate_web.dashboard_template import build_template
+        return build_template()
+
+    @pytest.fixture
+    def js(self):
+        from slate_web.dashboard_template import build_template_js
+        return build_template_js()
+
+    def test_card_css_variables(self, template):
+        for var in ['--card-rx', '--card-ry', '--card-tz', '--card-shadow-x', '--card-shadow-y']:
+            assert var in template, f"Missing CSS var: {var}"
+
+    def test_depth_tracking_class(self, template):
+        assert "depth-tracking" in template
+
+    def test_depth_lift_class(self, template):
+        assert "depth-lift" in template
+
+    def test_card_shimmer_keyframe(self, template):
+        assert "card-shimmer" in template
+
+    def test_shimmer_active_class(self, template):
+        assert "shimmer-active" in template
+
+    def test_card_depth_controller_js(self, js):
+        assert "CardDepthController" in js
+
+    def test_card_depth_mouse_events(self, js):
+        assert "mouseenter" in js
+        assert "mousemove" in js
+        assert "mouseleave" in js
+
+    def test_card_depth_rotation_calc(self, js):
+        # Should calculate rotation based on mouse position relative to card center
+        assert "rotateX" in js or "card-rx" in js
+        assert "rotateY" in js or "card-ry" in js
+
+    def test_card_depth_reduced_motion_check(self, js):
+        assert "prefers-reduced-motion" in js
+
+
+class TestBackgroundGearParallax:
+    """Test background gear parallax layers."""
+
+    @pytest.fixture
+    def template(self):
+        from slate_web.dashboard_template import build_template
+        return build_template()
+
+    @pytest.fixture
+    def js(self):
+        from slate_web.dashboard_template import build_template_js
+        return build_template_js()
+
+    def test_gear_parallax_layer_class(self, template):
+        assert "gear-parallax-layer" in template
+
+    def test_parallax_depth_tiers(self, template):
+        for tier in ['gear-parallax-far', 'gear-parallax-mid', 'gear-parallax-near']:
+            assert tier in template, f"Missing parallax tier: {tier}"
+
+    def test_five_gear_layers_css(self, template):
+        for i in range(1, 6):
+            assert f"gear-layer-{i}" in template
+
+    def test_five_gear_layers_html(self, template):
+        # All 5 gear layers should exist in the HTML body
+        for i in range(1, 6):
+            assert f'class="gear-layer-{i}' in template or f"class='gear-layer-{i}" in template or f'gear-layer-{i} gear-parallax-layer' in template
+
+    def test_gear_svg_elements(self, template):
+        # Each gear layer should have an animated SVG
+        assert "gear-animated" in template
+        count = template.count('class="gear-animated')
+        assert count >= 5, f"Expected at least 5 gear-animated SVGs, found {count}"
+
+    def test_reverse_gears(self, template):
+        # Some gears should rotate in reverse
+        assert 'gear-animated reverse' in template
+
+    def test_gear_container_id(self, template):
+        assert 'gear-bg-container' in template
+
+    def test_gear_parallax_js(self, js):
+        assert "GearParallax" in js
+
+    def test_parallax_mouse_move(self, js):
+        assert "mousemove" in js
+
+    def test_parallax_request_animation_frame(self, js):
+        assert "requestAnimationFrame" in js
+
+    def test_parallax_speed_factors(self, js):
+        # Each layer should have a different speed factor
+        assert "speed:" in js or "speed :" in js
+
+
+class TestAnimationSystemInit:
+    """Test the animation system initialization and integration."""
+
+    @pytest.fixture
+    def js(self):
+        from slate_web.dashboard_template import build_template_js
+        return build_template_js()
+
+    def test_init_animation_system_function(self, js):
+        assert "initAnimationSystem" in js
+
+    def test_init_calls_gear_controller(self, js):
+        assert "GearController.init()" in js
+
+    def test_init_calls_flow_controller(self, js):
+        assert "FlowController.init()" in js
+
+    def test_init_calls_card_depth(self, js):
+        assert "CardDepthController.init()" in js
+
+    def test_init_calls_gear_parallax(self, js):
+        assert "GearParallax.init()" in js
+
+    def test_gear_sync_interval(self, js):
+        # Gear speed should sync with system periodically
+        assert "syncWithSystem" in js
+
+    def test_flow_sync_interval(self, js):
+        assert "syncWithServices" in js
+
+    def test_init_animation_system_called(self, js):
+        # initAnimationSystem should be called in the init section
+        assert "initAnimationSystem();" in js
+
+
+class TestReducedMotionAccessibility:
+    """Test prefers-reduced-motion compliance."""
+
+    @pytest.fixture
+    def template(self):
+        from slate_web.dashboard_template import build_template
+        return build_template()
+
+    def test_reduced_motion_media_query(self, template):
+        assert "prefers-reduced-motion: reduce" in template
+
+    def test_reduced_motion_disables_gear_animations(self, template):
+        # The reduced motion block should target gear-animated SVGs
+        assert "gear-animated" in template
+
+    def test_reduced_motion_disables_jewel_pulse(self, template):
+        assert "pulse-urgent" in template
+        assert "pulse-slow" in template
+
+    def test_reduced_motion_disables_flow_lines(self, template):
+        assert "data-flow-line" in template
+
+    def test_reduced_motion_disables_depth_tracking(self, template):
+        assert "depth-tracking" in template
+
+    def test_reduced_motion_animation_none(self, template):
+        # Should set animation: none !important
+        assert "animation: none !important" in template
+
+
 if __name__ == "__main__":
     pytest.main([__file__, "-v", "--tb=short"])

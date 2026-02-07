@@ -1136,6 +1136,214 @@ def build_template() -> str:
             .gear-bg {{ left: 56px; }}
         }}
 
+        /* ═══ Phase 4: Animation System ═════════════════════════════════ */
+        /* Modified: 2026-02-08T08:00:00Z | Author: COPILOT | Change: Add gear rotation controller, flow line pulse, jewel pulse variants, card hover depth, background gear parallax */
+
+        /* --- Gear Rotation Speed Tiers (driven by system load) --- */
+        .gear-speed-idle {{
+            animation-duration: 30s !important;
+        }}
+        .gear-speed-low {{
+            animation-duration: 20s !important;
+        }}
+        .gear-speed-medium {{
+            animation-duration: 10s !important;
+        }}
+        .gear-speed-high {{
+            animation-duration: 5s !important;
+        }}
+        .gear-speed-max {{
+            animation-duration: 2s !important;
+        }}
+        .gear-paused {{
+            animation-play-state: paused !important;
+        }}
+
+        /* Counter-rotating gear pairs */
+        .gear-reverse {{
+            animation-direction: reverse;
+        }}
+        @keyframes gear-spin-eased {{
+            0% {{ transform: rotate(0deg); }}
+            100% {{ transform: rotate(360deg); }}
+        }}
+
+        /* Background gear parallax containers */
+        .gear-bg .gear-parallax-layer {{
+            position: absolute;
+            transition: transform 0.3s ease-out;
+            will-change: transform;
+        }}
+        .gear-parallax-far {{
+            opacity: 0.03;
+        }}
+        .gear-parallax-mid {{
+            opacity: 0.06;
+        }}
+        .gear-parallax-near {{
+            opacity: 0.1;
+        }}
+
+        /* --- Enhanced Flow Line Variants --- */
+        .data-flow-line.flow-fast {{
+            animation-duration: 0.6s;
+            stroke-width: 3;
+        }}
+        .data-flow-line.flow-medium {{
+            animation-duration: 1.5s;
+            stroke-width: 2;
+        }}
+        .data-flow-line.flow-slow {{
+            animation-duration: 3s;
+            stroke-width: 1.5;
+            opacity: 0.6;
+        }}
+        .data-flow-line.flow-inactive {{
+            animation-play-state: paused;
+            opacity: 0.2;
+            stroke-dasharray: 4 8;
+        }}
+        @keyframes flow-pulse-glow {{
+            0% {{ stroke-dashoffset: 0; filter: drop-shadow(0 0 0px var(--sl-accent, #B85A3C)); }}
+            50% {{ filter: drop-shadow(0 0 4px var(--sl-accent, #B85A3C)); }}
+            100% {{ stroke-dashoffset: -15; filter: drop-shadow(0 0 0px var(--sl-accent, #B85A3C)); }}
+        }}
+        .data-flow-line.flow-glow {{
+            animation-name: flow-pulse-glow;
+        }}
+
+        /* --- Jewel Pulse State Variants --- */
+        @keyframes jewel-pulse-urgent {{
+            0%, 100% {{ opacity: 1; transform: scale(1); box-shadow: 0 0 4px currentColor; }}
+            50% {{ opacity: 0.8; transform: scale(1.3); box-shadow: 0 0 12px currentColor; }}
+        }}
+        @keyframes jewel-pulse-slow {{
+            0%, 100% {{ opacity: 1; transform: scale(1); }}
+            50% {{ opacity: 0.85; transform: scale(1.05); }}
+        }}
+        @keyframes jewel-breathe {{
+            0%, 100% {{ opacity: 0.7; }}
+            50% {{ opacity: 1; }}
+        }}
+        .status-jewel.pulse-urgent {{
+            animation: jewel-pulse-urgent 0.8s ease-in-out infinite;
+        }}
+        .status-jewel.pulse-slow {{
+            animation: jewel-pulse-slow 3s ease-in-out infinite;
+        }}
+        .status-jewel.breathe {{
+            animation: jewel-breathe 4s ease-in-out infinite;
+        }}
+
+        /* --- Card Hover Depth System --- */
+        .watchmaker-card {{
+            --card-rx: 0deg;
+            --card-ry: 0deg;
+            --card-tz: 0px;
+            --card-shadow-x: 0px;
+            --card-shadow-y: 4px;
+        }}
+        .watchmaker-card.depth-tracking {{
+            transform: translateZ(var(--card-tz)) rotateX(var(--card-rx)) rotateY(var(--card-ry));
+            box-shadow:
+                calc(var(--card-shadow-x) * -1) calc(var(--card-shadow-y) + 4px) 24px rgba(0,0,0,0.2),
+                0 2px 8px rgba(0,0,0,0.12);
+            transition: box-shadow 0.15s ease;
+        }}
+        .watchmaker-card.depth-lift {{
+            --card-tz: 16px;
+            box-shadow:
+                0 16px 32px rgba(0,0,0,0.25),
+                0 4px 12px rgba(0,0,0,0.15),
+                inset 0 1px 0 rgba(255,255,255,0.06);
+        }}
+
+        /* Polish shimmer on hover */
+        @keyframes card-shimmer {{
+            0% {{ background-position: -200% 0; }}
+            100% {{ background-position: 200% 0; }}
+        }}
+        .watchmaker-card.shimmer-active::after {{
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            border-radius: inherit;
+            pointer-events: none;
+            background: linear-gradient(90deg,
+                transparent 0%,
+                rgba(255,255,255,0.04) 45%,
+                rgba(255,255,255,0.08) 50%,
+                rgba(255,255,255,0.04) 55%,
+                transparent 100%
+            );
+            background-size: 200% 100%;
+            animation: card-shimmer 2s ease-in-out;
+        }}
+
+        /* --- Background Gear Parallax Layers --- */
+        .gear-bg .gear-layer-1 {{
+            position: absolute;
+            top: 10%;
+            left: 15%;
+            width: 180px;
+            height: 180px;
+        }}
+        .gear-bg .gear-layer-2 {{
+            position: absolute;
+            top: 50%;
+            right: 10%;
+            width: 120px;
+            height: 120px;
+        }}
+        .gear-bg .gear-layer-3 {{
+            position: absolute;
+            bottom: 15%;
+            left: 40%;
+            width: 220px;
+            height: 220px;
+        }}
+        .gear-bg .gear-layer-4 {{
+            position: absolute;
+            top: 25%;
+            right: 35%;
+            width: 80px;
+            height: 80px;
+        }}
+        .gear-bg .gear-layer-5 {{
+            position: absolute;
+            bottom: 40%;
+            left: 5%;
+            width: 100px;
+            height: 100px;
+        }}
+        .gear-bg svg.gear-animated {{
+            animation: gear-spin-eased 20s linear infinite;
+        }}
+        .gear-bg svg.gear-animated.reverse {{
+            animation-direction: reverse;
+        }}
+
+        /* Reduced motion: disable all watchmaker animations */
+        @media (prefers-reduced-motion: reduce) {{
+            .gear-bg svg.gear-animated,
+            .watchmaker-card.active .gear-icon,
+            .status-jewel.pending,
+            .status-jewel.pulse-urgent,
+            .status-jewel.pulse-slow,
+            .status-jewel.breathe,
+            .data-flow-line,
+            .health-ring-connector::after,
+            .watchmaker-card.shimmer-active::after {{
+                animation: none !important;
+            }}
+            .watchmaker-card.depth-tracking {{
+                transform: none !important;
+            }}
+        }}
+
         /* ─── Buttons (M3-inspired) ────────────────────────────────── */
         .btn {{
             display: inline-flex;
@@ -1996,6 +2204,45 @@ def build_template() -> str:
     </div>
 
     <div class="dashboard-layout">
+        <!-- ═══ Gear Background Parallax (Phase 4) ═══ -->
+        <div class="gear-bg" id="gear-bg-container">
+            <div class="gear-layer-1 gear-parallax-layer gear-parallax-far">
+                <svg class="gear-animated" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+                    <g style="transform-origin:50% 50%"><circle cx="50" cy="50" r="28" fill="none" stroke="#B85A3C" stroke-width="3"/>
+                    <path d="M50,8 L54,18 L46,18Z M92,50 L82,54 L82,46Z M50,92 L46,82 L54,82Z M8,50 L18,46 L18,54Z M79,21 L72,29 L73,27Z M79,79 L72,72 L27,73Z M21,79 L29,72 L27,73Z M21,21 L29,29 L27,27Z" fill="#B85A3C"/>
+                    <circle cx="50" cy="50" r="10" fill="#B85A3C" opacity="0.3"/></g>
+                </svg>
+            </div>
+            <div class="gear-layer-2 gear-parallax-layer gear-parallax-mid">
+                <svg class="gear-animated reverse" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+                    <g style="transform-origin:50% 50%"><circle cx="50" cy="50" r="24" fill="none" stroke="#98C1D9" stroke-width="2"/>
+                    <path d="M50,10 L53,20 L47,20Z M90,50 L80,53 L80,47Z M50,90 L47,80 L53,80Z M10,50 L20,47 L20,53Z M78,22 L72,28Z M78,78 L72,72Z M22,78 L28,72Z M22,22 L28,28Z" fill="#98C1D9"/>
+                    <circle cx="50" cy="50" r="8" fill="#98C1D9" opacity="0.2"/></g>
+                </svg>
+            </div>
+            <div class="gear-layer-3 gear-parallax-layer gear-parallax-far">
+                <svg class="gear-animated" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg" style="animation-duration:30s;">
+                    <g style="transform-origin:50% 50%"><circle cx="50" cy="50" r="32" fill="none" stroke="#B85A3C" stroke-width="2.5"/>
+                    <path d="M50,5 L55,17 L45,17Z M95,50 L83,55 L83,45Z M50,95 L45,83 L55,83Z M5,50 L17,45 L17,55Z M82,18 L73,26Z M82,82 L73,74Z M18,82 L26,74Z M18,18 L26,26Z M68,9 L64,20Z M91,32 L80,36Z M91,68 L80,64Z M68,91 L64,80Z M32,91 L36,80Z M9,68 L20,64Z M9,32 L20,36Z M32,9 L36,20Z" fill="#B85A3C" opacity="0.8"/>
+                    <circle cx="50" cy="50" r="14" fill="#B85A3C" opacity="0.15"/></g>
+                </svg>
+            </div>
+            <div class="gear-layer-4 gear-parallax-layer gear-parallax-mid">
+                <svg class="gear-animated reverse" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg" style="animation-duration:15s;">
+                    <g style="transform-origin:50% 50%"><circle cx="50" cy="50" r="22" fill="none" stroke="#98C1D9" stroke-width="2"/>
+                    <path d="M50,12 L53,22 L47,22Z M88,50 L78,53 L78,47Z M50,88 L47,78 L53,78Z M12,50 L22,47 L22,53Z" fill="#98C1D9" opacity="0.5"/>
+                    <circle cx="50" cy="50" r="7" fill="#98C1D9" opacity="0.15"/></g>
+                </svg>
+            </div>
+            <div class="gear-layer-5 gear-parallax-layer gear-parallax-near">
+                <svg class="gear-animated" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg" style="animation-duration:12s;">
+                    <g style="transform-origin:50% 50%"><circle cx="50" cy="50" r="20" fill="none" stroke="#B85A3C" stroke-width="2.5"/>
+                    <path d="M50,14 L53,24 L47,24Z M86,50 L76,53 L76,47Z M50,86 L47,76 L53,76Z M14,50 L24,47 L24,53Z M74,26 L68,32Z M74,74 L68,68Z M26,74 L32,68Z M26,26 L32,32Z" fill="#B85A3C"/>
+                    <circle cx="50" cy="50" r="6" fill="#B85A3C" opacity="0.25"/></g>
+                </svg>
+            </div>
+        </div>
+
         <!-- ═══ Sidebar Navigation ═══ -->
         <nav class="nav-sidebar" role="navigation" aria-label="Main navigation">
             <div class="nav-brand">
@@ -3990,6 +4237,226 @@ def build_template_js() -> str:
             } catch (e) {}
         }
 
+        // ─── Watchmaker Phase 4: Animation System ──────────────────────
+        // Modified: 2026-02-08T08:00:00Z | Author: COPILOT | Change: Gear rotation controller, flow/jewel animation, card hover depth, gear parallax
+
+        // --- Gear Rotation Controller (speed-aware) ---
+        const GearController = {
+            _systemLoad: 0,
+            _lastSpeedClass: 'gear-speed-idle',
+            _gears: [],
+
+            init() {
+                this._gears = document.querySelectorAll('.gear-bg svg.gear-animated, .watchmaker-card .gear-icon');
+                this.updateSpeed(0);
+            },
+
+            // Map load percentage to speed tier
+            loadToSpeedClass(load) {
+                if (load <= 0) return 'gear-speed-idle';
+                if (load < 20) return 'gear-speed-low';
+                if (load < 50) return 'gear-speed-medium';
+                if (load < 80) return 'gear-speed-high';
+                return 'gear-speed-max';
+            },
+
+            updateSpeed(load) {
+                this._systemLoad = load;
+                const newClass = this.loadToSpeedClass(load);
+                if (newClass === this._lastSpeedClass) return;
+
+                const speedClasses = ['gear-speed-idle','gear-speed-low','gear-speed-medium','gear-speed-high','gear-speed-max'];
+                this._gears.forEach(g => {
+                    speedClasses.forEach(c => g.classList.remove(c));
+                    g.classList.add(newClass);
+                });
+                this._lastSpeedClass = newClass;
+            },
+
+            pause() {
+                this._gears.forEach(g => g.classList.add('gear-paused'));
+            },
+
+            resume() {
+                this._gears.forEach(g => g.classList.remove('gear-paused'));
+            },
+
+            // Fetch system load and update gears
+            async syncWithSystem() {
+                try {
+                    const resp = await fetch('/api/gpu');
+                    const data = await resp.json();
+                    const gpus = data.gpus || [];
+                    const avgLoad = gpus.length > 0
+                        ? gpus.reduce((sum, g) => sum + (g.utilization || g.load || 0), 0) / gpus.length
+                        : 0;
+                    this.updateSpeed(avgLoad);
+                } catch (e) {
+                    this.updateSpeed(0);
+                }
+            }
+        };
+
+        // --- Flow Line Pulse Controller ---
+        const FlowController = {
+            _lines: [],
+
+            init() {
+                this._lines = document.querySelectorAll('.data-flow-line');
+            },
+
+            // Set flow speed class based on throughput
+            setFlowSpeed(lineEl, speed) {
+                lineEl.classList.remove('flow-fast', 'flow-medium', 'flow-slow', 'flow-inactive', 'flow-glow');
+                if (speed === 'fast') lineEl.classList.add('flow-fast', 'flow-glow');
+                else if (speed === 'medium') lineEl.classList.add('flow-medium');
+                else if (speed === 'slow') lineEl.classList.add('flow-slow');
+                else lineEl.classList.add('flow-inactive');
+            },
+
+            // Update constellation flow lines based on service status
+            async syncWithServices() {
+                try {
+                    const resp = await fetch('/api/services');
+                    const data = await resp.json();
+                    const svcMap = {};
+                    (data.services || []).forEach(s => { svcMap[s.name.toLowerCase()] = s.status; });
+                    const allOnline = Object.values(svcMap).filter(v => v === 'online').length;
+                    const total = Object.keys(svcMap).length || 1;
+                    const ratio = allOnline / total;
+                    this._lines.forEach(l => {
+                        if (ratio >= 0.8) this.setFlowSpeed(l, 'fast');
+                        else if (ratio >= 0.5) this.setFlowSpeed(l, 'medium');
+                        else if (ratio > 0) this.setFlowSpeed(l, 'slow');
+                        else this.setFlowSpeed(l, 'inactive');
+                    });
+                } catch (e) {}
+            }
+        };
+
+        // --- Jewel Pulse Controller ---
+        const JewelController = {
+            // Set pulse variant based on urgency
+            setPulseVariant(jewelEl, variant) {
+                jewelEl.classList.remove('pulse-urgent', 'pulse-slow', 'breathe');
+                if (variant === 'urgent') jewelEl.classList.add('pulse-urgent');
+                else if (variant === 'slow') jewelEl.classList.add('pulse-slow');
+                else if (variant === 'breathe') jewelEl.classList.add('breathe');
+            }
+        };
+
+        // --- Card Hover Depth Controller ---
+        const CardDepthController = {
+            _cards: [],
+            _enabled: true,
+
+            init() {
+                this._cards = document.querySelectorAll('.watchmaker-card');
+                // Check for reduced motion preference
+                if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+                    this._enabled = false;
+                    return;
+                }
+                this._cards.forEach(card => {
+                    card.addEventListener('mouseenter', (e) => this._onEnter(card, e));
+                    card.addEventListener('mousemove', (e) => this._onMove(card, e));
+                    card.addEventListener('mouseleave', (e) => this._onLeave(card, e));
+                });
+            },
+
+            _onEnter(card) {
+                card.classList.add('depth-tracking');
+                card.style.position = 'relative';
+                // Trigger shimmer on hover
+                card.classList.add('shimmer-active');
+                setTimeout(() => card.classList.remove('shimmer-active'), 2000);
+            },
+
+            _onMove(card, e) {
+                if (!this._enabled) return;
+                const rect = card.getBoundingClientRect();
+                const x = e.clientX - rect.left;
+                const y = e.clientY - rect.top;
+                const centerX = rect.width / 2;
+                const centerY = rect.height / 2;
+                // Calculate rotation angles (max 3 degrees)
+                const rotateY = ((x - centerX) / centerX) * 3;
+                const rotateX = ((centerY - y) / centerY) * 3;
+                // Shadow offset follows mouse
+                const shadowX = ((x - centerX) / centerX) * 6;
+                const shadowY = ((y - centerY) / centerY) * 6;
+                card.style.setProperty('--card-rx', rotateX + 'deg');
+                card.style.setProperty('--card-ry', rotateY + 'deg');
+                card.style.setProperty('--card-tz', '16px');
+                card.style.setProperty('--card-shadow-x', shadowX + 'px');
+                card.style.setProperty('--card-shadow-y', shadowY + 'px');
+            },
+
+            _onLeave(card) {
+                card.classList.remove('depth-tracking');
+                card.style.setProperty('--card-rx', '0deg');
+                card.style.setProperty('--card-ry', '0deg');
+                card.style.setProperty('--card-tz', '0px');
+                card.style.setProperty('--card-shadow-x', '0px');
+                card.style.setProperty('--card-shadow-y', '4px');
+            }
+        };
+
+        // --- Background Gear Parallax Controller ---
+        const GearParallax = {
+            _layers: [],
+            _enabled: true,
+            _ticking: false,
+
+            init() {
+                if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+                    this._enabled = false;
+                    return;
+                }
+                this._layers = [
+                    { el: document.querySelector('.gear-layer-1'), speed: 0.02 },
+                    { el: document.querySelector('.gear-layer-2'), speed: 0.04 },
+                    { el: document.querySelector('.gear-layer-3'), speed: 0.01 },
+                    { el: document.querySelector('.gear-layer-4'), speed: 0.05 },
+                    { el: document.querySelector('.gear-layer-5'), speed: 0.03 }
+                ].filter(l => l.el);
+
+                // Only use mouse-based parallax (no scroll since dashboard uses sections)
+                document.addEventListener('mousemove', (e) => this._onMouseMove(e));
+            },
+
+            _onMouseMove(e) {
+                if (!this._enabled || this._ticking) return;
+                this._ticking = true;
+                requestAnimationFrame(() => {
+                    const cx = window.innerWidth / 2;
+                    const cy = window.innerHeight / 2;
+                    const dx = e.clientX - cx;
+                    const dy = e.clientY - cy;
+                    this._layers.forEach(layer => {
+                        const x = dx * layer.speed;
+                        const y = dy * layer.speed;
+                        layer.el.style.transform = `translate(${x}px, ${y}px)`;
+                    });
+                    this._ticking = false;
+                });
+            }
+        };
+
+        // --- Animation System Initialization ---
+        function initAnimationSystem() {
+            GearController.init();
+            FlowController.init();
+            CardDepthController.init();
+            GearParallax.init();
+            // Sync gear speed with system load every 10s
+            GearController.syncWithSystem();
+            setInterval(() => GearController.syncWithSystem(), 10000);
+            // Sync flow lines with service status every 30s
+            FlowController.syncWithServices();
+            setInterval(() => FlowController.syncWithServices(), 30000);
+        }
+
         // Initialize watchmaker views
         function initWatchmakerViews() {
             updateHealthRing();
@@ -4015,6 +4482,8 @@ def build_template_js() -> str:
         setInterval(updateGPUWorkbench, 10000);
         setInterval(updateConstellationJewels, 30000);
         setInterval(refreshTaskOrchestration, 30000);
+        // Watchmaker Phase 4 - animation system
+        initAnimationSystem();
     </script>
 </body>
 </html>'''
