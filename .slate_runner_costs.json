@@ -1,0 +1,5074 @@
+{
+  "last_updated": "2026-02-06T19:50:52.146641",
+  "runs": [
+    {
+      "id": 21770936762,
+      "workflow": "SLATE CI",
+      "created": "2026-02-07T00:41:15Z",
+      "conclusion": "success",
+      "jobs": [
+        {
+          "job_name": "SDK Validation",
+          "runner_type": "self-hosted",
+          "is_self_hosted": true,
+          "duration_minutes": 0.2,
+          "cost_rate": 0.0,
+          "actual_cost": 0.0,
+          "saved": 0.0016
+        },
+        {
+          "job_name": "Lint & Format",
+          "runner_type": "self-hosted",
+          "is_self_hosted": true,
+          "duration_minutes": 0.2,
+          "cost_rate": 0.0,
+          "actual_cost": 0.0,
+          "saved": 0.0016
+        },
+        {
+          "job_name": "Security Scan",
+          "runner_type": "self-hosted",
+          "is_self_hosted": true,
+          "duration_minutes": 0.22,
+          "cost_rate": 0.0,
+          "actual_cost": 0.0,
+          "saved": 0.0017
+        },
+        {
+          "job_name": "Unit Tests",
+          "runner_type": "self-hosted",
+          "is_self_hosted": true,
+          "duration_minutes": 0.22,
+          "cost_rate": 0.0,
+          "actual_cost": 0.0,
+          "saved": 0.0017
+        },
+        {
+          "job_name": "SLATE Quick Checks",
+          "runner_type": "self-hosted",
+          "is_self_hosted": true,
+          "duration_minutes": 0.2,
+          "cost_rate": 0.0,
+          "actual_cost": 0.0,
+          "saved": 0.0016
+        },
+        {
+          "job_name": "CI Summary",
+          "runner_type": "self-hosted",
+          "is_self_hosted": true,
+          "duration_minutes": 0.07,
+          "cost_rate": 0.0,
+          "actual_cost": 0.0,
+          "saved": 0.0005
+        }
+      ],
+      "total_minutes": 1.11,
+      "total_cost": 0.0,
+      "total_saved": 0.008700000000000001
+    },
+    {
+      "id": 21770936750,
+      "workflow": "CD - Build & Deploy",
+      "created": "2026-02-07T00:41:15Z",
+      "conclusion": "success",
+      "jobs": [
+        {
+          "job_name": "Determine Version",
+          "runner_type": "self-hosted",
+          "is_self_hosted": true,
+          "duration_minutes": 0.2,
+          "cost_rate": 0.0,
+          "actual_cost": 0.0,
+          "saved": 0.0016
+        },
+        {
+          "job_name": "Build Windows EXE",
+          "runner_type": "self-hosted",
+          "is_self_hosted": true,
+          "duration_minutes": 0.33,
+          "cost_rate": 0.0,
+          "actual_cost": 0.0,
+          "saved": 0.0027
+        },
+        {
+          "job_name": "CD Summary",
+          "runner_type": "self-hosted",
+          "is_self_hosted": true,
+          "duration_minutes": 0.07,
+          "cost_rate": 0.0,
+          "actual_cost": 0.0,
+          "saved": 0.0005
+        },
+        {
+          "job_name": "Create Release",
+          "runner_type": "self-hosted",
+          "is_self_hosted": true,
+          "duration_minutes": -0.02,
+          "cost_rate": 0.0,
+          "actual_cost": -0.0,
+          "saved": -0.0001
+        }
+      ],
+      "total_minutes": 0.5800000000000001,
+      "total_cost": 0.0,
+      "total_saved": 0.0047
+    },
+    {
+      "id": 21770936747,
+      "workflow": "SLATE Integration",
+      "created": "2026-02-07T00:41:15Z",
+      "conclusion": "success",
+      "jobs": [
+        {
+          "job_name": "SLATE Status Check",
+          "runner_type": "self-hosted",
+          "is_self_hosted": true,
+          "duration_minutes": 0.22,
+          "cost_rate": 0.0,
+          "actual_cost": 0.0,
+          "saved": 0.0017
+        },
+        {
+          "job_name": "Tech Tree Validation",
+          "runner_type": "self-hosted",
+          "is_self_hosted": true,
+          "duration_minutes": 0.2,
+          "cost_rate": 0.0,
+          "actual_cost": 0.0,
+          "saved": 0.0016
+        },
+        {
+          "job_name": "SDK Validation",
+          "runner_type": "self-hosted",
+          "is_self_hosted": true,
+          "duration_minutes": 0.2,
+          "cost_rate": 0.0,
+          "actual_cost": 0.0,
+          "saved": 0.0016
+        },
+        {
+          "job_name": "Task Queue Validation",
+          "runner_type": "self-hosted",
+          "is_self_hosted": true,
+          "duration_minutes": 0.18,
+          "cost_rate": 0.0,
+          "actual_cost": 0.0,
+          "saved": 0.0015
+        },
+        {
+          "job_name": "Dashboard Smoke Test",
+          "runner_type": "self-hosted",
+          "is_self_hosted": true,
+          "duration_minutes": 0.18,
+          "cost_rate": 0.0,
+          "actual_cost": 0.0,
+          "saved": 0.0015
+        },
+        {
+          "job_name": "Agent Module Test",
+          "runner_type": "self-hosted",
+          "is_self_hosted": true,
+          "duration_minutes": 0.2,
+          "cost_rate": 0.0,
+          "actual_cost": 0.0,
+          "saved": 0.0016
+        },
+        {
+          "job_name": "SLATE Summary",
+          "runner_type": "self-hosted",
+          "is_self_hosted": true,
+          "duration_minutes": 0.05,
+          "cost_rate": 0.0,
+          "actual_cost": 0.0,
+          "saved": 0.0004
+        }
+      ],
+      "total_minutes": 1.23,
+      "total_cost": 0.0,
+      "total_saved": 0.009899999999999999
+    },
+    {
+      "id": 21770891199,
+      "workflow": "SLATE CI",
+      "created": "2026-02-07T00:38:45Z",
+      "conclusion": "cancelled",
+      "jobs": [
+        {
+          "job_name": "SDK Validation",
+          "runner_type": "self-hosted",
+          "is_self_hosted": true,
+          "duration_minutes": 2.52,
+          "cost_rate": 0.0,
+          "actual_cost": 0.0,
+          "saved": 0.0201
+        },
+        {
+          "job_name": "Lint & Format",
+          "runner_type": "self-hosted",
+          "is_self_hosted": true,
+          "duration_minutes": 0.22,
+          "cost_rate": 0.0,
+          "actual_cost": 0.0,
+          "saved": 0.0017
+        },
+        {
+          "job_name": "Unit Tests",
+          "runner_type": "self-hosted",
+          "is_self_hosted": true,
+          "duration_minutes": 0.2,
+          "cost_rate": 0.0,
+          "actual_cost": 0.0,
+          "saved": 0.0016
+        },
+        {
+          "job_name": "SLATE Quick Checks",
+          "runner_type": "self-hosted",
+          "is_self_hosted": true,
+          "duration_minutes": 0.0,
+          "cost_rate": 0.0,
+          "actual_cost": 0.0,
+          "saved": 0.0
+        },
+        {
+          "job_name": "Security Scan",
+          "runner_type": "self-hosted",
+          "is_self_hosted": true,
+          "duration_minutes": 0.0,
+          "cost_rate": 0.0,
+          "actual_cost": 0.0,
+          "saved": 0.0
+        },
+        {
+          "job_name": "CI Summary",
+          "runner_type": "self-hosted",
+          "is_self_hosted": true,
+          "duration_minutes": 0.07,
+          "cost_rate": 0.0,
+          "actual_cost": 0.0,
+          "saved": 0.0005
+        }
+      ],
+      "total_minutes": 3.0100000000000002,
+      "total_cost": 0.0,
+      "total_saved": 0.0239
+    },
+    {
+      "id": 21770891194,
+      "workflow": "SLATE Integration",
+      "created": "2026-02-07T00:38:45Z",
+      "conclusion": "cancelled",
+      "jobs": [
+        {
+          "job_name": "Task Queue Validation",
+          "runner_type": "self-hosted",
+          "is_self_hosted": true,
+          "duration_minutes": 2.52,
+          "cost_rate": 0.0,
+          "actual_cost": 0.0,
+          "saved": 0.0201
+        },
+        {
+          "job_name": "Agent Module Test",
+          "runner_type": "self-hosted",
+          "is_self_hosted": true,
+          "duration_minutes": 0.0,
+          "cost_rate": 0.0,
+          "actual_cost": 0.0,
+          "saved": 0.0
+        },
+        {
+          "job_name": "Tech Tree Validation",
+          "runner_type": "self-hosted",
+          "is_self_hosted": true,
+          "duration_minutes": 0.0,
+          "cost_rate": 0.0,
+          "actual_cost": 0.0,
+          "saved": 0.0
+        },
+        {
+          "job_name": "Dashboard Smoke Test",
+          "runner_type": "self-hosted",
+          "is_self_hosted": true,
+          "duration_minutes": 0.0,
+          "cost_rate": 0.0,
+          "actual_cost": 0.0,
+          "saved": 0.0
+        },
+        {
+          "job_name": "SLATE Status Check",
+          "runner_type": "self-hosted",
+          "is_self_hosted": true,
+          "duration_minutes": 0.0,
+          "cost_rate": 0.0,
+          "actual_cost": 0.0,
+          "saved": 0.0
+        },
+        {
+          "job_name": "SDK Validation",
+          "runner_type": "self-hosted",
+          "is_self_hosted": true,
+          "duration_minutes": 0.0,
+          "cost_rate": 0.0,
+          "actual_cost": 0.0,
+          "saved": 0.0
+        },
+        {
+          "job_name": "SLATE Summary",
+          "runner_type": "self-hosted",
+          "is_self_hosted": true,
+          "duration_minutes": 0.05,
+          "cost_rate": 0.0,
+          "actual_cost": 0.0,
+          "saved": 0.0004
+        }
+      ],
+      "total_minutes": 2.57,
+      "total_cost": 0.0,
+      "total_saved": 0.0205
+    },
+    {
+      "id": 21770891191,
+      "workflow": "Docs Validation",
+      "created": "2026-02-07T00:38:45Z",
+      "conclusion": "success",
+      "jobs": [
+        {
+          "job_name": "Link Check",
+          "runner_type": "self-hosted",
+          "is_self_hosted": true,
+          "duration_minutes": 0.17,
+          "cost_rate": 0.0,
+          "actual_cost": 0.0,
+          "saved": 0.0013
+        },
+        {
+          "job_name": "README Check",
+          "runner_type": "self-hosted",
+          "is_self_hosted": true,
+          "duration_minutes": 0.18,
+          "cost_rate": 0.0,
+          "actual_cost": 0.0,
+          "saved": 0.0015
+        },
+        {
+          "job_name": "Docs Summary",
+          "runner_type": "self-hosted",
+          "is_self_hosted": true,
+          "duration_minutes": 0.07,
+          "cost_rate": 0.0,
+          "actual_cost": 0.0,
+          "saved": 0.0005
+        }
+      ],
+      "total_minutes": 0.42,
+      "total_cost": 0.0,
+      "total_saved": 0.0033
+    },
+    {
+      "id": 21770891182,
+      "workflow": "CodeQL Analysis",
+      "created": "2026-02-07T00:38:45Z",
+      "conclusion": "success",
+      "jobs": [
+        {
+          "job_name": "CodeQL Analysis (python)",
+          "runner_type": "self-hosted",
+          "is_self_hosted": true,
+          "duration_minutes": 1.43,
+          "cost_rate": 0.0,
+          "actual_cost": 0.0,
+          "saved": 0.0115
+        }
+      ],
+      "total_minutes": 1.43,
+      "total_cost": 0.0,
+      "total_saved": 0.0115
+    },
+    {
+      "id": 21770891178,
+      "workflow": "CD - Build & Deploy",
+      "created": "2026-02-07T00:38:45Z",
+      "conclusion": "success",
+      "jobs": [
+        {
+          "job_name": "Determine Version",
+          "runner_type": "self-hosted",
+          "is_self_hosted": true,
+          "duration_minutes": 0.2,
+          "cost_rate": 0.0,
+          "actual_cost": 0.0,
+          "saved": 0.0016
+        },
+        {
+          "job_name": "Build Windows EXE",
+          "runner_type": "self-hosted",
+          "is_self_hosted": true,
+          "duration_minutes": 0.33,
+          "cost_rate": 0.0,
+          "actual_cost": 0.0,
+          "saved": 0.0027
+        },
+        {
+          "job_name": "CD Summary",
+          "runner_type": "self-hosted",
+          "is_self_hosted": true,
+          "duration_minutes": 0.08,
+          "cost_rate": 0.0,
+          "actual_cost": 0.0,
+          "saved": 0.0007
+        },
+        {
+          "job_name": "Create Release",
+          "runner_type": "self-hosted",
+          "is_self_hosted": true,
+          "duration_minutes": 0.0,
+          "cost_rate": 0.0,
+          "actual_cost": 0.0,
+          "saved": 0.0
+        }
+      ],
+      "total_minutes": 0.61,
+      "total_cost": 0.0,
+      "total_saved": 0.005
+    },
+    {
+      "id": 21770813081,
+      "workflow": "SLATE Integration",
+      "created": "2026-02-07T00:34:23Z",
+      "conclusion": "success",
+      "jobs": [
+        {
+          "job_name": "SDK Validation",
+          "runner_type": "self-hosted",
+          "is_self_hosted": true,
+          "duration_minutes": 0.2,
+          "cost_rate": 0.0,
+          "actual_cost": 0.0,
+          "saved": 0.0016
+        },
+        {
+          "job_name": "Tech Tree Validation",
+          "runner_type": "self-hosted",
+          "is_self_hosted": true,
+          "duration_minutes": 0.18,
+          "cost_rate": 0.0,
+          "actual_cost": 0.0,
+          "saved": 0.0015
+        },
+        {
+          "job_name": "Task Queue Validation",
+          "runner_type": "self-hosted",
+          "is_self_hosted": true,
+          "duration_minutes": 0.2,
+          "cost_rate": 0.0,
+          "actual_cost": 0.0,
+          "saved": 0.0016
+        },
+        {
+          "job_name": "Agent Module Test",
+          "runner_type": "self-hosted",
+          "is_self_hosted": true,
+          "duration_minutes": 0.18,
+          "cost_rate": 0.0,
+          "actual_cost": 0.0,
+          "saved": 0.0015
+        },
+        {
+          "job_name": "SLATE Status Check",
+          "runner_type": "self-hosted",
+          "is_self_hosted": true,
+          "duration_minutes": 0.2,
+          "cost_rate": 0.0,
+          "actual_cost": 0.0,
+          "saved": 0.0016
+        },
+        {
+          "job_name": "Dashboard Smoke Test",
+          "runner_type": "self-hosted",
+          "is_self_hosted": true,
+          "duration_minutes": 0.2,
+          "cost_rate": 0.0,
+          "actual_cost": 0.0,
+          "saved": 0.0016
+        },
+        {
+          "job_name": "SLATE Summary",
+          "runner_type": "self-hosted",
+          "is_self_hosted": true,
+          "duration_minutes": 0.07,
+          "cost_rate": 0.0,
+          "actual_cost": 0.0,
+          "saved": 0.0005
+        }
+      ],
+      "total_minutes": 1.23,
+      "total_cost": 0.0,
+      "total_saved": 0.0099
+    },
+    {
+      "id": 21770813072,
+      "workflow": "CD - Build & Deploy",
+      "created": "2026-02-07T00:34:23Z",
+      "conclusion": "success",
+      "jobs": [
+        {
+          "job_name": "Determine Version",
+          "runner_type": "self-hosted",
+          "is_self_hosted": true,
+          "duration_minutes": 0.2,
+          "cost_rate": 0.0,
+          "actual_cost": 0.0,
+          "saved": 0.0016
+        },
+        {
+          "job_name": "Build Windows EXE",
+          "runner_type": "self-hosted",
+          "is_self_hosted": true,
+          "duration_minutes": 0.33,
+          "cost_rate": 0.0,
+          "actual_cost": 0.0,
+          "saved": 0.0027
+        },
+        {
+          "job_name": "CD Summary",
+          "runner_type": "self-hosted",
+          "is_self_hosted": true,
+          "duration_minutes": 0.05,
+          "cost_rate": 0.0,
+          "actual_cost": 0.0,
+          "saved": 0.0004
+        },
+        {
+          "job_name": "Create Release",
+          "runner_type": "self-hosted",
+          "is_self_hosted": true,
+          "duration_minutes": -0.02,
+          "cost_rate": 0.0,
+          "actual_cost": -0.0,
+          "saved": -0.0001
+        }
+      ],
+      "total_minutes": 0.56,
+      "total_cost": 0.0,
+      "total_saved": 0.0046
+    },
+    {
+      "id": 21770813066,
+      "workflow": "SLATE CI",
+      "created": "2026-02-07T00:34:23Z",
+      "conclusion": "success",
+      "jobs": [
+        {
+          "job_name": "Security Scan",
+          "runner_type": "self-hosted",
+          "is_self_hosted": true,
+          "duration_minutes": 0.2,
+          "cost_rate": 0.0,
+          "actual_cost": 0.0,
+          "saved": 0.0016
+        },
+        {
+          "job_name": "Unit Tests",
+          "runner_type": "self-hosted",
+          "is_self_hosted": true,
+          "duration_minutes": 0.2,
+          "cost_rate": 0.0,
+          "actual_cost": 0.0,
+          "saved": 0.0016
+        },
+        {
+          "job_name": "SDK Validation",
+          "runner_type": "self-hosted",
+          "is_self_hosted": true,
+          "duration_minutes": 0.18,
+          "cost_rate": 0.0,
+          "actual_cost": 0.0,
+          "saved": 0.0015
+        },
+        {
+          "job_name": "Lint & Format",
+          "runner_type": "self-hosted",
+          "is_self_hosted": true,
+          "duration_minutes": 0.22,
+          "cost_rate": 0.0,
+          "actual_cost": 0.0,
+          "saved": 0.0017
+        },
+        {
+          "job_name": "SLATE Quick Checks",
+          "runner_type": "self-hosted",
+          "is_self_hosted": true,
+          "duration_minutes": 0.2,
+          "cost_rate": 0.0,
+          "actual_cost": 0.0,
+          "saved": 0.0016
+        },
+        {
+          "job_name": "CI Summary",
+          "runner_type": "self-hosted",
+          "is_self_hosted": true,
+          "duration_minutes": 0.07,
+          "cost_rate": 0.0,
+          "actual_cost": 0.0,
+          "saved": 0.0005
+        }
+      ],
+      "total_minutes": 1.07,
+      "total_cost": 0.0,
+      "total_saved": 0.0085
+    },
+    {
+      "id": 21770805817,
+      "workflow": "Project Automation",
+      "created": "2026-02-07T00:34:01Z",
+      "conclusion": "success",
+      "jobs": [
+        {
+          "job_name": "Manual Project Actions",
+          "runner_type": "ubuntu-latest",
+          "is_self_hosted": false,
+          "duration_minutes": 0.08,
+          "cost_rate": 0.008,
+          "actual_cost": 0.0007,
+          "saved": 0
+        },
+        {
+          "job_name": "Auto-add to Project",
+          "runner_type": "ubuntu-latest",
+          "is_self_hosted": false,
+          "duration_minutes": 0.0,
+          "cost_rate": 0.008,
+          "actual_cost": 0.0,
+          "saved": 0
+        }
+      ],
+      "total_minutes": 0.08,
+      "total_cost": 0.0007,
+      "total_saved": 0
+    },
+    {
+      "id": 21770804220,
+      "workflow": "SLATE CI",
+      "created": "2026-02-07T00:33:56Z",
+      "conclusion": "cancelled",
+      "jobs": [
+        {
+          "job_name": "Lint & Format",
+          "runner_type": "self-hosted",
+          "is_self_hosted": true,
+          "duration_minutes": 0.2,
+          "cost_rate": 0.0,
+          "actual_cost": 0.0,
+          "saved": 0.0016
+        },
+        {
+          "job_name": "SLATE Quick Checks",
+          "runner_type": "self-hosted",
+          "is_self_hosted": true,
+          "duration_minutes": 0.0,
+          "cost_rate": 0.0,
+          "actual_cost": 0.0,
+          "saved": 0.0
+        },
+        {
+          "job_name": "Security Scan",
+          "runner_type": "self-hosted",
+          "is_self_hosted": true,
+          "duration_minutes": 0.45,
+          "cost_rate": 0.0,
+          "actual_cost": 0.0,
+          "saved": 0.0036
+        },
+        {
+          "job_name": "SDK Validation",
+          "runner_type": "self-hosted",
+          "is_self_hosted": true,
+          "duration_minutes": 0.45,
+          "cost_rate": 0.0,
+          "actual_cost": 0.0,
+          "saved": 0.0036
+        },
+        {
+          "job_name": "Unit Tests",
+          "runner_type": "self-hosted",
+          "is_self_hosted": true,
+          "duration_minutes": 0.0,
+          "cost_rate": 0.0,
+          "actual_cost": 0.0,
+          "saved": 0.0
+        },
+        {
+          "job_name": "CI Summary",
+          "runner_type": "self-hosted",
+          "is_self_hosted": true,
+          "duration_minutes": 0.07,
+          "cost_rate": 0.0,
+          "actual_cost": 0.0,
+          "saved": 0.0005
+        }
+      ],
+      "total_minutes": 1.1700000000000002,
+      "total_cost": 0.0,
+      "total_saved": 0.0093
+    },
+    {
+      "id": 21770804210,
+      "workflow": "CD - Build & Deploy",
+      "created": "2026-02-07T00:33:56Z",
+      "conclusion": "cancelled",
+      "jobs": [
+        {
+          "job_name": "Determine Version",
+          "runner_type": "self-hosted",
+          "is_self_hosted": true,
+          "duration_minutes": 0.18,
+          "cost_rate": 0.0,
+          "actual_cost": 0.0,
+          "saved": 0.0015
+        },
+        {
+          "job_name": "CD Summary",
+          "runner_type": "self-hosted",
+          "is_self_hosted": true,
+          "duration_minutes": 0.07,
+          "cost_rate": 0.0,
+          "actual_cost": 0.0,
+          "saved": 0.0005
+        },
+        {
+          "job_name": "Build Windows EXE",
+          "runner_type": "self-hosted",
+          "is_self_hosted": true,
+          "duration_minutes": 0.0,
+          "cost_rate": 0.0,
+          "actual_cost": 0.0,
+          "saved": 0.0
+        },
+        {
+          "job_name": "Create Release",
+          "runner_type": "self-hosted",
+          "is_self_hosted": true,
+          "duration_minutes": 0.0,
+          "cost_rate": 0.0,
+          "actual_cost": 0.0,
+          "saved": 0.0
+        }
+      ],
+      "total_minutes": 0.25,
+      "total_cost": 0.0,
+      "total_saved": 0.002
+    },
+    {
+      "id": 21770804205,
+      "workflow": "SLATE Integration",
+      "created": "2026-02-07T00:33:56Z",
+      "conclusion": "cancelled",
+      "jobs": [
+        {
+          "job_name": "SDK Validation",
+          "runner_type": "self-hosted",
+          "is_self_hosted": true,
+          "duration_minutes": 0.0,
+          "cost_rate": 0.0,
+          "actual_cost": 0.0,
+          "saved": 0.0
+        },
+        {
+          "job_name": "SLATE Status Check",
+          "runner_type": "self-hosted",
+          "is_self_hosted": true,
+          "duration_minutes": 0.47,
+          "cost_rate": 0.0,
+          "actual_cost": 0.0,
+          "saved": 0.0037
+        },
+        {
+          "job_name": "Agent Module Test",
+          "runner_type": "self-hosted",
+          "is_self_hosted": true,
+          "duration_minutes": 0.18,
+          "cost_rate": 0.0,
+          "actual_cost": 0.0,
+          "saved": 0.0015
+        },
+        {
+          "job_name": "Task Queue Validation",
+          "runner_type": "self-hosted",
+          "is_self_hosted": true,
+          "duration_minutes": 0.47,
+          "cost_rate": 0.0,
+          "actual_cost": 0.0,
+          "saved": 0.0037
+        },
+        {
+          "job_name": "Dashboard Smoke Test",
+          "runner_type": "self-hosted",
+          "is_self_hosted": true,
+          "duration_minutes": 0.47,
+          "cost_rate": 0.0,
+          "actual_cost": 0.0,
+          "saved": 0.0037
+        },
+        {
+          "job_name": "Tech Tree Validation",
+          "runner_type": "self-hosted",
+          "is_self_hosted": true,
+          "duration_minutes": 0.47,
+          "cost_rate": 0.0,
+          "actual_cost": 0.0,
+          "saved": 0.0037
+        },
+        {
+          "job_name": "SLATE Summary",
+          "runner_type": "self-hosted",
+          "is_self_hosted": true,
+          "duration_minutes": 0.08,
+          "cost_rate": 0.0,
+          "actual_cost": 0.0,
+          "saved": 0.0007
+        }
+      ],
+      "total_minutes": 2.1399999999999997,
+      "total_cost": 0.0,
+      "total_saved": 0.017
+    },
+    {
+      "id": 21770769743,
+      "workflow": "Docs Validation",
+      "created": "2026-02-07T00:32:02Z",
+      "conclusion": "failure",
+      "jobs": [
+        {
+          "job_name": "Link Check",
+          "runner_type": "self-hosted",
+          "is_self_hosted": true,
+          "duration_minutes": 0.18,
+          "cost_rate": 0.0,
+          "actual_cost": 0.0,
+          "saved": 0.0015
+        },
+        {
+          "job_name": "README Check",
+          "runner_type": "self-hosted",
+          "is_self_hosted": true,
+          "duration_minutes": 0.2,
+          "cost_rate": 0.0,
+          "actual_cost": 0.0,
+          "saved": 0.0016
+        },
+        {
+          "job_name": "Docs Summary",
+          "runner_type": "self-hosted",
+          "is_self_hosted": true,
+          "duration_minutes": 0.07,
+          "cost_rate": 0.0,
+          "actual_cost": 0.0,
+          "saved": 0.0005
+        }
+      ],
+      "total_minutes": 0.45,
+      "total_cost": 0.0,
+      "total_saved": 0.0036000000000000003
+    },
+    {
+      "id": 21770653229,
+      "workflow": "SLATE Integration",
+      "created": "2026-02-07T00:25:44Z",
+      "conclusion": "success",
+      "jobs": [
+        {
+          "job_name": "Agent Module Test",
+          "runner_type": "self-hosted",
+          "is_self_hosted": true,
+          "duration_minutes": 0.18,
+          "cost_rate": 0.0,
+          "actual_cost": 0.0,
+          "saved": 0.0015
+        },
+        {
+          "job_name": "SLATE Status Check",
+          "runner_type": "self-hosted",
+          "is_self_hosted": true,
+          "duration_minutes": 0.22,
+          "cost_rate": 0.0,
+          "actual_cost": 0.0,
+          "saved": 0.0017
+        },
+        {
+          "job_name": "Task Queue Validation",
+          "runner_type": "self-hosted",
+          "is_self_hosted": true,
+          "duration_minutes": 0.2,
+          "cost_rate": 0.0,
+          "actual_cost": 0.0,
+          "saved": 0.0016
+        },
+        {
+          "job_name": "SDK Validation",
+          "runner_type": "self-hosted",
+          "is_self_hosted": true,
+          "duration_minutes": 0.18,
+          "cost_rate": 0.0,
+          "actual_cost": 0.0,
+          "saved": 0.0015
+        },
+        {
+          "job_name": "Tech Tree Validation",
+          "runner_type": "self-hosted",
+          "is_self_hosted": true,
+          "duration_minutes": 0.18,
+          "cost_rate": 0.0,
+          "actual_cost": 0.0,
+          "saved": 0.0015
+        },
+        {
+          "job_name": "Dashboard Smoke Test",
+          "runner_type": "self-hosted",
+          "is_self_hosted": true,
+          "duration_minutes": 0.18,
+          "cost_rate": 0.0,
+          "actual_cost": 0.0,
+          "saved": 0.0015
+        },
+        {
+          "job_name": "SLATE Summary",
+          "runner_type": "self-hosted",
+          "is_self_hosted": true,
+          "duration_minutes": 0.07,
+          "cost_rate": 0.0,
+          "actual_cost": 0.0,
+          "saved": 0.0005
+        }
+      ],
+      "total_minutes": 1.21,
+      "total_cost": 0.0,
+      "total_saved": 0.0098
+    },
+    {
+      "id": 21770653227,
+      "workflow": "SLATE CI",
+      "created": "2026-02-07T00:25:44Z",
+      "conclusion": "success",
+      "jobs": [
+        {
+          "job_name": "Security Scan",
+          "runner_type": "self-hosted",
+          "is_self_hosted": true,
+          "duration_minutes": 0.2,
+          "cost_rate": 0.0,
+          "actual_cost": 0.0,
+          "saved": 0.0016
+        },
+        {
+          "job_name": "Unit Tests",
+          "runner_type": "self-hosted",
+          "is_self_hosted": true,
+          "duration_minutes": 0.22,
+          "cost_rate": 0.0,
+          "actual_cost": 0.0,
+          "saved": 0.0017
+        },
+        {
+          "job_name": "SLATE Quick Checks",
+          "runner_type": "self-hosted",
+          "is_self_hosted": true,
+          "duration_minutes": 0.2,
+          "cost_rate": 0.0,
+          "actual_cost": 0.0,
+          "saved": 0.0016
+        },
+        {
+          "job_name": "Lint & Format",
+          "runner_type": "self-hosted",
+          "is_self_hosted": true,
+          "duration_minutes": 0.2,
+          "cost_rate": 0.0,
+          "actual_cost": 0.0,
+          "saved": 0.0016
+        },
+        {
+          "job_name": "SDK Validation",
+          "runner_type": "self-hosted",
+          "is_self_hosted": true,
+          "duration_minutes": 0.2,
+          "cost_rate": 0.0,
+          "actual_cost": 0.0,
+          "saved": 0.0016
+        },
+        {
+          "job_name": "CI Summary",
+          "runner_type": "self-hosted",
+          "is_self_hosted": true,
+          "duration_minutes": 0.05,
+          "cost_rate": 0.0,
+          "actual_cost": 0.0,
+          "saved": 0.0004
+        }
+      ],
+      "total_minutes": 1.07,
+      "total_cost": 0.0,
+      "total_saved": 0.008499999999999999
+    },
+    {
+      "id": 21770653226,
+      "workflow": "CD - Build & Deploy",
+      "created": "2026-02-07T00:25:44Z",
+      "conclusion": "success",
+      "jobs": [
+        {
+          "job_name": "Determine Version",
+          "runner_type": "self-hosted",
+          "is_self_hosted": true,
+          "duration_minutes": 0.2,
+          "cost_rate": 0.0,
+          "actual_cost": 0.0,
+          "saved": 0.0016
+        },
+        {
+          "job_name": "Build Windows EXE",
+          "runner_type": "self-hosted",
+          "is_self_hosted": true,
+          "duration_minutes": 0.68,
+          "cost_rate": 0.0,
+          "actual_cost": 0.0,
+          "saved": 0.0055
+        },
+        {
+          "job_name": "Create Release",
+          "runner_type": "self-hosted",
+          "is_self_hosted": true,
+          "duration_minutes": 0.0,
+          "cost_rate": 0.0,
+          "actual_cost": 0.0,
+          "saved": 0.0
+        },
+        {
+          "job_name": "CD Summary",
+          "runner_type": "self-hosted",
+          "is_self_hosted": true,
+          "duration_minutes": 0.07,
+          "cost_rate": 0.0,
+          "actual_cost": 0.0,
+          "saved": 0.0005
+        }
+      ],
+      "total_minutes": 0.9500000000000002,
+      "total_cost": 0.0,
+      "total_saved": 0.007599999999999999
+    },
+    {
+      "id": 21770598001,
+      "workflow": "CodeQL Analysis",
+      "created": "2026-02-07T00:22:42Z",
+      "conclusion": "cancelled",
+      "jobs": [
+        {
+          "job_name": "CodeQL Analysis (python)",
+          "runner_type": "self-hosted",
+          "is_self_hosted": true,
+          "duration_minutes": 1.47,
+          "cost_rate": 0.0,
+          "actual_cost": 0.0,
+          "saved": 0.0117
+        }
+      ],
+      "total_minutes": 1.47,
+      "total_cost": 0.0,
+      "total_saved": 0.0117
+    },
+    {
+      "id": 21770597989,
+      "workflow": "Docs Validation",
+      "created": "2026-02-07T00:22:42Z",
+      "conclusion": "cancelled",
+      "jobs": [
+        {
+          "job_name": "README Check",
+          "runner_type": "self-hosted",
+          "is_self_hosted": true,
+          "duration_minutes": 0.18,
+          "cost_rate": 0.0,
+          "actual_cost": 0.0,
+          "saved": 0.0015
+        },
+        {
+          "job_name": "Link Check",
+          "runner_type": "self-hosted",
+          "is_self_hosted": true,
+          "duration_minutes": 0.25,
+          "cost_rate": 0.0,
+          "actual_cost": 0.0,
+          "saved": 0.002
+        },
+        {
+          "job_name": "Docs Summary",
+          "runner_type": "self-hosted",
+          "is_self_hosted": true,
+          "duration_minutes": 0.08,
+          "cost_rate": 0.0,
+          "actual_cost": 0.0,
+          "saved": 0.0007
+        }
+      ],
+      "total_minutes": 0.51,
+      "total_cost": 0.0,
+      "total_saved": 0.0042
+    },
+    {
+      "id": 21770597986,
+      "workflow": "SLATE CI",
+      "created": "2026-02-07T00:22:42Z",
+      "conclusion": "cancelled",
+      "jobs": [
+        {
+          "job_name": "SLATE Quick Checks",
+          "runner_type": "self-hosted",
+          "is_self_hosted": true,
+          "duration_minutes": 0.0,
+          "cost_rate": 0.0,
+          "actual_cost": 0.0,
+          "saved": 0.0
+        },
+        {
+          "job_name": "Lint & Format",
+          "runner_type": "self-hosted",
+          "is_self_hosted": true,
+          "duration_minutes": 0.23,
+          "cost_rate": 0.0,
+          "actual_cost": 0.0,
+          "saved": 0.0019
+        },
+        {
+          "job_name": "Security Scan",
+          "runner_type": "self-hosted",
+          "is_self_hosted": true,
+          "duration_minutes": 0.0,
+          "cost_rate": 0.0,
+          "actual_cost": 0.0,
+          "saved": 0.0
+        },
+        {
+          "job_name": "Unit Tests",
+          "runner_type": "self-hosted",
+          "is_self_hosted": true,
+          "duration_minutes": 3.03,
+          "cost_rate": 0.0,
+          "actual_cost": 0.0,
+          "saved": 0.0243
+        },
+        {
+          "job_name": "SDK Validation",
+          "runner_type": "self-hosted",
+          "is_self_hosted": true,
+          "duration_minutes": 0.0,
+          "cost_rate": 0.0,
+          "actual_cost": 0.0,
+          "saved": 0.0
+        },
+        {
+          "job_name": "CI Summary",
+          "runner_type": "self-hosted",
+          "is_self_hosted": true,
+          "duration_minutes": 0.07,
+          "cost_rate": 0.0,
+          "actual_cost": 0.0,
+          "saved": 0.0005
+        }
+      ],
+      "total_minutes": 3.3299999999999996,
+      "total_cost": 0.0,
+      "total_saved": 0.026699999999999998
+    },
+    {
+      "id": 21770597983,
+      "workflow": "SLATE Integration",
+      "created": "2026-02-07T00:22:42Z",
+      "conclusion": "cancelled",
+      "jobs": [
+        {
+          "job_name": "SLATE Status Check",
+          "runner_type": "self-hosted",
+          "is_self_hosted": true,
+          "duration_minutes": 0.23,
+          "cost_rate": 0.0,
+          "actual_cost": 0.0,
+          "saved": 0.0019
+        },
+        {
+          "job_name": "Tech Tree Validation",
+          "runner_type": "self-hosted",
+          "is_self_hosted": true,
+          "duration_minutes": 3.03,
+          "cost_rate": 0.0,
+          "actual_cost": 0.0,
+          "saved": 0.0243
+        },
+        {
+          "job_name": "Agent Module Test",
+          "runner_type": "self-hosted",
+          "is_self_hosted": true,
+          "duration_minutes": 0.2,
+          "cost_rate": 0.0,
+          "actual_cost": 0.0,
+          "saved": 0.0016
+        },
+        {
+          "job_name": "Task Queue Validation",
+          "runner_type": "self-hosted",
+          "is_self_hosted": true,
+          "duration_minutes": 0.23,
+          "cost_rate": 0.0,
+          "actual_cost": 0.0,
+          "saved": 0.0019
+        },
+        {
+          "job_name": "Dashboard Smoke Test",
+          "runner_type": "self-hosted",
+          "is_self_hosted": true,
+          "duration_minutes": 0.0,
+          "cost_rate": 0.0,
+          "actual_cost": 0.0,
+          "saved": 0.0
+        },
+        {
+          "job_name": "SDK Validation",
+          "runner_type": "self-hosted",
+          "is_self_hosted": true,
+          "duration_minutes": 0.2,
+          "cost_rate": 0.0,
+          "actual_cost": 0.0,
+          "saved": 0.0016
+        },
+        {
+          "job_name": "SLATE Summary",
+          "runner_type": "self-hosted",
+          "is_self_hosted": true,
+          "duration_minutes": 0.07,
+          "cost_rate": 0.0,
+          "actual_cost": 0.0,
+          "saved": 0.0005
+        }
+      ],
+      "total_minutes": 3.96,
+      "total_cost": 0.0,
+      "total_saved": 0.031799999999999995
+    },
+    {
+      "id": 21770597982,
+      "workflow": "CD - Build & Deploy",
+      "created": "2026-02-07T00:22:42Z",
+      "conclusion": "cancelled",
+      "jobs": [
+        {
+          "job_name": "Determine Version",
+          "runner_type": "self-hosted",
+          "is_self_hosted": true,
+          "duration_minutes": 0.0,
+          "cost_rate": 0.0,
+          "actual_cost": 0.0,
+          "saved": 0.0
+        },
+        {
+          "job_name": "Build Windows EXE",
+          "runner_type": "self-hosted",
+          "is_self_hosted": true,
+          "duration_minutes": -0.02,
+          "cost_rate": 0.0,
+          "actual_cost": -0.0,
+          "saved": -0.0001
+        },
+        {
+          "job_name": "CD Summary",
+          "runner_type": "self-hosted",
+          "is_self_hosted": true,
+          "duration_minutes": 0.05,
+          "cost_rate": 0.0,
+          "actual_cost": 0.0,
+          "saved": 0.0004
+        },
+        {
+          "job_name": "Create Release",
+          "runner_type": "self-hosted",
+          "is_self_hosted": true,
+          "duration_minutes": 0.0,
+          "cost_rate": 0.0,
+          "actual_cost": 0.0,
+          "saved": 0.0
+        }
+      ],
+      "total_minutes": 0.030000000000000002,
+      "total_cost": 0.0,
+      "total_saved": 0.00030000000000000003
+    },
+    {
+      "id": 21770377758,
+      "workflow": "SLATE CI",
+      "created": "2026-02-07T00:10:37Z",
+      "conclusion": "success",
+      "jobs": [
+        {
+          "job_name": "Lint & Format",
+          "runner_type": "self-hosted",
+          "is_self_hosted": true,
+          "duration_minutes": 0.23,
+          "cost_rate": 0.0,
+          "actual_cost": 0.0,
+          "saved": 0.0019
+        },
+        {
+          "job_name": "Security Scan",
+          "runner_type": "self-hosted",
+          "is_self_hosted": true,
+          "duration_minutes": 0.25,
+          "cost_rate": 0.0,
+          "actual_cost": 0.0,
+          "saved": 0.002
+        },
+        {
+          "job_name": "Unit Tests",
+          "runner_type": "self-hosted",
+          "is_self_hosted": true,
+          "duration_minutes": 0.22,
+          "cost_rate": 0.0,
+          "actual_cost": 0.0,
+          "saved": 0.0017
+        },
+        {
+          "job_name": "SLATE Quick Checks",
+          "runner_type": "self-hosted",
+          "is_self_hosted": true,
+          "duration_minutes": 0.18,
+          "cost_rate": 0.0,
+          "actual_cost": 0.0,
+          "saved": 0.0015
+        },
+        {
+          "job_name": "SDK Validation",
+          "runner_type": "self-hosted",
+          "is_self_hosted": true,
+          "duration_minutes": 0.2,
+          "cost_rate": 0.0,
+          "actual_cost": 0.0,
+          "saved": 0.0016
+        },
+        {
+          "job_name": "CI Summary",
+          "runner_type": "self-hosted",
+          "is_self_hosted": true,
+          "duration_minutes": 0.07,
+          "cost_rate": 0.0,
+          "actual_cost": 0.0,
+          "saved": 0.0005
+        }
+      ],
+      "total_minutes": 1.15,
+      "total_cost": 0.0,
+      "total_saved": 0.009200000000000002
+    },
+    {
+      "id": 21770377746,
+      "workflow": "CodeQL Analysis",
+      "created": "2026-02-07T00:10:37Z",
+      "conclusion": "success",
+      "jobs": [
+        {
+          "job_name": "CodeQL Analysis (python)",
+          "runner_type": "self-hosted",
+          "is_self_hosted": true,
+          "duration_minutes": 4.7,
+          "cost_rate": 0.0,
+          "actual_cost": 0.0,
+          "saved": 0.0376
+        }
+      ],
+      "total_minutes": 4.7,
+      "total_cost": 0.0,
+      "total_saved": 0.0376
+    },
+    {
+      "id": 21770377745,
+      "workflow": "SLATE Integration",
+      "created": "2026-02-07T00:10:37Z",
+      "conclusion": "success",
+      "jobs": [
+        {
+          "job_name": "Agent Module Test",
+          "runner_type": "self-hosted",
+          "is_self_hosted": true,
+          "duration_minutes": 0.2,
+          "cost_rate": 0.0,
+          "actual_cost": 0.0,
+          "saved": 0.0016
+        },
+        {
+          "job_name": "SLATE Status Check",
+          "runner_type": "self-hosted",
+          "is_self_hosted": true,
+          "duration_minutes": 0.22,
+          "cost_rate": 0.0,
+          "actual_cost": 0.0,
+          "saved": 0.0017
+        },
+        {
+          "job_name": "Tech Tree Validation",
+          "runner_type": "self-hosted",
+          "is_self_hosted": true,
+          "duration_minutes": 0.2,
+          "cost_rate": 0.0,
+          "actual_cost": 0.0,
+          "saved": 0.0016
+        },
+        {
+          "job_name": "SDK Validation",
+          "runner_type": "self-hosted",
+          "is_self_hosted": true,
+          "duration_minutes": 0.2,
+          "cost_rate": 0.0,
+          "actual_cost": 0.0,
+          "saved": 0.0016
+        },
+        {
+          "job_name": "Dashboard Smoke Test",
+          "runner_type": "self-hosted",
+          "is_self_hosted": true,
+          "duration_minutes": 0.18,
+          "cost_rate": 0.0,
+          "actual_cost": 0.0,
+          "saved": 0.0015
+        },
+        {
+          "job_name": "Task Queue Validation",
+          "runner_type": "self-hosted",
+          "is_self_hosted": true,
+          "duration_minutes": 0.2,
+          "cost_rate": 0.0,
+          "actual_cost": 0.0,
+          "saved": 0.0016
+        },
+        {
+          "job_name": "SLATE Summary",
+          "runner_type": "self-hosted",
+          "is_self_hosted": true,
+          "duration_minutes": 0.05,
+          "cost_rate": 0.0,
+          "actual_cost": 0.0,
+          "saved": 0.0004
+        }
+      ],
+      "total_minutes": 1.25,
+      "total_cost": 0.0,
+      "total_saved": 0.01
+    },
+    {
+      "id": 21770377738,
+      "workflow": "Docs Validation",
+      "created": "2026-02-07T00:10:37Z",
+      "conclusion": "failure",
+      "jobs": [
+        {
+          "job_name": "Link Check",
+          "runner_type": "self-hosted",
+          "is_self_hosted": true,
+          "duration_minutes": 0.18,
+          "cost_rate": 0.0,
+          "actual_cost": 0.0,
+          "saved": 0.0015
+        },
+        {
+          "job_name": "README Check",
+          "runner_type": "self-hosted",
+          "is_self_hosted": true,
+          "duration_minutes": 0.17,
+          "cost_rate": 0.0,
+          "actual_cost": 0.0,
+          "saved": 0.0013
+        },
+        {
+          "job_name": "Docs Summary",
+          "runner_type": "self-hosted",
+          "is_self_hosted": true,
+          "duration_minutes": 0.05,
+          "cost_rate": 0.0,
+          "actual_cost": 0.0,
+          "saved": 0.0004
+        }
+      ],
+      "total_minutes": 0.39999999999999997,
+      "total_cost": 0.0,
+      "total_saved": 0.0032
+    },
+    {
+      "id": 21770377736,
+      "workflow": "CD - Build & Deploy",
+      "created": "2026-02-07T00:10:37Z",
+      "conclusion": "success",
+      "jobs": [
+        {
+          "job_name": "Determine Version",
+          "runner_type": "self-hosted",
+          "is_self_hosted": true,
+          "duration_minutes": 0.2,
+          "cost_rate": 0.0,
+          "actual_cost": 0.0,
+          "saved": 0.0016
+        },
+        {
+          "job_name": "Build Windows EXE",
+          "runner_type": "self-hosted",
+          "is_self_hosted": true,
+          "duration_minutes": 0.52,
+          "cost_rate": 0.0,
+          "actual_cost": 0.0,
+          "saved": 0.0041
+        },
+        {
+          "job_name": "CD Summary",
+          "runner_type": "self-hosted",
+          "is_self_hosted": true,
+          "duration_minutes": 0.07,
+          "cost_rate": 0.0,
+          "actual_cost": 0.0,
+          "saved": 0.0005
+        },
+        {
+          "job_name": "Create Release",
+          "runner_type": "self-hosted",
+          "is_self_hosted": true,
+          "duration_minutes": 0.0,
+          "cost_rate": 0.0,
+          "actual_cost": 0.0,
+          "saved": 0.0
+        }
+      ],
+      "total_minutes": 0.79,
+      "total_cost": 0.0,
+      "total_saved": 0.006200000000000001
+    },
+    {
+      "id": 21770296000,
+      "workflow": "CD - Build & Deploy",
+      "created": "2026-02-07T00:06:10Z",
+      "conclusion": "failure",
+      "jobs": [
+        {
+          "job_name": "Determine Version",
+          "runner_type": "self-hosted",
+          "is_self_hosted": true,
+          "duration_minutes": 0.2,
+          "cost_rate": 0.0,
+          "actual_cost": 0.0,
+          "saved": 0.0016
+        },
+        {
+          "job_name": "Build Windows EXE",
+          "runner_type": "self-hosted",
+          "is_self_hosted": true,
+          "duration_minutes": 0.0,
+          "cost_rate": 0.0,
+          "actual_cost": 0.0,
+          "saved": 0.0
+        },
+        {
+          "job_name": "CD Summary",
+          "runner_type": "self-hosted",
+          "is_self_hosted": true,
+          "duration_minutes": 0.05,
+          "cost_rate": 0.0,
+          "actual_cost": 0.0,
+          "saved": 0.0004
+        },
+        {
+          "job_name": "Create Release",
+          "runner_type": "self-hosted",
+          "is_self_hosted": true,
+          "duration_minutes": 0.0,
+          "cost_rate": 0.0,
+          "actual_cost": 0.0,
+          "saved": 0.0
+        }
+      ],
+      "total_minutes": 0.25,
+      "total_cost": 0.0,
+      "total_saved": 0.002
+    },
+    {
+      "id": 21770295974,
+      "workflow": "SLATE Integration",
+      "created": "2026-02-07T00:06:10Z",
+      "conclusion": "success",
+      "jobs": [
+        {
+          "job_name": "SLATE Status Check",
+          "runner_type": "self-hosted",
+          "is_self_hosted": true,
+          "duration_minutes": 0.22,
+          "cost_rate": 0.0,
+          "actual_cost": 0.0,
+          "saved": 0.0017
+        },
+        {
+          "job_name": "Tech Tree Validation",
+          "runner_type": "self-hosted",
+          "is_self_hosted": true,
+          "duration_minutes": 0.2,
+          "cost_rate": 0.0,
+          "actual_cost": 0.0,
+          "saved": 0.0016
+        },
+        {
+          "job_name": "Agent Module Test",
+          "runner_type": "self-hosted",
+          "is_self_hosted": true,
+          "duration_minutes": 0.2,
+          "cost_rate": 0.0,
+          "actual_cost": 0.0,
+          "saved": 0.0016
+        },
+        {
+          "job_name": "SDK Validation",
+          "runner_type": "self-hosted",
+          "is_self_hosted": true,
+          "duration_minutes": 0.18,
+          "cost_rate": 0.0,
+          "actual_cost": 0.0,
+          "saved": 0.0015
+        },
+        {
+          "job_name": "Dashboard Smoke Test",
+          "runner_type": "self-hosted",
+          "is_self_hosted": true,
+          "duration_minutes": 0.18,
+          "cost_rate": 0.0,
+          "actual_cost": 0.0,
+          "saved": 0.0015
+        },
+        {
+          "job_name": "Task Queue Validation",
+          "runner_type": "self-hosted",
+          "is_self_hosted": true,
+          "duration_minutes": 0.18,
+          "cost_rate": 0.0,
+          "actual_cost": 0.0,
+          "saved": 0.0015
+        },
+        {
+          "job_name": "SLATE Summary",
+          "runner_type": "self-hosted",
+          "is_self_hosted": true,
+          "duration_minutes": 0.05,
+          "cost_rate": 0.0,
+          "actual_cost": 0.0,
+          "saved": 0.0004
+        }
+      ],
+      "total_minutes": 1.21,
+      "total_cost": 0.0,
+      "total_saved": 0.009799999999999998
+    },
+    {
+      "id": 21770279410,
+      "workflow": "SLATE CI",
+      "created": "2026-02-07T00:05:12Z",
+      "conclusion": "success",
+      "jobs": [
+        {
+          "job_name": "Unit Tests",
+          "runner_type": "self-hosted",
+          "is_self_hosted": true,
+          "duration_minutes": 0.25,
+          "cost_rate": 0.0,
+          "actual_cost": 0.0,
+          "saved": 0.002
+        },
+        {
+          "job_name": "SLATE Quick Checks",
+          "runner_type": "self-hosted",
+          "is_self_hosted": true,
+          "duration_minutes": 0.18,
+          "cost_rate": 0.0,
+          "actual_cost": 0.0,
+          "saved": 0.0015
+        },
+        {
+          "job_name": "Lint & Format",
+          "runner_type": "self-hosted",
+          "is_self_hosted": true,
+          "duration_minutes": 0.22,
+          "cost_rate": 0.0,
+          "actual_cost": 0.0,
+          "saved": 0.0017
+        },
+        {
+          "job_name": "SDK Validation",
+          "runner_type": "self-hosted",
+          "is_self_hosted": true,
+          "duration_minutes": 0.2,
+          "cost_rate": 0.0,
+          "actual_cost": 0.0,
+          "saved": 0.0016
+        },
+        {
+          "job_name": "Security Scan",
+          "runner_type": "self-hosted",
+          "is_self_hosted": true,
+          "duration_minutes": 0.25,
+          "cost_rate": 0.0,
+          "actual_cost": 0.0,
+          "saved": 0.002
+        },
+        {
+          "job_name": "CI Summary",
+          "runner_type": "self-hosted",
+          "is_self_hosted": true,
+          "duration_minutes": 0.07,
+          "cost_rate": 0.0,
+          "actual_cost": 0.0,
+          "saved": 0.0005
+        }
+      ],
+      "total_minutes": 1.1700000000000002,
+      "total_cost": 0.0,
+      "total_saved": 0.0093
+    },
+    {
+      "id": 21770252236,
+      "workflow": "SLATE CI",
+      "created": "2026-02-07T00:03:47Z",
+      "conclusion": "cancelled",
+      "jobs": [
+        {
+          "job_name": "Lint & Format",
+          "runner_type": "self-hosted",
+          "is_self_hosted": true,
+          "duration_minutes": 0.0,
+          "cost_rate": 0.0,
+          "actual_cost": 0.0,
+          "saved": 0.0
+        },
+        {
+          "job_name": "Security Scan",
+          "runner_type": "self-hosted",
+          "is_self_hosted": true,
+          "duration_minutes": 0.0,
+          "cost_rate": 0.0,
+          "actual_cost": 0.0,
+          "saved": 0.0
+        },
+        {
+          "job_name": "SLATE Quick Checks",
+          "runner_type": "self-hosted",
+          "is_self_hosted": true,
+          "duration_minutes": 0.0,
+          "cost_rate": 0.0,
+          "actual_cost": 0.0,
+          "saved": 0.0
+        },
+        {
+          "job_name": "SDK Validation",
+          "runner_type": "self-hosted",
+          "is_self_hosted": true,
+          "duration_minutes": 1.33,
+          "cost_rate": 0.0,
+          "actual_cost": 0.0,
+          "saved": 0.0107
+        },
+        {
+          "job_name": "Unit Tests",
+          "runner_type": "self-hosted",
+          "is_self_hosted": true,
+          "duration_minutes": 0.0,
+          "cost_rate": 0.0,
+          "actual_cost": 0.0,
+          "saved": 0.0
+        },
+        {
+          "job_name": "CI Summary",
+          "runner_type": "self-hosted",
+          "is_self_hosted": true,
+          "duration_minutes": 0.07,
+          "cost_rate": 0.0,
+          "actual_cost": 0.0,
+          "saved": 0.0005
+        }
+      ],
+      "total_minutes": 1.4000000000000001,
+      "total_cost": 0.0,
+      "total_saved": 0.0112
+    },
+    {
+      "id": 21770252201,
+      "workflow": "SLATE Integration",
+      "created": "2026-02-07T00:03:47Z",
+      "conclusion": "cancelled",
+      "jobs": [
+        {
+          "job_name": "SLATE Status Check",
+          "runner_type": "self-hosted",
+          "is_self_hosted": true,
+          "duration_minutes": 0.22,
+          "cost_rate": 0.0,
+          "actual_cost": 0.0,
+          "saved": 0.0017
+        },
+        {
+          "job_name": "SDK Validation",
+          "runner_type": "self-hosted",
+          "is_self_hosted": true,
+          "duration_minutes": 0.2,
+          "cost_rate": 0.0,
+          "actual_cost": 0.0,
+          "saved": 0.0016
+        },
+        {
+          "job_name": "Task Queue Validation",
+          "runner_type": "self-hosted",
+          "is_self_hosted": true,
+          "duration_minutes": 0.18,
+          "cost_rate": 0.0,
+          "actual_cost": 0.0,
+          "saved": 0.0015
+        },
+        {
+          "job_name": "Tech Tree Validation",
+          "runner_type": "self-hosted",
+          "is_self_hosted": true,
+          "duration_minutes": 0.18,
+          "cost_rate": 0.0,
+          "actual_cost": 0.0,
+          "saved": 0.0015
+        },
+        {
+          "job_name": "Dashboard Smoke Test",
+          "runner_type": "self-hosted",
+          "is_self_hosted": true,
+          "duration_minutes": 0.18,
+          "cost_rate": 0.0,
+          "actual_cost": 0.0,
+          "saved": 0.0015
+        },
+        {
+          "job_name": "Agent Module Test",
+          "runner_type": "self-hosted",
+          "is_self_hosted": true,
+          "duration_minutes": 0.0,
+          "cost_rate": 0.0,
+          "actual_cost": 0.0,
+          "saved": 0.0
+        },
+        {
+          "job_name": "SLATE Summary",
+          "runner_type": "self-hosted",
+          "is_self_hosted": true,
+          "duration_minutes": 0.05,
+          "cost_rate": 0.0,
+          "actual_cost": 0.0,
+          "saved": 0.0004
+        }
+      ],
+      "total_minutes": 1.01,
+      "total_cost": 0.0,
+      "total_saved": 0.008199999999999999
+    },
+    {
+      "id": 21770252198,
+      "workflow": "CD - Build & Deploy",
+      "created": "2026-02-07T00:03:47Z",
+      "conclusion": "failure",
+      "jobs": [
+        {
+          "job_name": "Determine Version",
+          "runner_type": "self-hosted",
+          "is_self_hosted": true,
+          "duration_minutes": 0.17,
+          "cost_rate": 0.0,
+          "actual_cost": 0.0,
+          "saved": 0.0013
+        },
+        {
+          "job_name": "CD Summary",
+          "runner_type": "self-hosted",
+          "is_self_hosted": true,
+          "duration_minutes": 0.07,
+          "cost_rate": 0.0,
+          "actual_cost": 0.0,
+          "saved": 0.0005
+        },
+        {
+          "job_name": "Build Windows EXE",
+          "runner_type": "self-hosted",
+          "is_self_hosted": true,
+          "duration_minutes": -0.02,
+          "cost_rate": 0.0,
+          "actual_cost": -0.0,
+          "saved": -0.0001
+        },
+        {
+          "job_name": "Create Release",
+          "runner_type": "self-hosted",
+          "is_self_hosted": true,
+          "duration_minutes": -0.02,
+          "cost_rate": 0.0,
+          "actual_cost": -0.0,
+          "saved": -0.0001
+        }
+      ],
+      "total_minutes": 0.20000000000000004,
+      "total_cost": 0.0,
+      "total_saved": 0.0015999999999999999
+    },
+    {
+      "id": 21770151437,
+      "workflow": "SLATE Nightly",
+      "created": "2026-02-06T23:58:28Z",
+      "conclusion": "failure",
+      "jobs": [],
+      "total_minutes": 0,
+      "total_cost": 0,
+      "total_saved": 0
+    },
+    {
+      "id": 21770151329,
+      "workflow": "CD - Build & Deploy",
+      "created": "2026-02-06T23:58:27Z",
+      "conclusion": "failure",
+      "jobs": [],
+      "total_minutes": 0,
+      "total_cost": 0,
+      "total_saved": 0
+    },
+    {
+      "id": 21770151222,
+      "workflow": "SLATE CI",
+      "created": "2026-02-06T23:58:27Z",
+      "conclusion": "failure",
+      "jobs": [],
+      "total_minutes": 0,
+      "total_cost": 0,
+      "total_saved": 0
+    },
+    {
+      "id": 21770151127,
+      "workflow": "Fork Validation",
+      "created": "2026-02-06T23:58:27Z",
+      "conclusion": "failure",
+      "jobs": [],
+      "total_minutes": 0,
+      "total_cost": 0,
+      "total_saved": 0
+    },
+    {
+      "id": 21770151006,
+      "workflow": "SLATE Integration",
+      "created": "2026-02-06T23:58:26Z",
+      "conclusion": "failure",
+      "jobs": [],
+      "total_minutes": 0,
+      "total_cost": 0,
+      "total_saved": 0
+    },
+    {
+      "id": 21770150876,
+      "workflow": "Contributor PR",
+      "created": "2026-02-06T23:58:26Z",
+      "conclusion": "failure",
+      "jobs": [],
+      "total_minutes": 0,
+      "total_cost": 0,
+      "total_saved": 0
+    },
+    {
+      "id": 21770150717,
+      "workflow": "SLATE PR Check",
+      "created": "2026-02-06T23:58:26Z",
+      "conclusion": "failure",
+      "jobs": [],
+      "total_minutes": 0,
+      "total_cost": 0,
+      "total_saved": 0
+    },
+    {
+      "id": 21770150571,
+      "workflow": "Docs Validation",
+      "created": "2026-02-06T23:58:25Z",
+      "conclusion": "failure",
+      "jobs": [],
+      "total_minutes": 0,
+      "total_cost": 0,
+      "total_saved": 0
+    },
+    {
+      "id": 21770130759,
+      "workflow": "SLATE CI",
+      "created": "2026-02-06T23:57:25Z",
+      "conclusion": "cancelled",
+      "jobs": [
+        {
+          "job_name": "Security Scan",
+          "runner_type": "self-hosted",
+          "is_self_hosted": true,
+          "duration_minutes": 0.18,
+          "cost_rate": 0.0,
+          "actual_cost": 0.0,
+          "saved": 0.0015
+        },
+        {
+          "job_name": "SDK Validation",
+          "runner_type": "self-hosted",
+          "is_self_hosted": true,
+          "duration_minutes": 0.18,
+          "cost_rate": 0.0,
+          "actual_cost": 0.0,
+          "saved": 0.0015
+        },
+        {
+          "job_name": "Lint & Format",
+          "runner_type": "self-hosted",
+          "is_self_hosted": true,
+          "duration_minutes": 0.85,
+          "cost_rate": 0.0,
+          "actual_cost": 0.0,
+          "saved": 0.0068
+        },
+        {
+          "job_name": "Unit Tests",
+          "runner_type": "self-hosted",
+          "is_self_hosted": true,
+          "duration_minutes": 0.2,
+          "cost_rate": 0.0,
+          "actual_cost": 0.0,
+          "saved": 0.0016
+        },
+        {
+          "job_name": "SLATE Quick Checks",
+          "runner_type": "self-hosted",
+          "is_self_hosted": true,
+          "duration_minutes": 0.17,
+          "cost_rate": 0.0,
+          "actual_cost": 0.0,
+          "saved": 0.0013
+        }
+      ],
+      "total_minutes": 1.5799999999999998,
+      "total_cost": 0.0,
+      "total_saved": 0.0127
+    },
+    {
+      "id": 21770054789,
+      "workflow": "SLATE CI",
+      "created": "2026-02-06T23:53:36Z",
+      "conclusion": "failure",
+      "jobs": [
+        {
+          "job_name": "SDK Validation",
+          "runner_type": "self-hosted",
+          "is_self_hosted": true,
+          "duration_minutes": 0.18,
+          "cost_rate": 0.0,
+          "actual_cost": 0.0,
+          "saved": 0.0015
+        },
+        {
+          "job_name": "Unit Tests",
+          "runner_type": "self-hosted",
+          "is_self_hosted": true,
+          "duration_minutes": 0.2,
+          "cost_rate": 0.0,
+          "actual_cost": 0.0,
+          "saved": 0.0016
+        },
+        {
+          "job_name": "Security Scan",
+          "runner_type": "self-hosted",
+          "is_self_hosted": true,
+          "duration_minutes": 0.18,
+          "cost_rate": 0.0,
+          "actual_cost": 0.0,
+          "saved": 0.0015
+        },
+        {
+          "job_name": "Lint & Format",
+          "runner_type": "self-hosted",
+          "is_self_hosted": true,
+          "duration_minutes": 0.18,
+          "cost_rate": 0.0,
+          "actual_cost": 0.0,
+          "saved": 0.0015
+        },
+        {
+          "job_name": "SLATE Quick Checks",
+          "runner_type": "self-hosted",
+          "is_self_hosted": true,
+          "duration_minutes": 0.18,
+          "cost_rate": 0.0,
+          "actual_cost": 0.0,
+          "saved": 0.0015
+        },
+        {
+          "job_name": "CI Summary",
+          "runner_type": "self-hosted",
+          "is_self_hosted": true,
+          "duration_minutes": 0.07,
+          "cost_rate": 0.0,
+          "actual_cost": 0.0,
+          "saved": 0.0005
+        }
+      ],
+      "total_minutes": 0.99,
+      "total_cost": 0.0,
+      "total_saved": 0.0081
+    },
+    {
+      "id": 21770042907,
+      "workflow": "CD - Build & Deploy",
+      "created": "2026-02-06T23:52:58Z",
+      "conclusion": "cancelled",
+      "jobs": [
+        {
+          "job_name": "Determine Version",
+          "runner_type": "self-hosted",
+          "is_self_hosted": true,
+          "duration_minutes": 0.27,
+          "cost_rate": 0.0,
+          "actual_cost": 0.0,
+          "saved": 0.0021
+        }
+      ],
+      "total_minutes": 0.27,
+      "total_cost": 0.0,
+      "total_saved": 0.0021
+    },
+    {
+      "id": 21770042901,
+      "workflow": "SLATE Integration",
+      "created": "2026-02-06T23:52:58Z",
+      "conclusion": "cancelled",
+      "jobs": [
+        {
+          "job_name": "Agent Module Test",
+          "runner_type": "self-hosted",
+          "is_self_hosted": true,
+          "duration_minutes": 0.27,
+          "cost_rate": 0.0,
+          "actual_cost": 0.0,
+          "saved": 0.0021
+        },
+        {
+          "job_name": "Dashboard Smoke Test",
+          "runner_type": "self-hosted",
+          "is_self_hosted": true,
+          "duration_minutes": 0.2,
+          "cost_rate": 0.0,
+          "actual_cost": 0.0,
+          "saved": 0.0016
+        },
+        {
+          "job_name": "Task Queue Validation",
+          "runner_type": "self-hosted",
+          "is_self_hosted": true,
+          "duration_minutes": 0.27,
+          "cost_rate": 0.0,
+          "actual_cost": 0.0,
+          "saved": 0.0021
+        },
+        {
+          "job_name": "SDK Validation",
+          "runner_type": "self-hosted",
+          "is_self_hosted": true,
+          "duration_minutes": 0.03,
+          "cost_rate": 0.0,
+          "actual_cost": 0.0,
+          "saved": 0.0003
+        },
+        {
+          "job_name": "Tech Tree Validation",
+          "runner_type": "self-hosted",
+          "is_self_hosted": true,
+          "duration_minutes": 0.27,
+          "cost_rate": 0.0,
+          "actual_cost": 0.0,
+          "saved": 0.0021
+        },
+        {
+          "job_name": "SLATE Status Check",
+          "runner_type": "self-hosted",
+          "is_self_hosted": true,
+          "duration_minutes": 0.27,
+          "cost_rate": 0.0,
+          "actual_cost": 0.0,
+          "saved": 0.0021
+        }
+      ],
+      "total_minutes": 1.31,
+      "total_cost": 0.0,
+      "total_saved": 0.010299999999999998
+    },
+    {
+      "id": 21770042896,
+      "workflow": "SLATE CI",
+      "created": "2026-02-06T23:52:58Z",
+      "conclusion": "cancelled",
+      "jobs": [
+        {
+          "job_name": "SLATE Quick Checks",
+          "runner_type": "self-hosted",
+          "is_self_hosted": true,
+          "duration_minutes": 0.27,
+          "cost_rate": 0.0,
+          "actual_cost": 0.0,
+          "saved": 0.0021
+        },
+        {
+          "job_name": "Lint & Format",
+          "runner_type": "self-hosted",
+          "is_self_hosted": true,
+          "duration_minutes": 0.27,
+          "cost_rate": 0.0,
+          "actual_cost": 0.0,
+          "saved": 0.0021
+        },
+        {
+          "job_name": "Unit Tests",
+          "runner_type": "self-hosted",
+          "is_self_hosted": true,
+          "duration_minutes": 0.27,
+          "cost_rate": 0.0,
+          "actual_cost": 0.0,
+          "saved": 0.0021
+        },
+        {
+          "job_name": "SDK Validation",
+          "runner_type": "self-hosted",
+          "is_self_hosted": true,
+          "duration_minutes": 0.27,
+          "cost_rate": 0.0,
+          "actual_cost": 0.0,
+          "saved": 0.0021
+        },
+        {
+          "job_name": "Security Scan",
+          "runner_type": "self-hosted",
+          "is_self_hosted": true,
+          "duration_minutes": 0.27,
+          "cost_rate": 0.0,
+          "actual_cost": 0.0,
+          "saved": 0.0021
+        }
+      ],
+      "total_minutes": 1.35,
+      "total_cost": 0.0,
+      "total_saved": 0.010499999999999999
+    },
+    {
+      "id": 21769949186,
+      "workflow": "SLATE CI",
+      "created": "2026-02-06T23:48:10Z",
+      "conclusion": "cancelled",
+      "jobs": [
+        {
+          "job_name": "Lint & Format",
+          "runner_type": "self-hosted",
+          "is_self_hosted": true,
+          "duration_minutes": 0.4,
+          "cost_rate": 0.0,
+          "actual_cost": 0.0,
+          "saved": 0.0032
+        },
+        {
+          "job_name": "SDK Validation",
+          "runner_type": "self-hosted",
+          "is_self_hosted": true,
+          "duration_minutes": 0.57,
+          "cost_rate": 0.0,
+          "actual_cost": 0.0,
+          "saved": 0.0045
+        },
+        {
+          "job_name": "Security Scan",
+          "runner_type": "self-hosted",
+          "is_self_hosted": true,
+          "duration_minutes": 4.35,
+          "cost_rate": 0.0,
+          "actual_cost": 0.0,
+          "saved": 0.0348
+        },
+        {
+          "job_name": "SLATE Quick Checks",
+          "runner_type": "self-hosted",
+          "is_self_hosted": true,
+          "duration_minutes": 4.35,
+          "cost_rate": 0.0,
+          "actual_cost": 0.0,
+          "saved": 0.0348
+        },
+        {
+          "job_name": "Unit Tests",
+          "runner_type": "self-hosted",
+          "is_self_hosted": true,
+          "duration_minutes": 4.35,
+          "cost_rate": 0.0,
+          "actual_cost": 0.0,
+          "saved": 0.0348
+        }
+      ],
+      "total_minutes": 14.019999999999998,
+      "total_cost": 0.0,
+      "total_saved": 0.11209999999999999
+    },
+    {
+      "id": 21769945523,
+      "workflow": "CD - Build & Deploy",
+      "created": "2026-02-06T23:47:57Z",
+      "conclusion": "failure",
+      "jobs": [
+        {
+          "job_name": "Determine Version",
+          "runner_type": "self-hosted",
+          "is_self_hosted": true,
+          "duration_minutes": 0.18,
+          "cost_rate": 0.0,
+          "actual_cost": 0.0,
+          "saved": 0.0015
+        },
+        {
+          "job_name": "CD Summary",
+          "runner_type": "self-hosted",
+          "is_self_hosted": true,
+          "duration_minutes": 0.07,
+          "cost_rate": 0.0,
+          "actual_cost": 0.0,
+          "saved": 0.0005
+        },
+        {
+          "job_name": "Build Windows EXE",
+          "runner_type": "self-hosted",
+          "is_self_hosted": true,
+          "duration_minutes": 0.0,
+          "cost_rate": 0.0,
+          "actual_cost": 0.0,
+          "saved": 0.0
+        },
+        {
+          "job_name": "Create Release",
+          "runner_type": "self-hosted",
+          "is_self_hosted": true,
+          "duration_minutes": -0.02,
+          "cost_rate": 0.0,
+          "actual_cost": -0.0,
+          "saved": -0.0001
+        }
+      ],
+      "total_minutes": 0.23,
+      "total_cost": 0.0,
+      "total_saved": 0.0019
+    },
+    {
+      "id": 21769945515,
+      "workflow": "SLATE Integration",
+      "created": "2026-02-06T23:47:57Z",
+      "conclusion": "cancelled",
+      "jobs": [
+        {
+          "job_name": "Dashboard Smoke Test",
+          "runner_type": "self-hosted",
+          "is_self_hosted": true,
+          "duration_minutes": 1.1,
+          "cost_rate": 0.0,
+          "actual_cost": 0.0,
+          "saved": 0.0088
+        },
+        {
+          "job_name": "Tech Tree Validation",
+          "runner_type": "self-hosted",
+          "is_self_hosted": true,
+          "duration_minutes": 0.42,
+          "cost_rate": 0.0,
+          "actual_cost": 0.0,
+          "saved": 0.0033
+        },
+        {
+          "job_name": "Agent Module Test",
+          "runner_type": "self-hosted",
+          "is_self_hosted": true,
+          "duration_minutes": 0.45,
+          "cost_rate": 0.0,
+          "actual_cost": 0.0,
+          "saved": 0.0036
+        },
+        {
+          "job_name": "SLATE Status Check",
+          "runner_type": "self-hosted",
+          "is_self_hosted": true,
+          "duration_minutes": 0.43,
+          "cost_rate": 0.0,
+          "actual_cost": 0.0,
+          "saved": 0.0035
+        },
+        {
+          "job_name": "SDK Validation",
+          "runner_type": "self-hosted",
+          "is_self_hosted": true,
+          "duration_minutes": 0.25,
+          "cost_rate": 0.0,
+          "actual_cost": 0.0,
+          "saved": 0.002
+        },
+        {
+          "job_name": "Task Queue Validation",
+          "runner_type": "self-hosted",
+          "is_self_hosted": true,
+          "duration_minutes": 0.45,
+          "cost_rate": 0.0,
+          "actual_cost": 0.0,
+          "saved": 0.0036
+        }
+      ],
+      "total_minutes": 3.1,
+      "total_cost": 0.0,
+      "total_saved": 0.024799999999999996
+    },
+    {
+      "id": 21769945508,
+      "workflow": "SLATE CI",
+      "created": "2026-02-06T23:47:57Z",
+      "conclusion": "cancelled",
+      "jobs": [],
+      "total_minutes": 0,
+      "total_cost": 0,
+      "total_saved": 0
+    },
+    {
+      "id": 21769945319,
+      "workflow": "SLATE PR Check",
+      "created": "2026-02-06T23:47:56Z",
+      "conclusion": "failure",
+      "jobs": [],
+      "total_minutes": 0,
+      "total_cost": 0,
+      "total_saved": 0
+    },
+    {
+      "id": 21769928352,
+      "workflow": "SLATE Integration",
+      "created": "2026-02-06T23:47:00Z",
+      "conclusion": "cancelled",
+      "jobs": [
+        {
+          "job_name": "Dashboard Smoke Test",
+          "runner_type": "self-hosted",
+          "is_self_hosted": true,
+          "duration_minutes": 0.87,
+          "cost_rate": 0.0,
+          "actual_cost": 0.0,
+          "saved": 0.0069
+        },
+        {
+          "job_name": "Tech Tree Validation",
+          "runner_type": "self-hosted",
+          "is_self_hosted": true,
+          "duration_minutes": 0.0,
+          "cost_rate": 0.0,
+          "actual_cost": 0.0,
+          "saved": 0.0
+        },
+        {
+          "job_name": "SLATE Status Check",
+          "runner_type": "self-hosted",
+          "is_self_hosted": true,
+          "duration_minutes": 0.0,
+          "cost_rate": 0.0,
+          "actual_cost": 0.0,
+          "saved": 0.0
+        },
+        {
+          "job_name": "Task Queue Validation",
+          "runner_type": "self-hosted",
+          "is_self_hosted": true,
+          "duration_minutes": 0.0,
+          "cost_rate": 0.0,
+          "actual_cost": 0.0,
+          "saved": 0.0
+        },
+        {
+          "job_name": "Agent Module Test",
+          "runner_type": "self-hosted",
+          "is_self_hosted": true,
+          "duration_minutes": 0.0,
+          "cost_rate": 0.0,
+          "actual_cost": 0.0,
+          "saved": 0.0
+        },
+        {
+          "job_name": "SDK Validation",
+          "runner_type": "self-hosted",
+          "is_self_hosted": true,
+          "duration_minutes": 0.0,
+          "cost_rate": 0.0,
+          "actual_cost": 0.0,
+          "saved": 0.0
+        },
+        {
+          "job_name": "SLATE Summary",
+          "runner_type": "self-hosted",
+          "is_self_hosted": true,
+          "duration_minutes": 0.05,
+          "cost_rate": 0.0,
+          "actual_cost": 0.0,
+          "saved": 0.0004
+        }
+      ],
+      "total_minutes": 0.92,
+      "total_cost": 0.0,
+      "total_saved": 0.0073
+    },
+    {
+      "id": 21769928349,
+      "workflow": "CD - Build & Deploy",
+      "created": "2026-02-06T23:47:00Z",
+      "conclusion": "cancelled",
+      "jobs": [
+        {
+          "job_name": "Determine Version",
+          "runner_type": "self-hosted",
+          "is_self_hosted": true,
+          "duration_minutes": 0.18,
+          "cost_rate": 0.0,
+          "actual_cost": 0.0,
+          "saved": 0.0015
+        },
+        {
+          "job_name": "CD Summary",
+          "runner_type": "self-hosted",
+          "is_self_hosted": true,
+          "duration_minutes": 0.08,
+          "cost_rate": 0.0,
+          "actual_cost": 0.0,
+          "saved": 0.0007
+        },
+        {
+          "job_name": "Build Windows EXE",
+          "runner_type": "self-hosted",
+          "is_self_hosted": true,
+          "duration_minutes": 0.0,
+          "cost_rate": 0.0,
+          "actual_cost": 0.0,
+          "saved": 0.0
+        },
+        {
+          "job_name": "Create Release",
+          "runner_type": "self-hosted",
+          "is_self_hosted": true,
+          "duration_minutes": 0.0,
+          "cost_rate": 0.0,
+          "actual_cost": 0.0,
+          "saved": 0.0
+        }
+      ],
+      "total_minutes": 0.26,
+      "total_cost": 0.0,
+      "total_saved": 0.0022
+    },
+    {
+      "id": 21769928342,
+      "workflow": "SLATE CI",
+      "created": "2026-02-06T23:47:00Z",
+      "conclusion": "cancelled",
+      "jobs": [
+        {
+          "job_name": "Unit Tests",
+          "runner_type": "self-hosted",
+          "is_self_hosted": true,
+          "duration_minutes": 0.0,
+          "cost_rate": 0.0,
+          "actual_cost": 0.0,
+          "saved": 0.0
+        },
+        {
+          "job_name": "SLATE Quick Checks",
+          "runner_type": "self-hosted",
+          "is_self_hosted": true,
+          "duration_minutes": 0.0,
+          "cost_rate": 0.0,
+          "actual_cost": 0.0,
+          "saved": 0.0
+        },
+        {
+          "job_name": "SDK Validation",
+          "runner_type": "self-hosted",
+          "is_self_hosted": true,
+          "duration_minutes": 0.0,
+          "cost_rate": 0.0,
+          "actual_cost": 0.0,
+          "saved": 0.0
+        },
+        {
+          "job_name": "Security Scan",
+          "runner_type": "self-hosted",
+          "is_self_hosted": true,
+          "duration_minutes": 0.72,
+          "cost_rate": 0.0,
+          "actual_cost": 0.0,
+          "saved": 0.0057
+        },
+        {
+          "job_name": "Lint & Format",
+          "runner_type": "self-hosted",
+          "is_self_hosted": true,
+          "duration_minutes": 0.0,
+          "cost_rate": 0.0,
+          "actual_cost": 0.0,
+          "saved": 0.0
+        },
+        {
+          "job_name": "CI Summary",
+          "runner_type": "self-hosted",
+          "is_self_hosted": true,
+          "duration_minutes": 0.07,
+          "cost_rate": 0.0,
+          "actual_cost": 0.0,
+          "saved": 0.0005
+        }
+      ],
+      "total_minutes": 0.79,
+      "total_cost": 0.0,
+      "total_saved": 0.006200000000000001
+    },
+    {
+      "id": 21769867923,
+      "workflow": "SLATE CI",
+      "created": "2026-02-06T23:43:52Z",
+      "conclusion": "failure",
+      "jobs": [
+        {
+          "job_name": "Lint & Format",
+          "runner_type": "self-hosted",
+          "is_self_hosted": true,
+          "duration_minutes": 0.2,
+          "cost_rate": 0.0,
+          "actual_cost": 0.0,
+          "saved": 0.0016
+        },
+        {
+          "job_name": "SLATE Quick Checks",
+          "runner_type": "self-hosted",
+          "is_self_hosted": true,
+          "duration_minutes": 0.18,
+          "cost_rate": 0.0,
+          "actual_cost": 0.0,
+          "saved": 0.0015
+        },
+        {
+          "job_name": "Unit Tests",
+          "runner_type": "self-hosted",
+          "is_self_hosted": true,
+          "duration_minutes": 0.2,
+          "cost_rate": 0.0,
+          "actual_cost": 0.0,
+          "saved": 0.0016
+        },
+        {
+          "job_name": "SDK Validation",
+          "runner_type": "self-hosted",
+          "is_self_hosted": true,
+          "duration_minutes": 0.2,
+          "cost_rate": 0.0,
+          "actual_cost": 0.0,
+          "saved": 0.0016
+        },
+        {
+          "job_name": "Security Scan",
+          "runner_type": "self-hosted",
+          "is_self_hosted": true,
+          "duration_minutes": 0.2,
+          "cost_rate": 0.0,
+          "actual_cost": 0.0,
+          "saved": 0.0016
+        },
+        {
+          "job_name": "CI Summary",
+          "runner_type": "self-hosted",
+          "is_self_hosted": true,
+          "duration_minutes": 0.07,
+          "cost_rate": 0.0,
+          "actual_cost": 0.0,
+          "saved": 0.0005
+        }
+      ],
+      "total_minutes": 1.05,
+      "total_cost": 0.0,
+      "total_saved": 0.008400000000000001
+    },
+    {
+      "id": 21769774898,
+      "workflow": "CD - Build & Deploy",
+      "created": "2026-02-06T23:39:03Z",
+      "conclusion": "failure",
+      "jobs": [
+        {
+          "job_name": "Determine Version",
+          "runner_type": "ubuntu-latest",
+          "is_self_hosted": false,
+          "duration_minutes": 0.1,
+          "cost_rate": 0.008,
+          "actual_cost": 0.0008,
+          "saved": 0
+        },
+        {
+          "job_name": "Build Windows EXE",
+          "runner_type": "windows-latest",
+          "is_self_hosted": false,
+          "duration_minutes": 1.95,
+          "cost_rate": 0.016,
+          "actual_cost": 0.0312,
+          "saved": 0
+        },
+        {
+          "job_name": "CD Summary",
+          "runner_type": "ubuntu-latest",
+          "is_self_hosted": false,
+          "duration_minutes": 0.03,
+          "cost_rate": 0.008,
+          "actual_cost": 0.0003,
+          "saved": 0
+        },
+        {
+          "job_name": "Create Release",
+          "runner_type": "ubuntu-latest",
+          "is_self_hosted": false,
+          "duration_minutes": 0.0,
+          "cost_rate": 0.008,
+          "actual_cost": 0.0,
+          "saved": 0
+        }
+      ],
+      "total_minutes": 2.0799999999999996,
+      "total_cost": 0.0323,
+      "total_saved": 0
+    },
+    {
+      "id": 21769774895,
+      "workflow": "SLATE CI",
+      "created": "2026-02-06T23:39:03Z",
+      "conclusion": "failure",
+      "jobs": [
+        {
+          "job_name": "Security Scan",
+          "runner_type": "self-hosted",
+          "is_self_hosted": true,
+          "duration_minutes": 0.1,
+          "cost_rate": 0.0,
+          "actual_cost": 0.0,
+          "saved": 0.0008
+        },
+        {
+          "job_name": "Lint & Format",
+          "runner_type": "self-hosted",
+          "is_self_hosted": true,
+          "duration_minutes": 0.12,
+          "cost_rate": 0.0,
+          "actual_cost": 0.0,
+          "saved": 0.0009
+        },
+        {
+          "job_name": "SDK Validation",
+          "runner_type": "self-hosted",
+          "is_self_hosted": true,
+          "duration_minutes": 0.13,
+          "cost_rate": 0.0,
+          "actual_cost": 0.0,
+          "saved": 0.0011
+        },
+        {
+          "job_name": "Unit Tests",
+          "runner_type": "self-hosted",
+          "is_self_hosted": true,
+          "duration_minutes": 0.12,
+          "cost_rate": 0.0,
+          "actual_cost": 0.0,
+          "saved": 0.0009
+        },
+        {
+          "job_name": "SLATE Quick Checks",
+          "runner_type": "self-hosted",
+          "is_self_hosted": true,
+          "duration_minutes": 0.1,
+          "cost_rate": 0.0,
+          "actual_cost": 0.0,
+          "saved": 0.0008
+        },
+        {
+          "job_name": "CI Summary",
+          "runner_type": "self-hosted",
+          "is_self_hosted": true,
+          "duration_minutes": 0.07,
+          "cost_rate": 0.0,
+          "actual_cost": 0.0,
+          "saved": 0.0005
+        }
+      ],
+      "total_minutes": 0.6399999999999999,
+      "total_cost": 0.0,
+      "total_saved": 0.005000000000000001
+    },
+    {
+      "id": 21769774894,
+      "workflow": "SLATE Integration",
+      "created": "2026-02-06T23:39:02Z",
+      "conclusion": "failure",
+      "jobs": [
+        {
+          "job_name": "SLATE Status Check",
+          "runner_type": "self-hosted",
+          "is_self_hosted": true,
+          "duration_minutes": 0.1,
+          "cost_rate": 0.0,
+          "actual_cost": 0.0,
+          "saved": 0.0008
+        },
+        {
+          "job_name": "Tech Tree Validation",
+          "runner_type": "self-hosted",
+          "is_self_hosted": true,
+          "duration_minutes": 0.1,
+          "cost_rate": 0.0,
+          "actual_cost": 0.0,
+          "saved": 0.0008
+        },
+        {
+          "job_name": "Agent Module Test",
+          "runner_type": "self-hosted",
+          "is_self_hosted": true,
+          "duration_minutes": 0.1,
+          "cost_rate": 0.0,
+          "actual_cost": 0.0,
+          "saved": 0.0008
+        },
+        {
+          "job_name": "SDK Validation",
+          "runner_type": "self-hosted",
+          "is_self_hosted": true,
+          "duration_minutes": 0.1,
+          "cost_rate": 0.0,
+          "actual_cost": 0.0,
+          "saved": 0.0008
+        },
+        {
+          "job_name": "Dashboard Smoke Test",
+          "runner_type": "self-hosted",
+          "is_self_hosted": true,
+          "duration_minutes": 0.1,
+          "cost_rate": 0.0,
+          "actual_cost": 0.0,
+          "saved": 0.0008
+        },
+        {
+          "job_name": "Task Queue Validation",
+          "runner_type": "self-hosted",
+          "is_self_hosted": true,
+          "duration_minutes": 0.1,
+          "cost_rate": 0.0,
+          "actual_cost": 0.0,
+          "saved": 0.0008
+        },
+        {
+          "job_name": "SLATE Summary",
+          "runner_type": "self-hosted",
+          "is_self_hosted": true,
+          "duration_minutes": 0.05,
+          "cost_rate": 0.0,
+          "actual_cost": 0.0,
+          "saved": 0.0004
+        }
+      ],
+      "total_minutes": 0.65,
+      "total_cost": 0.0,
+      "total_saved": 0.005200000000000001
+    },
+    {
+      "id": 21769713640,
+      "workflow": "CD - Build & Deploy",
+      "created": "2026-02-06T23:35:45Z",
+      "conclusion": "failure",
+      "jobs": [
+        {
+          "job_name": "Determine Version",
+          "runner_type": "ubuntu-latest",
+          "is_self_hosted": false,
+          "duration_minutes": 0.1,
+          "cost_rate": 0.008,
+          "actual_cost": 0.0008,
+          "saved": 0
+        },
+        {
+          "job_name": "Build Windows EXE",
+          "runner_type": "windows-latest",
+          "is_self_hosted": false,
+          "duration_minutes": 2.0,
+          "cost_rate": 0.016,
+          "actual_cost": 0.032,
+          "saved": 0
+        },
+        {
+          "job_name": "CD Summary",
+          "runner_type": "ubuntu-latest",
+          "is_self_hosted": false,
+          "duration_minutes": 0.05,
+          "cost_rate": 0.008,
+          "actual_cost": 0.0004,
+          "saved": 0
+        },
+        {
+          "job_name": "Create Release",
+          "runner_type": "ubuntu-latest",
+          "is_self_hosted": false,
+          "duration_minutes": 0.0,
+          "cost_rate": 0.008,
+          "actual_cost": 0.0,
+          "saved": 0
+        }
+      ],
+      "total_minutes": 2.15,
+      "total_cost": 0.0332,
+      "total_saved": 0
+    },
+    {
+      "id": 21769713633,
+      "workflow": "SLATE CI",
+      "created": "2026-02-06T23:35:45Z",
+      "conclusion": "cancelled",
+      "jobs": [
+        {
+          "job_name": "SLATE Quick Checks",
+          "runner_type": "self-hosted",
+          "is_self_hosted": true,
+          "duration_minutes": 0.12,
+          "cost_rate": 0.0,
+          "actual_cost": 0.0,
+          "saved": 0.0009
+        },
+        {
+          "job_name": "Security Scan",
+          "runner_type": "self-hosted",
+          "is_self_hosted": true,
+          "duration_minutes": 0.12,
+          "cost_rate": 0.0,
+          "actual_cost": 0.0,
+          "saved": 0.0009
+        },
+        {
+          "job_name": "SDK Validation",
+          "runner_type": "self-hosted",
+          "is_self_hosted": true,
+          "duration_minutes": 0.12,
+          "cost_rate": 0.0,
+          "actual_cost": 0.0,
+          "saved": 0.0009
+        },
+        {
+          "job_name": "Lint & Format",
+          "runner_type": "self-hosted",
+          "is_self_hosted": true,
+          "duration_minutes": 0.1,
+          "cost_rate": 0.0,
+          "actual_cost": 0.0,
+          "saved": 0.0008
+        },
+        {
+          "job_name": "Unit Tests",
+          "runner_type": "self-hosted",
+          "is_self_hosted": true,
+          "duration_minutes": 0.1,
+          "cost_rate": 0.0,
+          "actual_cost": 0.0,
+          "saved": 0.0008
+        },
+        {
+          "job_name": "CI Summary",
+          "runner_type": "self-hosted",
+          "is_self_hosted": true,
+          "duration_minutes": 0.05,
+          "cost_rate": 0.0,
+          "actual_cost": 0.0,
+          "saved": 0.0004
+        }
+      ],
+      "total_minutes": 0.61,
+      "total_cost": 0.0,
+      "total_saved": 0.0047
+    },
+    {
+      "id": 21769713611,
+      "workflow": "SLATE Integration",
+      "created": "2026-02-06T23:35:44Z",
+      "conclusion": "cancelled",
+      "jobs": [
+        {
+          "job_name": "Tech Tree Validation",
+          "runner_type": "self-hosted",
+          "is_self_hosted": true,
+          "duration_minutes": 0.12,
+          "cost_rate": 0.0,
+          "actual_cost": 0.0,
+          "saved": 0.0009
+        },
+        {
+          "job_name": "SLATE Status Check",
+          "runner_type": "self-hosted",
+          "is_self_hosted": true,
+          "duration_minutes": 0.1,
+          "cost_rate": 0.0,
+          "actual_cost": 0.0,
+          "saved": 0.0008
+        },
+        {
+          "job_name": "SDK Validation",
+          "runner_type": "self-hosted",
+          "is_self_hosted": true,
+          "duration_minutes": 0.12,
+          "cost_rate": 0.0,
+          "actual_cost": 0.0,
+          "saved": 0.0009
+        },
+        {
+          "job_name": "Task Queue Validation",
+          "runner_type": "self-hosted",
+          "is_self_hosted": true,
+          "duration_minutes": 0.1,
+          "cost_rate": 0.0,
+          "actual_cost": 0.0,
+          "saved": 0.0008
+        },
+        {
+          "job_name": "Dashboard Smoke Test",
+          "runner_type": "self-hosted",
+          "is_self_hosted": true,
+          "duration_minutes": 0.0,
+          "cost_rate": 0.0,
+          "actual_cost": 0.0,
+          "saved": 0.0
+        },
+        {
+          "job_name": "Agent Module Test",
+          "runner_type": "self-hosted",
+          "is_self_hosted": true,
+          "duration_minutes": 0.1,
+          "cost_rate": 0.0,
+          "actual_cost": 0.0,
+          "saved": 0.0008
+        },
+        {
+          "job_name": "SLATE Summary",
+          "runner_type": "self-hosted",
+          "is_self_hosted": true,
+          "duration_minutes": 0.05,
+          "cost_rate": 0.0,
+          "actual_cost": 0.0,
+          "saved": 0.0004
+        }
+      ],
+      "total_minutes": 0.59,
+      "total_cost": 0.0,
+      "total_saved": 0.0046
+    },
+    {
+      "id": 21769664935,
+      "workflow": "SLATE Nightly",
+      "created": "2026-02-06T23:33:21Z",
+      "conclusion": "cancelled",
+      "jobs": [
+        {
+          "job_name": "SLATE Health",
+          "runner_type": "self-hosted",
+          "is_self_hosted": true,
+          "duration_minutes": 0.0,
+          "cost_rate": 0.0,
+          "actual_cost": 0.0,
+          "saved": 0.0
+        },
+        {
+          "job_name": "Full Test Suite",
+          "runner_type": "self-hosted",
+          "is_self_hosted": true,
+          "duration_minutes": 4.18,
+          "cost_rate": 0.0,
+          "actual_cost": 0.0,
+          "saved": 0.0335
+        },
+        {
+          "job_name": "Dependency Check",
+          "runner_type": "self-hosted",
+          "is_self_hosted": true,
+          "duration_minutes": 4.18,
+          "cost_rate": 0.0,
+          "actual_cost": 0.0,
+          "saved": 0.0335
+        },
+        {
+          "job_name": "SDK Import Audit",
+          "runner_type": "self-hosted",
+          "is_self_hosted": true,
+          "duration_minutes": 4.18,
+          "cost_rate": 0.0,
+          "actual_cost": 0.0,
+          "saved": 0.0335
+        },
+        {
+          "job_name": "Nightly Summary",
+          "runner_type": "self-hosted",
+          "is_self_hosted": true,
+          "duration_minutes": 0.05,
+          "cost_rate": 0.0,
+          "actual_cost": 0.0,
+          "saved": 0.0004
+        }
+      ],
+      "total_minutes": 12.59,
+      "total_cost": 0.0,
+      "total_saved": 0.1009
+    },
+    {
+      "id": 21769664607,
+      "workflow": "SLATE Integration",
+      "created": "2026-02-06T23:33:20Z",
+      "conclusion": "cancelled",
+      "jobs": [
+        {
+          "job_name": "Task Queue Validation",
+          "runner_type": "self-hosted",
+          "is_self_hosted": true,
+          "duration_minutes": 0.0,
+          "cost_rate": 0.0,
+          "actual_cost": 0.0,
+          "saved": 0.0
+        },
+        {
+          "job_name": "Dashboard Smoke Test",
+          "runner_type": "self-hosted",
+          "is_self_hosted": true,
+          "duration_minutes": 0.0,
+          "cost_rate": 0.0,
+          "actual_cost": 0.0,
+          "saved": 0.0
+        },
+        {
+          "job_name": "Tech Tree Validation",
+          "runner_type": "self-hosted",
+          "is_self_hosted": true,
+          "duration_minutes": 4.2,
+          "cost_rate": 0.0,
+          "actual_cost": 0.0,
+          "saved": 0.0336
+        },
+        {
+          "job_name": "SLATE Status Check",
+          "runner_type": "self-hosted",
+          "is_self_hosted": true,
+          "duration_minutes": 0.0,
+          "cost_rate": 0.0,
+          "actual_cost": 0.0,
+          "saved": 0.0
+        },
+        {
+          "job_name": "SDK Validation",
+          "runner_type": "self-hosted",
+          "is_self_hosted": true,
+          "duration_minutes": 0.0,
+          "cost_rate": 0.0,
+          "actual_cost": 0.0,
+          "saved": 0.0
+        },
+        {
+          "job_name": "Agent Module Test",
+          "runner_type": "self-hosted",
+          "is_self_hosted": true,
+          "duration_minutes": 0.0,
+          "cost_rate": 0.0,
+          "actual_cost": 0.0,
+          "saved": 0.0
+        },
+        {
+          "job_name": "SLATE Summary",
+          "runner_type": "self-hosted",
+          "is_self_hosted": true,
+          "duration_minutes": 0.05,
+          "cost_rate": 0.0,
+          "actual_cost": 0.0,
+          "saved": 0.0004
+        }
+      ],
+      "total_minutes": 4.25,
+      "total_cost": 0.0,
+      "total_saved": 0.033999999999999996
+    },
+    {
+      "id": 21769664232,
+      "workflow": "SLATE CI",
+      "created": "2026-02-06T23:33:19Z",
+      "conclusion": "cancelled",
+      "jobs": [
+        {
+          "job_name": "SDK Validation",
+          "runner_type": "self-hosted",
+          "is_self_hosted": true,
+          "duration_minutes": 0.18,
+          "cost_rate": 0.0,
+          "actual_cost": 0.0,
+          "saved": 0.0015
+        },
+        {
+          "job_name": "Security Scan",
+          "runner_type": "self-hosted",
+          "is_self_hosted": true,
+          "duration_minutes": 0.0,
+          "cost_rate": 0.0,
+          "actual_cost": 0.0,
+          "saved": 0.0
+        },
+        {
+          "job_name": "SLATE Quick Checks",
+          "runner_type": "self-hosted",
+          "is_self_hosted": true,
+          "duration_minutes": 0.18,
+          "cost_rate": 0.0,
+          "actual_cost": 0.0,
+          "saved": 0.0015
+        },
+        {
+          "job_name": "Lint & Format",
+          "runner_type": "self-hosted",
+          "is_self_hosted": true,
+          "duration_minutes": 4.22,
+          "cost_rate": 0.0,
+          "actual_cost": 0.0,
+          "saved": 0.0337
+        },
+        {
+          "job_name": "Unit Tests",
+          "runner_type": "self-hosted",
+          "is_self_hosted": true,
+          "duration_minutes": 0.0,
+          "cost_rate": 0.0,
+          "actual_cost": 0.0,
+          "saved": 0.0
+        },
+        {
+          "job_name": "CI Summary",
+          "runner_type": "self-hosted",
+          "is_self_hosted": true,
+          "duration_minutes": 0.05,
+          "cost_rate": 0.0,
+          "actual_cost": 0.0,
+          "saved": 0.0004
+        }
+      ],
+      "total_minutes": 4.63,
+      "total_cost": 0.0,
+      "total_saved": 0.0371
+    },
+    {
+      "id": 21769412339,
+      "workflow": "SLATE CI",
+      "created": "2026-02-06T23:20:49Z",
+      "conclusion": "cancelled",
+      "jobs": [
+        {
+          "job_name": "Security Scan",
+          "runner_type": "self-hosted",
+          "is_self_hosted": true,
+          "duration_minutes": 0.1,
+          "cost_rate": 0.0,
+          "actual_cost": 0.0,
+          "saved": 0.0008
+        },
+        {
+          "job_name": "Lint & Format",
+          "runner_type": "self-hosted",
+          "is_self_hosted": true,
+          "duration_minutes": 0.12,
+          "cost_rate": 0.0,
+          "actual_cost": 0.0,
+          "saved": 0.0009
+        },
+        {
+          "job_name": "Unit Tests",
+          "runner_type": "self-hosted",
+          "is_self_hosted": true,
+          "duration_minutes": 0.12,
+          "cost_rate": 0.0,
+          "actual_cost": 0.0,
+          "saved": 0.0009
+        },
+        {
+          "job_name": "SLATE Quick Checks",
+          "runner_type": "self-hosted",
+          "is_self_hosted": true,
+          "duration_minutes": 0.1,
+          "cost_rate": 0.0,
+          "actual_cost": 0.0,
+          "saved": 0.0008
+        },
+        {
+          "job_name": "SDK Validation",
+          "runner_type": "self-hosted",
+          "is_self_hosted": true,
+          "duration_minutes": 0.1,
+          "cost_rate": 0.0,
+          "actual_cost": 0.0,
+          "saved": 0.0008
+        },
+        {
+          "job_name": "CI Summary",
+          "runner_type": "self-hosted",
+          "is_self_hosted": true,
+          "duration_minutes": 5.5,
+          "cost_rate": 0.0,
+          "actual_cost": 0.0,
+          "saved": 0.044
+        }
+      ],
+      "total_minutes": 6.04,
+      "total_cost": 0.0,
+      "total_saved": 0.0482
+    },
+    {
+      "id": 21769412311,
+      "workflow": "CD - Build & Deploy",
+      "created": "2026-02-06T23:20:49Z",
+      "conclusion": "failure",
+      "jobs": [
+        {
+          "job_name": "Determine Version",
+          "runner_type": "ubuntu-latest",
+          "is_self_hosted": false,
+          "duration_minutes": 0.08,
+          "cost_rate": 0.008,
+          "actual_cost": 0.0007,
+          "saved": 0
+        },
+        {
+          "job_name": "Build Windows EXE",
+          "runner_type": "windows-latest",
+          "is_self_hosted": false,
+          "duration_minutes": 2.07,
+          "cost_rate": 0.016,
+          "actual_cost": 0.0331,
+          "saved": 0
+        },
+        {
+          "job_name": "CD Summary",
+          "runner_type": "ubuntu-latest",
+          "is_self_hosted": false,
+          "duration_minutes": 0.03,
+          "cost_rate": 0.008,
+          "actual_cost": 0.0003,
+          "saved": 0
+        },
+        {
+          "job_name": "Create Release",
+          "runner_type": "ubuntu-latest",
+          "is_self_hosted": false,
+          "duration_minutes": 0.0,
+          "cost_rate": 0.008,
+          "actual_cost": 0.0,
+          "saved": 0
+        }
+      ],
+      "total_minutes": 2.1799999999999997,
+      "total_cost": 0.0341,
+      "total_saved": 0
+    },
+    {
+      "id": 21769412301,
+      "workflow": "SLATE Integration",
+      "created": "2026-02-06T23:20:49Z",
+      "conclusion": "cancelled",
+      "jobs": [
+        {
+          "job_name": "Agent Module Test",
+          "runner_type": "self-hosted",
+          "is_self_hosted": true,
+          "duration_minutes": 0.1,
+          "cost_rate": 0.0,
+          "actual_cost": 0.0,
+          "saved": 0.0008
+        },
+        {
+          "job_name": "Dashboard Smoke Test",
+          "runner_type": "self-hosted",
+          "is_self_hosted": true,
+          "duration_minutes": 6.08,
+          "cost_rate": 0.0,
+          "actual_cost": 0.0,
+          "saved": 0.0487
+        },
+        {
+          "job_name": "Tech Tree Validation",
+          "runner_type": "self-hosted",
+          "is_self_hosted": true,
+          "duration_minutes": 0.12,
+          "cost_rate": 0.0,
+          "actual_cost": 0.0,
+          "saved": 0.0009
+        },
+        {
+          "job_name": "Task Queue Validation",
+          "runner_type": "self-hosted",
+          "is_self_hosted": true,
+          "duration_minutes": 0.12,
+          "cost_rate": 0.0,
+          "actual_cost": 0.0,
+          "saved": 0.0009
+        },
+        {
+          "job_name": "SDK Validation",
+          "runner_type": "self-hosted",
+          "is_self_hosted": true,
+          "duration_minutes": 0.1,
+          "cost_rate": 0.0,
+          "actual_cost": 0.0,
+          "saved": 0.0008
+        },
+        {
+          "job_name": "SLATE Status Check",
+          "runner_type": "self-hosted",
+          "is_self_hosted": true,
+          "duration_minutes": 3.65,
+          "cost_rate": 0.0,
+          "actual_cost": 0.0,
+          "saved": 0.0292
+        }
+      ],
+      "total_minutes": 10.17,
+      "total_cost": 0.0,
+      "total_saved": 0.0813
+    },
+    {
+      "id": 21769412299,
+      "workflow": "Docs Validation",
+      "created": "2026-02-06T23:20:49Z",
+      "conclusion": "success",
+      "jobs": [
+        {
+          "job_name": "Link Check",
+          "runner_type": "ubuntu-latest",
+          "is_self_hosted": false,
+          "duration_minutes": 0.08,
+          "cost_rate": 0.008,
+          "actual_cost": 0.0007,
+          "saved": 0
+        },
+        {
+          "job_name": "README Check",
+          "runner_type": "ubuntu-latest",
+          "is_self_hosted": false,
+          "duration_minutes": 0.07,
+          "cost_rate": 0.008,
+          "actual_cost": 0.0005,
+          "saved": 0
+        },
+        {
+          "job_name": "Docs Summary",
+          "runner_type": "ubuntu-latest",
+          "is_self_hosted": false,
+          "duration_minutes": 0.03,
+          "cost_rate": 0.008,
+          "actual_cost": 0.0003,
+          "saved": 0
+        }
+      ],
+      "total_minutes": 0.18000000000000002,
+      "total_cost": 0.0015,
+      "total_saved": 0
+    },
+    {
+      "id": 21769387957,
+      "workflow": "SLATE Nightly",
+      "created": "2026-02-06T23:19:35Z",
+      "conclusion": "failure",
+      "jobs": [
+        {
+          "job_name": "SLATE Health",
+          "runner_type": "self-hosted",
+          "is_self_hosted": true,
+          "duration_minutes": 0.1,
+          "cost_rate": 0.0,
+          "actual_cost": 0.0,
+          "saved": 0.0008
+        },
+        {
+          "job_name": "Dependency Check",
+          "runner_type": "self-hosted",
+          "is_self_hosted": true,
+          "duration_minutes": 0.12,
+          "cost_rate": 0.0,
+          "actual_cost": 0.0,
+          "saved": 0.0009
+        },
+        {
+          "job_name": "SDK Import Audit",
+          "runner_type": "self-hosted",
+          "is_self_hosted": true,
+          "duration_minutes": 0.1,
+          "cost_rate": 0.0,
+          "actual_cost": 0.0,
+          "saved": 0.0008
+        },
+        {
+          "job_name": "Full Test Suite",
+          "runner_type": "self-hosted",
+          "is_self_hosted": true,
+          "duration_minutes": 0.1,
+          "cost_rate": 0.0,
+          "actual_cost": 0.0,
+          "saved": 0.0008
+        },
+        {
+          "job_name": "Nightly Summary",
+          "runner_type": "self-hosted",
+          "is_self_hosted": true,
+          "duration_minutes": 0.05,
+          "cost_rate": 0.0,
+          "actual_cost": 0.0,
+          "saved": 0.0004
+        }
+      ],
+      "total_minutes": 0.47000000000000003,
+      "total_cost": 0.0,
+      "total_saved": 0.0037
+    },
+    {
+      "id": 21769387540,
+      "workflow": "SLATE Integration",
+      "created": "2026-02-06T23:19:34Z",
+      "conclusion": "failure",
+      "jobs": [
+        {
+          "job_name": "SLATE Status Check",
+          "runner_type": "self-hosted",
+          "is_self_hosted": true,
+          "duration_minutes": 0.13,
+          "cost_rate": 0.0,
+          "actual_cost": 0.0,
+          "saved": 0.0011
+        },
+        {
+          "job_name": "Agent Module Test",
+          "runner_type": "self-hosted",
+          "is_self_hosted": true,
+          "duration_minutes": 0.1,
+          "cost_rate": 0.0,
+          "actual_cost": 0.0,
+          "saved": 0.0008
+        },
+        {
+          "job_name": "Task Queue Validation",
+          "runner_type": "self-hosted",
+          "is_self_hosted": true,
+          "duration_minutes": 0.1,
+          "cost_rate": 0.0,
+          "actual_cost": 0.0,
+          "saved": 0.0008
+        },
+        {
+          "job_name": "Tech Tree Validation",
+          "runner_type": "self-hosted",
+          "is_self_hosted": true,
+          "duration_minutes": 0.1,
+          "cost_rate": 0.0,
+          "actual_cost": 0.0,
+          "saved": 0.0008
+        },
+        {
+          "job_name": "SDK Validation",
+          "runner_type": "self-hosted",
+          "is_self_hosted": true,
+          "duration_minutes": 0.1,
+          "cost_rate": 0.0,
+          "actual_cost": 0.0,
+          "saved": 0.0008
+        },
+        {
+          "job_name": "Dashboard Smoke Test",
+          "runner_type": "self-hosted",
+          "is_self_hosted": true,
+          "duration_minutes": 0.12,
+          "cost_rate": 0.0,
+          "actual_cost": 0.0,
+          "saved": 0.0009
+        },
+        {
+          "job_name": "SLATE Summary",
+          "runner_type": "self-hosted",
+          "is_self_hosted": true,
+          "duration_minutes": 0.05,
+          "cost_rate": 0.0,
+          "actual_cost": 0.0,
+          "saved": 0.0004
+        }
+      ],
+      "total_minutes": 0.7000000000000001,
+      "total_cost": 0.0,
+      "total_saved": 0.0056
+    },
+    {
+      "id": 21769387151,
+      "workflow": "SLATE CI",
+      "created": "2026-02-06T23:19:33Z",
+      "conclusion": "cancelled",
+      "jobs": [
+        {
+          "job_name": "SDK Validation",
+          "runner_type": "self-hosted",
+          "is_self_hosted": true,
+          "duration_minutes": 0.1,
+          "cost_rate": 0.0,
+          "actual_cost": 0.0,
+          "saved": 0.0008
+        },
+        {
+          "job_name": "SLATE Quick Checks",
+          "runner_type": "self-hosted",
+          "is_self_hosted": true,
+          "duration_minutes": 0.1,
+          "cost_rate": 0.0,
+          "actual_cost": 0.0,
+          "saved": 0.0008
+        },
+        {
+          "job_name": "Unit Tests",
+          "runner_type": "self-hosted",
+          "is_self_hosted": true,
+          "duration_minutes": 0.1,
+          "cost_rate": 0.0,
+          "actual_cost": 0.0,
+          "saved": 0.0008
+        },
+        {
+          "job_name": "Security Scan",
+          "runner_type": "self-hosted",
+          "is_self_hosted": true,
+          "duration_minutes": 0.12,
+          "cost_rate": 0.0,
+          "actual_cost": 0.0,
+          "saved": 0.0009
+        },
+        {
+          "job_name": "Lint & Format",
+          "runner_type": "self-hosted",
+          "is_self_hosted": true,
+          "duration_minutes": 0.1,
+          "cost_rate": 0.0,
+          "actual_cost": 0.0,
+          "saved": 0.0008
+        },
+        {
+          "job_name": "CI Summary",
+          "runner_type": "self-hosted",
+          "is_self_hosted": true,
+          "duration_minutes": 7.18,
+          "cost_rate": 0.0,
+          "actual_cost": 0.0,
+          "saved": 0.0575
+        }
+      ],
+      "total_minutes": 7.699999999999999,
+      "total_cost": 0.0,
+      "total_saved": 0.0616
+    },
+    {
+      "id": 21769341065,
+      "workflow": "Docs Validation",
+      "created": "2026-02-06T23:17:16Z",
+      "conclusion": "success",
+      "jobs": [
+        {
+          "job_name": "README Check",
+          "runner_type": "ubuntu-latest",
+          "is_self_hosted": false,
+          "duration_minutes": 0.07,
+          "cost_rate": 0.008,
+          "actual_cost": 0.0005,
+          "saved": 0
+        },
+        {
+          "job_name": "Link Check",
+          "runner_type": "ubuntu-latest",
+          "is_self_hosted": false,
+          "duration_minutes": 0.05,
+          "cost_rate": 0.008,
+          "actual_cost": 0.0004,
+          "saved": 0
+        },
+        {
+          "job_name": "Docs Summary",
+          "runner_type": "ubuntu-latest",
+          "is_self_hosted": false,
+          "duration_minutes": 0.07,
+          "cost_rate": 0.008,
+          "actual_cost": 0.0005,
+          "saved": 0
+        }
+      ],
+      "total_minutes": 0.19,
+      "total_cost": 0.0014,
+      "total_saved": 0
+    },
+    {
+      "id": 21769341061,
+      "workflow": "SLATE CI",
+      "created": "2026-02-06T23:17:15Z",
+      "conclusion": "cancelled",
+      "jobs": [
+        {
+          "job_name": "Security Scan",
+          "runner_type": "self-hosted",
+          "is_self_hosted": true,
+          "duration_minutes": 0.0,
+          "cost_rate": 0.0,
+          "actual_cost": 0.0,
+          "saved": 0.0
+        },
+        {
+          "job_name": "SLATE Quick Checks",
+          "runner_type": "self-hosted",
+          "is_self_hosted": true,
+          "duration_minutes": 0.0,
+          "cost_rate": 0.0,
+          "actual_cost": 0.0,
+          "saved": 0.0
+        },
+        {
+          "job_name": "SDK Validation",
+          "runner_type": "self-hosted",
+          "is_self_hosted": true,
+          "duration_minutes": 0.15,
+          "cost_rate": 0.0,
+          "actual_cost": 0.0,
+          "saved": 0.0012
+        },
+        {
+          "job_name": "Lint & Format",
+          "runner_type": "self-hosted",
+          "is_self_hosted": true,
+          "duration_minutes": 0.15,
+          "cost_rate": 0.0,
+          "actual_cost": 0.0,
+          "saved": 0.0012
+        },
+        {
+          "job_name": "Unit Tests",
+          "runner_type": "self-hosted",
+          "is_self_hosted": true,
+          "duration_minutes": 0.15,
+          "cost_rate": 0.0,
+          "actual_cost": 0.0,
+          "saved": 0.0012
+        },
+        {
+          "job_name": "CI Summary",
+          "runner_type": "self-hosted",
+          "is_self_hosted": true,
+          "duration_minutes": 0.07,
+          "cost_rate": 0.0,
+          "actual_cost": 0.0,
+          "saved": 0.0005
+        }
+      ],
+      "total_minutes": 0.52,
+      "total_cost": 0.0,
+      "total_saved": 0.0040999999999999995
+    },
+    {
+      "id": 21769341056,
+      "workflow": "SLATE Integration",
+      "created": "2026-02-06T23:17:15Z",
+      "conclusion": "cancelled",
+      "jobs": [
+        {
+          "job_name": "Task Queue Validation",
+          "runner_type": "self-hosted",
+          "is_self_hosted": true,
+          "duration_minutes": 0.0,
+          "cost_rate": 0.0,
+          "actual_cost": 0.0,
+          "saved": 0.0
+        },
+        {
+          "job_name": "Dashboard Smoke Test",
+          "runner_type": "self-hosted",
+          "is_self_hosted": true,
+          "duration_minutes": 0.0,
+          "cost_rate": 0.0,
+          "actual_cost": 0.0,
+          "saved": 0.0
+        },
+        {
+          "job_name": "SLATE Status Check",
+          "runner_type": "self-hosted",
+          "is_self_hosted": true,
+          "duration_minutes": 0.0,
+          "cost_rate": 0.0,
+          "actual_cost": 0.0,
+          "saved": 0.0
+        },
+        {
+          "job_name": "Agent Module Test",
+          "runner_type": "self-hosted",
+          "is_self_hosted": true,
+          "duration_minutes": 0.0,
+          "cost_rate": 0.0,
+          "actual_cost": 0.0,
+          "saved": 0.0
+        },
+        {
+          "job_name": "SDK Validation",
+          "runner_type": "self-hosted",
+          "is_self_hosted": true,
+          "duration_minutes": 0.15,
+          "cost_rate": 0.0,
+          "actual_cost": 0.0,
+          "saved": 0.0012
+        },
+        {
+          "job_name": "Tech Tree Validation",
+          "runner_type": "self-hosted",
+          "is_self_hosted": true,
+          "duration_minutes": 0.0,
+          "cost_rate": 0.0,
+          "actual_cost": 0.0,
+          "saved": 0.0
+        },
+        {
+          "job_name": "SLATE Summary",
+          "runner_type": "self-hosted",
+          "is_self_hosted": true,
+          "duration_minutes": 0.05,
+          "cost_rate": 0.0,
+          "actual_cost": 0.0,
+          "saved": 0.0004
+        }
+      ],
+      "total_minutes": 0.2,
+      "total_cost": 0.0,
+      "total_saved": 0.0015999999999999999
+    },
+    {
+      "id": 21769341053,
+      "workflow": "CD - Build & Deploy",
+      "created": "2026-02-06T23:17:15Z",
+      "conclusion": "cancelled",
+      "jobs": [
+        {
+          "job_name": "Determine Version",
+          "runner_type": "ubuntu-latest",
+          "is_self_hosted": false,
+          "duration_minutes": 0.07,
+          "cost_rate": 0.008,
+          "actual_cost": 0.0005,
+          "saved": 0
+        },
+        {
+          "job_name": "Build Windows EXE",
+          "runner_type": "windows-latest",
+          "is_self_hosted": false,
+          "duration_minutes": 0.33,
+          "cost_rate": 0.016,
+          "actual_cost": 0.0053,
+          "saved": 0
+        },
+        {
+          "job_name": "CD Summary",
+          "runner_type": "ubuntu-latest",
+          "is_self_hosted": false,
+          "duration_minutes": 0.05,
+          "cost_rate": 0.008,
+          "actual_cost": 0.0004,
+          "saved": 0
+        },
+        {
+          "job_name": "Create Release",
+          "runner_type": "ubuntu-latest",
+          "is_self_hosted": false,
+          "duration_minutes": 0.0,
+          "cost_rate": 0.008,
+          "actual_cost": 0.0,
+          "saved": 0
+        }
+      ],
+      "total_minutes": 0.45,
+      "total_cost": 0.0062,
+      "total_saved": 0
+    },
+    {
+      "id": 21769341045,
+      "workflow": "CodeQL Analysis",
+      "created": "2026-02-06T23:17:15Z",
+      "conclusion": "cancelled",
+      "jobs": [
+        {
+          "job_name": "CodeQL Analysis (python)",
+          "runner_type": "ubuntu-latest",
+          "is_self_hosted": false,
+          "duration_minutes": 0.13,
+          "cost_rate": 0.008,
+          "actual_cost": 0.0011,
+          "saved": 0
+        }
+      ],
+      "total_minutes": 0.13,
+      "total_cost": 0.0011,
+      "total_saved": 0
+    },
+    {
+      "id": 21769329208,
+      "workflow": "SLATE CI",
+      "created": "2026-02-06T23:16:45Z",
+      "conclusion": "cancelled",
+      "jobs": [],
+      "total_minutes": 0,
+      "total_cost": 0,
+      "total_saved": 0
+    },
+    {
+      "id": 21769329186,
+      "workflow": "SLATE Integration",
+      "created": "2026-02-06T23:16:45Z",
+      "conclusion": "cancelled",
+      "jobs": [],
+      "total_minutes": 0,
+      "total_cost": 0,
+      "total_saved": 0
+    },
+    {
+      "id": 21769287534,
+      "workflow": "SLATE CI",
+      "created": "2026-02-06T23:14:50Z",
+      "conclusion": "cancelled",
+      "jobs": [
+        {
+          "job_name": "SDK Validation",
+          "runner_type": "self-hosted",
+          "is_self_hosted": true,
+          "duration_minutes": 0.12,
+          "cost_rate": 0.0,
+          "actual_cost": 0.0,
+          "saved": 0.0009
+        },
+        {
+          "job_name": "Security Scan",
+          "runner_type": "self-hosted",
+          "is_self_hosted": true,
+          "duration_minutes": 0.1,
+          "cost_rate": 0.0,
+          "actual_cost": 0.0,
+          "saved": 0.0008
+        },
+        {
+          "job_name": "SLATE Quick Checks",
+          "runner_type": "self-hosted",
+          "is_self_hosted": true,
+          "duration_minutes": 0.1,
+          "cost_rate": 0.0,
+          "actual_cost": 0.0,
+          "saved": 0.0008
+        },
+        {
+          "job_name": "Unit Tests",
+          "runner_type": "self-hosted",
+          "is_self_hosted": true,
+          "duration_minutes": 0.1,
+          "cost_rate": 0.0,
+          "actual_cost": 0.0,
+          "saved": 0.0008
+        },
+        {
+          "job_name": "Lint & Format",
+          "runner_type": "self-hosted",
+          "is_self_hosted": true,
+          "duration_minutes": 0.1,
+          "cost_rate": 0.0,
+          "actual_cost": 0.0,
+          "saved": 0.0008
+        },
+        {
+          "job_name": "CI Summary",
+          "runner_type": "self-hosted",
+          "is_self_hosted": true,
+          "duration_minutes": 0.05,
+          "cost_rate": 0.0,
+          "actual_cost": 0.0,
+          "saved": 0.0004
+        }
+      ],
+      "total_minutes": 0.5700000000000001,
+      "total_cost": 0.0,
+      "total_saved": 0.0045000000000000005
+    },
+    {
+      "id": 21769287516,
+      "workflow": "SLATE Integration",
+      "created": "2026-02-06T23:14:50Z",
+      "conclusion": "cancelled",
+      "jobs": [
+        {
+          "job_name": "SLATE Status Check",
+          "runner_type": "self-hosted",
+          "is_self_hosted": true,
+          "duration_minutes": 0.1,
+          "cost_rate": 0.0,
+          "actual_cost": 0.0,
+          "saved": 0.0008
+        },
+        {
+          "job_name": "Agent Module Test",
+          "runner_type": "self-hosted",
+          "is_self_hosted": true,
+          "duration_minutes": 0.12,
+          "cost_rate": 0.0,
+          "actual_cost": 0.0,
+          "saved": 0.0009
+        },
+        {
+          "job_name": "Tech Tree Validation",
+          "runner_type": "self-hosted",
+          "is_self_hosted": true,
+          "duration_minutes": 0.12,
+          "cost_rate": 0.0,
+          "actual_cost": 0.0,
+          "saved": 0.0009
+        },
+        {
+          "job_name": "Task Queue Validation",
+          "runner_type": "self-hosted",
+          "is_self_hosted": true,
+          "duration_minutes": 1.92,
+          "cost_rate": 0.0,
+          "actual_cost": 0.0,
+          "saved": 0.0153
+        },
+        {
+          "job_name": "Dashboard Smoke Test",
+          "runner_type": "self-hosted",
+          "is_self_hosted": true,
+          "duration_minutes": 0.1,
+          "cost_rate": 0.0,
+          "actual_cost": 0.0,
+          "saved": 0.0008
+        },
+        {
+          "job_name": "SDK Validation",
+          "runner_type": "self-hosted",
+          "is_self_hosted": true,
+          "duration_minutes": 0.1,
+          "cost_rate": 0.0,
+          "actual_cost": 0.0,
+          "saved": 0.0008
+        },
+        {
+          "job_name": "SLATE Summary",
+          "runner_type": "self-hosted",
+          "is_self_hosted": true,
+          "duration_minutes": 0.05,
+          "cost_rate": 0.0,
+          "actual_cost": 0.0,
+          "saved": 0.0004
+        }
+      ],
+      "total_minutes": 2.51,
+      "total_cost": 0.0,
+      "total_saved": 0.019899999999999998
+    },
+    {
+      "id": 21769143095,
+      "workflow": "SLATE Nightly",
+      "created": "2026-02-06T23:08:34Z",
+      "conclusion": "cancelled",
+      "jobs": [
+        {
+          "job_name": "Full Test Suite",
+          "runner_type": "self-hosted",
+          "is_self_hosted": true,
+          "duration_minutes": 0.1,
+          "cost_rate": 0.0,
+          "actual_cost": 0.0,
+          "saved": 0.0008
+        },
+        {
+          "job_name": "SLATE Health",
+          "runner_type": "self-hosted",
+          "is_self_hosted": true,
+          "duration_minutes": 0.12,
+          "cost_rate": 0.0,
+          "actual_cost": 0.0,
+          "saved": 0.0009
+        },
+        {
+          "job_name": "SDK Import Audit",
+          "runner_type": "self-hosted",
+          "is_self_hosted": true,
+          "duration_minutes": 0.0,
+          "cost_rate": 0.0,
+          "actual_cost": 0.0,
+          "saved": 0.0
+        },
+        {
+          "job_name": "Dependency Check",
+          "runner_type": "self-hosted",
+          "is_self_hosted": true,
+          "duration_minutes": 0.0,
+          "cost_rate": 0.0,
+          "actual_cost": 0.0,
+          "saved": 0.0
+        },
+        {
+          "job_name": "Nightly Summary",
+          "runner_type": "self-hosted",
+          "is_self_hosted": true,
+          "duration_minutes": 0.05,
+          "cost_rate": 0.0,
+          "actual_cost": 0.0,
+          "saved": 0.0004
+        }
+      ],
+      "total_minutes": 0.27,
+      "total_cost": 0.0,
+      "total_saved": 0.0021000000000000003
+    },
+    {
+      "id": 21769142747,
+      "workflow": "SLATE Integration",
+      "created": "2026-02-06T23:08:33Z",
+      "conclusion": "failure",
+      "jobs": [
+        {
+          "job_name": "SLATE Status Check",
+          "runner_type": "self-hosted",
+          "is_self_hosted": true,
+          "duration_minutes": 0.1,
+          "cost_rate": 0.0,
+          "actual_cost": 0.0,
+          "saved": 0.0008
+        },
+        {
+          "job_name": "Dashboard Smoke Test",
+          "runner_type": "self-hosted",
+          "is_self_hosted": true,
+          "duration_minutes": 0.1,
+          "cost_rate": 0.0,
+          "actual_cost": 0.0,
+          "saved": 0.0008
+        },
+        {
+          "job_name": "Task Queue Validation",
+          "runner_type": "self-hosted",
+          "is_self_hosted": true,
+          "duration_minutes": 0.1,
+          "cost_rate": 0.0,
+          "actual_cost": 0.0,
+          "saved": 0.0008
+        },
+        {
+          "job_name": "Tech Tree Validation",
+          "runner_type": "self-hosted",
+          "is_self_hosted": true,
+          "duration_minutes": 0.12,
+          "cost_rate": 0.0,
+          "actual_cost": 0.0,
+          "saved": 0.0009
+        },
+        {
+          "job_name": "Agent Module Test",
+          "runner_type": "self-hosted",
+          "is_self_hosted": true,
+          "duration_minutes": 0.1,
+          "cost_rate": 0.0,
+          "actual_cost": 0.0,
+          "saved": 0.0008
+        },
+        {
+          "job_name": "SDK Validation",
+          "runner_type": "self-hosted",
+          "is_self_hosted": true,
+          "duration_minutes": 0.12,
+          "cost_rate": 0.0,
+          "actual_cost": 0.0,
+          "saved": 0.0009
+        },
+        {
+          "job_name": "SLATE Summary",
+          "runner_type": "self-hosted",
+          "is_self_hosted": true,
+          "duration_minutes": 0.05,
+          "cost_rate": 0.0,
+          "actual_cost": 0.0,
+          "saved": 0.0004
+        }
+      ],
+      "total_minutes": 0.6900000000000001,
+      "total_cost": 0.0,
+      "total_saved": 0.0054
+    },
+    {
+      "id": 21769139884,
+      "workflow": "SLATE CI",
+      "created": "2026-02-06T23:08:25Z",
+      "conclusion": "failure",
+      "jobs": [
+        {
+          "job_name": "Unit Tests",
+          "runner_type": "self-hosted",
+          "is_self_hosted": true,
+          "duration_minutes": 0.1,
+          "cost_rate": 0.0,
+          "actual_cost": 0.0,
+          "saved": 0.0008
+        },
+        {
+          "job_name": "Lint & Format",
+          "runner_type": "self-hosted",
+          "is_self_hosted": true,
+          "duration_minutes": 0.1,
+          "cost_rate": 0.0,
+          "actual_cost": 0.0,
+          "saved": 0.0008
+        },
+        {
+          "job_name": "SLATE Quick Checks",
+          "runner_type": "self-hosted",
+          "is_self_hosted": true,
+          "duration_minutes": 0.1,
+          "cost_rate": 0.0,
+          "actual_cost": 0.0,
+          "saved": 0.0008
+        },
+        {
+          "job_name": "SDK Validation",
+          "runner_type": "self-hosted",
+          "is_self_hosted": true,
+          "duration_minutes": 0.1,
+          "cost_rate": 0.0,
+          "actual_cost": 0.0,
+          "saved": 0.0008
+        },
+        {
+          "job_name": "Security Scan",
+          "runner_type": "self-hosted",
+          "is_self_hosted": true,
+          "duration_minutes": 0.12,
+          "cost_rate": 0.0,
+          "actual_cost": 0.0,
+          "saved": 0.0009
+        },
+        {
+          "job_name": "CI Summary",
+          "runner_type": "self-hosted",
+          "is_self_hosted": true,
+          "duration_minutes": 0.05,
+          "cost_rate": 0.0,
+          "actual_cost": 0.0,
+          "saved": 0.0004
+        }
+      ],
+      "total_minutes": 0.5700000000000001,
+      "total_cost": 0.0,
+      "total_saved": 0.0045000000000000005
+    },
+    {
+      "id": 21768921574,
+      "workflow": "SLATE Nightly",
+      "created": "2026-02-06T22:59:18Z",
+      "conclusion": "failure",
+      "jobs": [
+        {
+          "job_name": "SLATE Health",
+          "runner_type": "self-hosted",
+          "is_self_hosted": true,
+          "duration_minutes": 0.1,
+          "cost_rate": 0.0,
+          "actual_cost": 0.0,
+          "saved": 0.0008
+        },
+        {
+          "job_name": "Full Test Suite",
+          "runner_type": "self-hosted",
+          "is_self_hosted": true,
+          "duration_minutes": 0.12,
+          "cost_rate": 0.0,
+          "actual_cost": 0.0,
+          "saved": 0.0009
+        },
+        {
+          "job_name": "Dependency Check",
+          "runner_type": "self-hosted",
+          "is_self_hosted": true,
+          "duration_minutes": 0.12,
+          "cost_rate": 0.0,
+          "actual_cost": 0.0,
+          "saved": 0.0009
+        },
+        {
+          "job_name": "SDK Import Audit",
+          "runner_type": "self-hosted",
+          "is_self_hosted": true,
+          "duration_minutes": 0.1,
+          "cost_rate": 0.0,
+          "actual_cost": 0.0,
+          "saved": 0.0008
+        },
+        {
+          "job_name": "Nightly Summary",
+          "runner_type": "self-hosted",
+          "is_self_hosted": true,
+          "duration_minutes": 0.05,
+          "cost_rate": 0.0,
+          "actual_cost": 0.0,
+          "saved": 0.0004
+        }
+      ],
+      "total_minutes": 0.48999999999999994,
+      "total_cost": 0.0,
+      "total_saved": 0.0038
+    },
+    {
+      "id": 21768914036,
+      "workflow": "SLATE Integration",
+      "created": "2026-02-06T22:59:00Z",
+      "conclusion": "failure",
+      "jobs": [
+        {
+          "job_name": "Tech Tree Validation",
+          "runner_type": "self-hosted",
+          "is_self_hosted": true,
+          "duration_minutes": 0.12,
+          "cost_rate": 0.0,
+          "actual_cost": 0.0,
+          "saved": 0.0009
+        },
+        {
+          "job_name": "Task Queue Validation",
+          "runner_type": "self-hosted",
+          "is_self_hosted": true,
+          "duration_minutes": 0.1,
+          "cost_rate": 0.0,
+          "actual_cost": 0.0,
+          "saved": 0.0008
+        },
+        {
+          "job_name": "Agent Module Test",
+          "runner_type": "self-hosted",
+          "is_self_hosted": true,
+          "duration_minutes": 0.1,
+          "cost_rate": 0.0,
+          "actual_cost": 0.0,
+          "saved": 0.0008
+        },
+        {
+          "job_name": "Dashboard Smoke Test",
+          "runner_type": "self-hosted",
+          "is_self_hosted": true,
+          "duration_minutes": 0.1,
+          "cost_rate": 0.0,
+          "actual_cost": 0.0,
+          "saved": 0.0008
+        },
+        {
+          "job_name": "SLATE Status Check",
+          "runner_type": "self-hosted",
+          "is_self_hosted": true,
+          "duration_minutes": 0.12,
+          "cost_rate": 0.0,
+          "actual_cost": 0.0,
+          "saved": 0.0009
+        },
+        {
+          "job_name": "SDK Validation",
+          "runner_type": "self-hosted",
+          "is_self_hosted": true,
+          "duration_minutes": 0.1,
+          "cost_rate": 0.0,
+          "actual_cost": 0.0,
+          "saved": 0.0008
+        },
+        {
+          "job_name": "SLATE Summary",
+          "runner_type": "self-hosted",
+          "is_self_hosted": true,
+          "duration_minutes": 0.05,
+          "cost_rate": 0.0,
+          "actual_cost": 0.0,
+          "saved": 0.0004
+        }
+      ],
+      "total_minutes": 0.6900000000000001,
+      "total_cost": 0.0,
+      "total_saved": 0.0054
+    },
+    {
+      "id": 21768914016,
+      "workflow": "SLATE CI",
+      "created": "2026-02-06T22:59:00Z",
+      "conclusion": "failure",
+      "jobs": [
+        {
+          "job_name": "Lint & Format",
+          "runner_type": "self-hosted",
+          "is_self_hosted": true,
+          "duration_minutes": 0.1,
+          "cost_rate": 0.0,
+          "actual_cost": 0.0,
+          "saved": 0.0008
+        },
+        {
+          "job_name": "SDK Validation",
+          "runner_type": "self-hosted",
+          "is_self_hosted": true,
+          "duration_minutes": 0.1,
+          "cost_rate": 0.0,
+          "actual_cost": 0.0,
+          "saved": 0.0008
+        },
+        {
+          "job_name": "Unit Tests",
+          "runner_type": "self-hosted",
+          "is_self_hosted": true,
+          "duration_minutes": 0.1,
+          "cost_rate": 0.0,
+          "actual_cost": 0.0,
+          "saved": 0.0008
+        },
+        {
+          "job_name": "Security Scan",
+          "runner_type": "self-hosted",
+          "is_self_hosted": true,
+          "duration_minutes": 0.12,
+          "cost_rate": 0.0,
+          "actual_cost": 0.0,
+          "saved": 0.0009
+        },
+        {
+          "job_name": "SLATE Quick Checks",
+          "runner_type": "self-hosted",
+          "is_self_hosted": true,
+          "duration_minutes": 0.12,
+          "cost_rate": 0.0,
+          "actual_cost": 0.0,
+          "saved": 0.0009
+        },
+        {
+          "job_name": "CI Summary",
+          "runner_type": "self-hosted",
+          "is_self_hosted": true,
+          "duration_minutes": 0.05,
+          "cost_rate": 0.0,
+          "actual_cost": 0.0,
+          "saved": 0.0004
+        }
+      ],
+      "total_minutes": 0.5900000000000001,
+      "total_cost": 0.0,
+      "total_saved": 0.0046
+    },
+    {
+      "id": 21768849067,
+      "workflow": "SLATE Integration",
+      "created": "2026-02-06T22:56:08Z",
+      "conclusion": "failure",
+      "jobs": [
+        {
+          "job_name": "Agent Module Test",
+          "runner_type": "self-hosted",
+          "is_self_hosted": true,
+          "duration_minutes": 0.1,
+          "cost_rate": 0.0,
+          "actual_cost": 0.0,
+          "saved": 0.0008
+        },
+        {
+          "job_name": "SLATE Status Check",
+          "runner_type": "self-hosted",
+          "is_self_hosted": true,
+          "duration_minutes": 0.1,
+          "cost_rate": 0.0,
+          "actual_cost": 0.0,
+          "saved": 0.0008
+        },
+        {
+          "job_name": "Tech Tree Validation",
+          "runner_type": "self-hosted",
+          "is_self_hosted": true,
+          "duration_minutes": 0.12,
+          "cost_rate": 0.0,
+          "actual_cost": 0.0,
+          "saved": 0.0009
+        },
+        {
+          "job_name": "Dashboard Smoke Test",
+          "runner_type": "self-hosted",
+          "is_self_hosted": true,
+          "duration_minutes": 0.12,
+          "cost_rate": 0.0,
+          "actual_cost": 0.0,
+          "saved": 0.0009
+        },
+        {
+          "job_name": "SDK Validation",
+          "runner_type": "self-hosted",
+          "is_self_hosted": true,
+          "duration_minutes": 0.1,
+          "cost_rate": 0.0,
+          "actual_cost": 0.0,
+          "saved": 0.0008
+        },
+        {
+          "job_name": "Task Queue Validation",
+          "runner_type": "self-hosted",
+          "is_self_hosted": true,
+          "duration_minutes": 0.1,
+          "cost_rate": 0.0,
+          "actual_cost": 0.0,
+          "saved": 0.0008
+        },
+        {
+          "job_name": "SLATE Summary",
+          "runner_type": "self-hosted",
+          "is_self_hosted": true,
+          "duration_minutes": 0.07,
+          "cost_rate": 0.0,
+          "actual_cost": 0.0,
+          "saved": 0.0005
+        }
+      ],
+      "total_minutes": 0.71,
+      "total_cost": 0.0,
+      "total_saved": 0.005500000000000001
+    },
+    {
+      "id": 21768839318,
+      "workflow": "SLATE Nightly",
+      "created": "2026-02-06T22:55:42Z",
+      "conclusion": "failure",
+      "jobs": [
+        {
+          "job_name": "SLATE Health",
+          "runner_type": "self-hosted",
+          "is_self_hosted": true,
+          "duration_minutes": 0.12,
+          "cost_rate": 0.0,
+          "actual_cost": 0.0,
+          "saved": 0.0009
+        },
+        {
+          "job_name": "SDK Import Audit",
+          "runner_type": "self-hosted",
+          "is_self_hosted": true,
+          "duration_minutes": 0.12,
+          "cost_rate": 0.0,
+          "actual_cost": 0.0,
+          "saved": 0.0009
+        },
+        {
+          "job_name": "Dependency Check",
+          "runner_type": "self-hosted",
+          "is_self_hosted": true,
+          "duration_minutes": 0.1,
+          "cost_rate": 0.0,
+          "actual_cost": 0.0,
+          "saved": 0.0008
+        },
+        {
+          "job_name": "Full Test Suite",
+          "runner_type": "self-hosted",
+          "is_self_hosted": true,
+          "duration_minutes": 0.1,
+          "cost_rate": 0.0,
+          "actual_cost": 0.0,
+          "saved": 0.0008
+        },
+        {
+          "job_name": "Nightly Summary",
+          "runner_type": "self-hosted",
+          "is_self_hosted": true,
+          "duration_minutes": 0.05,
+          "cost_rate": 0.0,
+          "actual_cost": 0.0,
+          "saved": 0.0004
+        }
+      ],
+      "total_minutes": 0.48999999999999994,
+      "total_cost": 0.0,
+      "total_saved": 0.0038
+    },
+    {
+      "id": 21768838867,
+      "workflow": "SLATE Integration",
+      "created": "2026-02-06T22:55:41Z",
+      "conclusion": "failure",
+      "jobs": [
+        {
+          "job_name": "SLATE Status Check",
+          "runner_type": "self-hosted",
+          "is_self_hosted": true,
+          "duration_minutes": 0.1,
+          "cost_rate": 0.0,
+          "actual_cost": 0.0,
+          "saved": 0.0008
+        },
+        {
+          "job_name": "Task Queue Validation",
+          "runner_type": "self-hosted",
+          "is_self_hosted": true,
+          "duration_minutes": 0.1,
+          "cost_rate": 0.0,
+          "actual_cost": 0.0,
+          "saved": 0.0008
+        },
+        {
+          "job_name": "Tech Tree Validation",
+          "runner_type": "self-hosted",
+          "is_self_hosted": true,
+          "duration_minutes": 0.1,
+          "cost_rate": 0.0,
+          "actual_cost": 0.0,
+          "saved": 0.0008
+        },
+        {
+          "job_name": "Agent Module Test",
+          "runner_type": "self-hosted",
+          "is_self_hosted": true,
+          "duration_minutes": 0.1,
+          "cost_rate": 0.0,
+          "actual_cost": 0.0,
+          "saved": 0.0008
+        },
+        {
+          "job_name": "Dashboard Smoke Test",
+          "runner_type": "self-hosted",
+          "is_self_hosted": true,
+          "duration_minutes": 0.1,
+          "cost_rate": 0.0,
+          "actual_cost": 0.0,
+          "saved": 0.0008
+        },
+        {
+          "job_name": "SDK Validation",
+          "runner_type": "self-hosted",
+          "is_self_hosted": true,
+          "duration_minutes": 0.1,
+          "cost_rate": 0.0,
+          "actual_cost": 0.0,
+          "saved": 0.0008
+        },
+        {
+          "job_name": "SLATE Summary",
+          "runner_type": "self-hosted",
+          "is_self_hosted": true,
+          "duration_minutes": 0.05,
+          "cost_rate": 0.0,
+          "actual_cost": 0.0,
+          "saved": 0.0004
+        }
+      ],
+      "total_minutes": 0.65,
+      "total_cost": 0.0,
+      "total_saved": 0.005200000000000001
+    },
+    {
+      "id": 21768838462,
+      "workflow": "SLATE CI",
+      "created": "2026-02-06T22:55:40Z",
+      "conclusion": "failure",
+      "jobs": [
+        {
+          "job_name": "Unit Tests",
+          "runner_type": "self-hosted",
+          "is_self_hosted": true,
+          "duration_minutes": 0.12,
+          "cost_rate": 0.0,
+          "actual_cost": 0.0,
+          "saved": 0.0009
+        },
+        {
+          "job_name": "SLATE Quick Checks",
+          "runner_type": "self-hosted",
+          "is_self_hosted": true,
+          "duration_minutes": 0.1,
+          "cost_rate": 0.0,
+          "actual_cost": 0.0,
+          "saved": 0.0008
+        },
+        {
+          "job_name": "SDK Validation",
+          "runner_type": "self-hosted",
+          "is_self_hosted": true,
+          "duration_minutes": 0.12,
+          "cost_rate": 0.0,
+          "actual_cost": 0.0,
+          "saved": 0.0009
+        },
+        {
+          "job_name": "Security Scan",
+          "runner_type": "self-hosted",
+          "is_self_hosted": true,
+          "duration_minutes": 0.12,
+          "cost_rate": 0.0,
+          "actual_cost": 0.0,
+          "saved": 0.0009
+        },
+        {
+          "job_name": "Lint & Format",
+          "runner_type": "self-hosted",
+          "is_self_hosted": true,
+          "duration_minutes": 0.1,
+          "cost_rate": 0.0,
+          "actual_cost": 0.0,
+          "saved": 0.0008
+        },
+        {
+          "job_name": "CI Summary",
+          "runner_type": "self-hosted",
+          "is_self_hosted": true,
+          "duration_minutes": 0.07,
+          "cost_rate": 0.0,
+          "actual_cost": 0.0,
+          "saved": 0.0005
+        }
+      ],
+      "total_minutes": 0.6299999999999999,
+      "total_cost": 0.0,
+      "total_saved": 0.0048000000000000004
+    },
+    {
+      "id": 21768731882,
+      "workflow": "SLATE Integration",
+      "created": "2026-02-06T22:51:19Z",
+      "conclusion": "cancelled",
+      "jobs": [
+        {
+          "job_name": "SDK Validation",
+          "runner_type": "self-hosted",
+          "is_self_hosted": true,
+          "duration_minutes": 0.28,
+          "cost_rate": 0.0,
+          "actual_cost": 0.0,
+          "saved": 0.0023
+        },
+        {
+          "job_name": "Tech Tree Validation",
+          "runner_type": "self-hosted",
+          "is_self_hosted": true,
+          "duration_minutes": 0.28,
+          "cost_rate": 0.0,
+          "actual_cost": 0.0,
+          "saved": 0.0023
+        },
+        {
+          "job_name": "Task Queue Validation",
+          "runner_type": "self-hosted",
+          "is_self_hosted": true,
+          "duration_minutes": 0.28,
+          "cost_rate": 0.0,
+          "actual_cost": 0.0,
+          "saved": 0.0023
+        },
+        {
+          "job_name": "Dashboard Smoke Test",
+          "runner_type": "self-hosted",
+          "is_self_hosted": true,
+          "duration_minutes": 0.28,
+          "cost_rate": 0.0,
+          "actual_cost": 0.0,
+          "saved": 0.0023
+        },
+        {
+          "job_name": "SLATE Status Check",
+          "runner_type": "self-hosted",
+          "is_self_hosted": true,
+          "duration_minutes": 0.28,
+          "cost_rate": 0.0,
+          "actual_cost": 0.0,
+          "saved": 0.0023
+        },
+        {
+          "job_name": "Agent Module Test",
+          "runner_type": "self-hosted",
+          "is_self_hosted": true,
+          "duration_minutes": 0.0,
+          "cost_rate": 0.0,
+          "actual_cost": 0.0,
+          "saved": 0.0
+        },
+        {
+          "job_name": "SLATE Summary",
+          "runner_type": "self-hosted",
+          "is_self_hosted": true,
+          "duration_minutes": 0.07,
+          "cost_rate": 0.0,
+          "actual_cost": 0.0,
+          "saved": 0.0005
+        }
+      ],
+      "total_minutes": 1.4700000000000002,
+      "total_cost": 0.0,
+      "total_saved": 0.012
+    },
+    {
+      "id": 21768731873,
+      "workflow": "Docs Validation",
+      "created": "2026-02-06T22:51:19Z",
+      "conclusion": "success",
+      "jobs": [
+        {
+          "job_name": "README Check",
+          "runner_type": "ubuntu-latest",
+          "is_self_hosted": false,
+          "duration_minutes": 0.08,
+          "cost_rate": 0.008,
+          "actual_cost": 0.0007,
+          "saved": 0
+        },
+        {
+          "job_name": "Link Check",
+          "runner_type": "ubuntu-latest",
+          "is_self_hosted": false,
+          "duration_minutes": 0.05,
+          "cost_rate": 0.008,
+          "actual_cost": 0.0004,
+          "saved": 0
+        },
+        {
+          "job_name": "Docs Summary",
+          "runner_type": "ubuntu-latest",
+          "is_self_hosted": false,
+          "duration_minutes": 0.07,
+          "cost_rate": 0.008,
+          "actual_cost": 0.0005,
+          "saved": 0
+        }
+      ],
+      "total_minutes": 0.2,
+      "total_cost": 0.0016,
+      "total_saved": 0
+    },
+    {
+      "id": 21768731871,
+      "workflow": "SLATE CI",
+      "created": "2026-02-06T22:51:19Z",
+      "conclusion": "cancelled",
+      "jobs": [
+        {
+          "job_name": "Security Scan",
+          "runner_type": "self-hosted",
+          "is_self_hosted": true,
+          "duration_minutes": 0.0,
+          "cost_rate": 0.0,
+          "actual_cost": 0.0,
+          "saved": 0.0
+        },
+        {
+          "job_name": "Lint & Format",
+          "runner_type": "self-hosted",
+          "is_self_hosted": true,
+          "duration_minutes": 0.0,
+          "cost_rate": 0.0,
+          "actual_cost": 0.0,
+          "saved": 0.0
+        },
+        {
+          "job_name": "SLATE Quick Checks",
+          "runner_type": "self-hosted",
+          "is_self_hosted": true,
+          "duration_minutes": 0.0,
+          "cost_rate": 0.0,
+          "actual_cost": 0.0,
+          "saved": 0.0
+        },
+        {
+          "job_name": "Unit Tests",
+          "runner_type": "self-hosted",
+          "is_self_hosted": true,
+          "duration_minutes": 0.0,
+          "cost_rate": 0.0,
+          "actual_cost": 0.0,
+          "saved": 0.0
+        },
+        {
+          "job_name": "SDK Validation",
+          "runner_type": "self-hosted",
+          "is_self_hosted": true,
+          "duration_minutes": 0.0,
+          "cost_rate": 0.0,
+          "actual_cost": 0.0,
+          "saved": 0.0
+        },
+        {
+          "job_name": "CI Summary",
+          "runner_type": "self-hosted",
+          "is_self_hosted": true,
+          "duration_minutes": 0.07,
+          "cost_rate": 0.0,
+          "actual_cost": 0.0,
+          "saved": 0.0005
+        }
+      ],
+      "total_minutes": 0.07,
+      "total_cost": 0.0,
+      "total_saved": 0.0005
+    },
+    {
+      "id": 21768731868,
+      "workflow": "Label Sync",
+      "created": "2026-02-06T22:51:19Z",
+      "conclusion": "success",
+      "jobs": [
+        {
+          "job_name": "Sync Labels",
+          "runner_type": "ubuntu-latest",
+          "is_self_hosted": false,
+          "duration_minutes": 0.1,
+          "cost_rate": 0.008,
+          "actual_cost": 0.0008,
+          "saved": 0
+        }
+      ],
+      "total_minutes": 0.1,
+      "total_cost": 0.0008,
+      "total_saved": 0
+    },
+    {
+      "id": 21768731867,
+      "workflow": "CD - Build & Deploy",
+      "created": "2026-02-06T22:51:19Z",
+      "conclusion": "failure",
+      "jobs": [
+        {
+          "job_name": "Determine Version",
+          "runner_type": "ubuntu-latest",
+          "is_self_hosted": false,
+          "duration_minutes": 0.07,
+          "cost_rate": 0.008,
+          "actual_cost": 0.0005,
+          "saved": 0
+        },
+        {
+          "job_name": "Build Windows EXE",
+          "runner_type": "windows-latest",
+          "is_self_hosted": false,
+          "duration_minutes": 0.07,
+          "cost_rate": 0.016,
+          "actual_cost": 0.0011,
+          "saved": 0
+        },
+        {
+          "job_name": "CD Summary",
+          "runner_type": "ubuntu-latest",
+          "is_self_hosted": false,
+          "duration_minutes": 0.05,
+          "cost_rate": 0.008,
+          "actual_cost": 0.0004,
+          "saved": 0
+        },
+        {
+          "job_name": "Create Release",
+          "runner_type": "ubuntu-latest",
+          "is_self_hosted": false,
+          "duration_minutes": 0.0,
+          "cost_rate": 0.008,
+          "actual_cost": 0.0,
+          "saved": 0
+        }
+      ],
+      "total_minutes": 0.19,
+      "total_cost": 0.002,
+      "total_saved": 0
+    },
+    {
+      "id": 21768731865,
+      "workflow": "CodeQL Analysis",
+      "created": "2026-02-06T22:51:19Z",
+      "conclusion": "cancelled",
+      "jobs": [
+        {
+          "job_name": "CodeQL Analysis (python)",
+          "runner_type": "ubuntu-latest",
+          "is_self_hosted": false,
+          "duration_minutes": 2.17,
+          "cost_rate": 0.008,
+          "actual_cost": 0.0173,
+          "saved": 0
+        }
+      ],
+      "total_minutes": 2.17,
+      "total_cost": 0.0173,
+      "total_saved": 0
+    },
+    {
+      "id": 21768730214,
+      "workflow": "Dependabot Auto-Merge",
+      "created": "2026-02-06T22:51:15Z",
+      "conclusion": "skipped",
+      "jobs": [
+        {
+          "job_name": "Auto-Merge Dependabot",
+          "runner_type": "ubuntu-latest",
+          "is_self_hosted": false,
+          "duration_minutes": -0.17,
+          "cost_rate": 0.008,
+          "actual_cost": -0.0013,
+          "saved": 0
+        }
+      ],
+      "total_minutes": -0.17,
+      "total_cost": -0.0013,
+      "total_saved": 0
+    },
+    {
+      "id": 21768730203,
+      "workflow": "Docs Validation",
+      "created": "2026-02-06T22:51:15Z",
+      "conclusion": "success",
+      "jobs": [
+        {
+          "job_name": "README Check",
+          "runner_type": "ubuntu-latest",
+          "is_self_hosted": false,
+          "duration_minutes": 0.07,
+          "cost_rate": 0.008,
+          "actual_cost": 0.0005,
+          "saved": 0
+        },
+        {
+          "job_name": "Link Check",
+          "runner_type": "ubuntu-latest",
+          "is_self_hosted": false,
+          "duration_minutes": 0.07,
+          "cost_rate": 0.008,
+          "actual_cost": 0.0005,
+          "saved": 0
+        },
+        {
+          "job_name": "Docs Summary",
+          "runner_type": "ubuntu-latest",
+          "is_self_hosted": false,
+          "duration_minutes": 0.05,
+          "cost_rate": 0.008,
+          "actual_cost": 0.0004,
+          "saved": 0
+        }
+      ],
+      "total_minutes": 0.19,
+      "total_cost": 0.0014,
+      "total_saved": 0
+    }
+  ],
+  "monthly_summaries": {
+    "2026-02": {
+      "self_hosted_minutes": 195.32,
+      "hosted_minutes": 190.18,
+      "saved_usd": 1.56,
+      "spent_usd": 1.6
+    }
+  },
+  "total_self_hosted_minutes": 195.32,
+  "total_hosted_minutes": 190.18,
+  "total_saved_usd": 1.56,
+  "total_spent_usd": 1.6
+}

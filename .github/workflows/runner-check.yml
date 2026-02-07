@@ -1,0 +1,80 @@
+# Reusable workflow for smart runner selection with fallback
+# Priority: self-hosted (free) -> GitHub-hosted (paid fallback)
+name: Runner Check
+
+on:
+  workflow_call:
+    inputs:
+      fallback_enabled:
+        description: 'Allow fallback to GitHub-hosted runner'
+        type: boolean
+        default: false
+      fallback_runner:
+        description: 'Fallback runner if self-hosted unavailable'
+        type: string
+        default: 'ubuntu-latest'
+    outputs:
+      runner:
+        description: 'The runner to use'
+        value: ${{ jobs.check.outputs.runner }}
+      is_self_hosted:
+        description: 'Whether using self-hosted runner'
+        value: ${{ jobs.check.outputs.is_self_hosted }}
+      cost_per_minute:
+        description: 'Cost per minute (USD)'
+        value: ${{ jobs.check.outputs.cost_per_minute }}
+
+jobs:
+  check:
+    name: Select Runner
+    runs-on: ubuntu-latest
+    outputs:
+      runner: ${{ steps.select.outputs.runner }}
+      is_self_hosted: ${{ steps.select.outputs.is_self_hosted }}
+      cost_per_minute: ${{ steps.select.outputs.cost_per_minute }}
+    steps:
+      - name: Check self-hosted runner availability
+        id: select
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          echo "Checking self-hosted runner availability..."
+
+          # Query runners API
+          RUNNER_STATUS=$(gh api repos/${{ github.repository }}/actions/runners \
+            --jq '.runners[] | select(.status == "online" and (.labels[].name == "slate")) | .name' \
+            2>/dev/null || echo "")
+
+          if [ -n "$RUNNER_STATUS" ]; then
+            echo "✅ Self-hosted runner available: $RUNNER_STATUS"
+            echo 'runner=["self-hosted", "slate"]' >> $GITHUB_OUTPUT
+            echo "is_self_hosted=true" >> $GITHUB_OUTPUT
+            echo "cost_per_minute=0" >> $GITHUB_OUTPUT
+          else
+            echo "⚠️ Self-hosted runner not available"
+            if [ "${{ inputs.fallback_enabled }}" == "true" ]; then
+              echo "Using fallback runner: ${{ inputs.fallback_runner }}"
+              echo 'runner="${{ inputs.fallback_runner }}"' >> $GITHUB_OUTPUT
+              echo "is_self_hosted=false" >> $GITHUB_OUTPUT
+              # Cost rates (USD per minute)
+              case "${{ inputs.fallback_runner }}" in
+                ubuntu-latest|ubuntu-22.04|ubuntu-20.04)
+                  echo "cost_per_minute=0.008" >> $GITHUB_OUTPUT
+                  ;;
+                windows-latest|windows-2022|windows-2019)
+                  echo "cost_per_minute=0.016" >> $GITHUB_OUTPUT
+                  ;;
+                macos-latest|macos-14|macos-13)
+                  echo "cost_per_minute=0.08" >> $GITHUB_OUTPUT
+                  ;;
+                *)
+                  echo "cost_per_minute=0.008" >> $GITHUB_OUTPUT
+                  ;;
+              esac
+            else
+              echo "Fallback disabled - using self-hosted (will queue)"
+              echo 'runner=["self-hosted", "slate"]' >> $GITHUB_OUTPUT
+              echo "is_self_hosted=true" >> $GITHUB_OUTPUT
+              echo "cost_per_minute=0" >> $GITHUB_OUTPUT
+            fi
+          fi
