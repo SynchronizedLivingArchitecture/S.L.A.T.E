@@ -556,10 +556,12 @@ def step_vscode_extension(tracker, args):
 
     # Fallback: dev mode symlink
     tracker.update_progress("vscode_ext", 90, "Using development mode link")
+    # Modified: 2026-02-07T04:57:00Z | Author: COPILOT | Change: Update extension dev-link target version
+    extension_version = "2.5.0"
     if os.name == "nt":
-        ext_target = Path(os.environ.get("USERPROFILE", "~")) / ".vscode" / "extensions" / "slate.slate-copilot-2.4.0"
+        ext_target = Path(os.environ.get("USERPROFILE", "~")) / ".vscode" / "extensions" / f"slate.slate-copilot-{extension_version}"
     else:
-        ext_target = Path.home() / ".vscode" / "extensions" / "slate.slate-copilot-2.4.0"
+        ext_target = Path.home() / ".vscode" / "extensions" / f"slate.slate-copilot-{extension_version}"
 
     try:
         ext_target.parent.mkdir(parents=True, exist_ok=True)

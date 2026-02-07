@@ -3,7 +3,7 @@
 	"publisher": "slate",
 	"displayName": "SLATE Copilot Agent",
 	"description": "The @slate chat participant for SLATE system management — runner, CI, GPU, orchestrator, benchmarks.",
-	"version": "2.4.0",
+	"version": "2.5.0",
 	"engines": {
 		"vscode": "^1.100.0"
 	},
@@ -11,7 +11,10 @@
 		"AI",
 		"Chat"
 	],
-	"activationEvents": [],
+	"activationEvents": [
+		"onCommand:slate.showStatus",
+		"onCommand:slate.openDashboard"
+	],
 	"main": "./out/extension.js",
 	"contributes": {
 		"chatParticipants": [
@@ -257,6 +260,10 @@
 			{
 				"command": "slate.showStatus",
 				"title": "SLATE: Show System Status"
+			},
+			{
+				"command": "slate.openDashboard",
+				"title": "SLATE: Open Dashboard"
 			}
 		]
 	},

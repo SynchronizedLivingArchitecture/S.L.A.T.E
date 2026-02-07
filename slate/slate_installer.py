@@ -29,11 +29,12 @@ import time
 from pathlib import Path
 from typing import Optional
 
-# Modified: 2026-02-06T22:30:00Z | Author: COPILOT | Change: Constants for installer
+# Modified: 2026-02-07T04:57:00Z | Author: COPILOT | Change: Update extension version constant
 SLATE_REPO = "https://github.com/SynchronizedLivingArchitecture/S.L.A.T.E.git"
 SLATE_BETA_REPO = "https://github.com/SynchronizedLivingArchitecture/S.L.A.T.E.-BETA.git"
 SLATE_VERSION = "2.4.0"
 EXTENSION_ID = "slate.slate-copilot"
+EXTENSION_VERSION = "2.5.0"
 OLLAMA_DOWNLOAD_WIN = "https://ollama.com/download/OllamaSetup.exe"
 OLLAMA_DOWNLOAD_LINUX = "https://ollama.ai/install.sh"
 DOCKER_DOWNLOAD_WIN = "https://desktop.docker.com/win/main/amd64/Docker%20Desktop%20Installer.exe"
@@ -733,9 +734,9 @@ class SlateInstaller:
             # Fallback: symlink dev extension
             self._log("→", "Falling back to development mode (symlink)...")
             if _is_windows():
-                ext_target = Path(os.environ.get("USERPROFILE", "~")) / ".vscode" / "extensions" / "slate.slate-copilot-2.4.0"
+                ext_target = Path(os.environ.get("USERPROFILE", "~")) / ".vscode" / "extensions" / f"slate.slate-copilot-{EXTENSION_VERSION}"
             else:
-                ext_target = Path.home() / ".vscode" / "extensions" / "slate.slate-copilot-2.4.0"
+                ext_target = Path.home() / ".vscode" / "extensions" / f"slate.slate-copilot-{EXTENSION_VERSION}"
 
             try:
                 ext_target.parent.mkdir(parents=True, exist_ok=True)
