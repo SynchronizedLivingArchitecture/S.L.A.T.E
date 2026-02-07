@@ -83,6 +83,9 @@ actions-runner-*/
 # Runtime state files
 .slate_orchestrator.pid
 .slate_orchestrator_state.json
+.slate_watchdog.pid
+.slate_watchdog_state.json
+.slate_gpu_state.json
 .slate_autonomous_state.json
 .slate_integrated_state.json
 .slate_ml_state.json
@@ -105,8 +108,11 @@ slate_logs/
 # Discussion state (runtime)
 .slate_discussions/
 
-# Claude
-.claude/
+# Claude — track commands for fork compatibility
+# Only ignore user-specific settings
+.claude/settings.local.json
+.claude/todos.json
+.claude/keybindings.json
 
 # Secrets (NEVER commit)
 .env

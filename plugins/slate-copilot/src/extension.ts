@@ -1,14 +1,18 @@
-// Modified: 2026-02-07T05:50:00Z | Author: COPILOT | Change: Add sidebar dashboard view provider + panel command
+// Modified: 2026-02-07T06:00:00Z | Author: Claude | Change: Add service monitor for auto-restart of SLATE dashboard
 import * as vscode from 'vscode';
 import { registerSlateParticipant } from './slateParticipant';
 import { registerSlateTools } from './tools';
 import { SlateDashboardViewProvider } from './slateDashboardView';
+import { registerServiceMonitor } from './slateServiceMonitor';
 
 const DASHBOARD_URL = 'http://127.0.0.1:8080';
 
 export function activate(context: vscode.ExtensionContext) {
 	registerSlateTools(context);
 	registerSlateParticipant(context);
+
+	// Register service monitor for auto-restart
+	const serviceMonitor = registerServiceMonitor(context);
 
 	// Register the sidebar dashboard webview
 	const dashboardViewProvider = new SlateDashboardViewProvider(context.extensionUri);

@@ -1,0 +1,219 @@
+# Service Management Workflow
+# Manages SLATE services via GitHub Actions runner
+# Can start/stop/restart dashboard and orchestrator
+
+name: Service Management
+
+on:
+  workflow_dispatch:
+    inputs:
+      action:
+        description: 'Action to perform'
+        required: true
+        type: choice
+        options:
+          - status
+          - start-dashboard
+          - stop-dashboard
+          - restart-dashboard
+          - start-watchdog
+          - stop-watchdog
+          - start-all
+          - stop-all
+          - restart-all
+      force:
+        description: 'Force action (skip checks)'
+        required: false
+        type: boolean
+        default: false
+
+  # Scheduled health check every 15 minutes
+  schedule:
+    - cron: '*/15 * * * *'
+
+jobs:
+  service-action:
+    name: ${{ github.event.inputs.action || 'health-check' }}
+    runs-on: [self-hosted, slate]
+    timeout-minutes: 5
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Python
+        run: |
+          # Use workspace venv
+          $env:PYTHONPATH = "${{ github.workspace }}"
+          $env:SLATE_WORKSPACE = "${{ github.workspace }}"
+        shell: pwsh
+
+      - name: Execute Service Action
+        id: service
+        run: |
+          $python = ".\.venv\Scripts\python.exe"
+          $action = "${{ github.event.inputs.action }}"
+
+          # Default to status for scheduled runs
+          if (-not $action) { $action = "status" }
+
+          Write-Host "=== SLATE Service Management ===" -ForegroundColor Cyan
+          Write-Host "Action: $action"
+
+          switch ($action) {
+            "status" {
+              & $python slate/slate_orchestrator.py status
+              & $python slate/slate_service_watchdog.py status
+            }
+
+            "start-dashboard" {
+              Write-Host "Starting dashboard server..."
+              Start-Process -FilePath $python `
+                -ArgumentList "agents/slate_dashboard_server.py" `
+                -WindowStyle Hidden
+              Start-Sleep -Seconds 3
+
+              # Verify
+              try {
+                $response = Invoke-WebRequest -Uri "http://127.0.0.1:8080/health" -TimeoutSec 5
+                if ($response.StatusCode -eq 200) {
+                  Write-Host "Dashboard started successfully" -ForegroundColor Green
+                }
+              } catch {
+                Write-Host "Dashboard may still be starting..." -ForegroundColor Yellow
+              }
+            }
+
+            "stop-dashboard" {
+              Write-Host "Stopping dashboard server..."
+              Get-Process | Where-Object { $_.MainWindowTitle -match "slate_dashboard" -or $_.CommandLine -match "slate_dashboard_server" } | Stop-Process -Force -ErrorAction SilentlyContinue
+              Write-Host "Dashboard stopped" -ForegroundColor Green
+            }
+
+            "restart-dashboard" {
+              Write-Host "Restarting dashboard server..."
+              Get-Process | Where-Object { $_.CommandLine -match "slate_dashboard_server" } | Stop-Process -Force -ErrorAction SilentlyContinue
+              Start-Sleep -Seconds 2
+              Start-Process -FilePath $python `
+                -ArgumentList "agents/slate_dashboard_server.py" `
+                -WindowStyle Hidden
+              Start-Sleep -Seconds 3
+              Write-Host "Dashboard restarted" -ForegroundColor Green
+            }
+
+            "start-watchdog" {
+              Write-Host "Starting service watchdog..."
+              Start-Process -FilePath $python `
+                -ArgumentList "slate/slate_service_watchdog.py", "start" `
+                -WindowStyle Hidden
+              Write-Host "Watchdog started" -ForegroundColor Green
+            }
+
+            "stop-watchdog" {
+              Write-Host "Stopping service watchdog..."
+              & $python slate/slate_service_watchdog.py stop
+            }
+
+            "start-all" {
+              Write-Host "Starting all SLATE services..."
+              & $python slate/slate_orchestrator.py start &
+              Write-Host "Orchestrator started in background" -ForegroundColor Green
+            }
+
+            "stop-all" {
+              Write-Host "Stopping all SLATE services..."
+              & $python slate/slate_orchestrator.py stop
+              & $python slate/slate_service_watchdog.py stop
+            }
+
+            "restart-all" {
+              Write-Host "Restarting all SLATE services..."
+              & $python slate/slate_orchestrator.py stop
+              Start-Sleep -Seconds 3
+              & $python slate/slate_orchestrator.py start &
+            }
+
+            default {
+              Write-Host "Unknown action: $action" -ForegroundColor Red
+              exit 1
+            }
+          }
+        shell: pwsh
+
+      - name: Health Check
+        if: github.event_name == 'schedule'
+        run: |
+          $python = ".\.venv\Scripts\python.exe"
+
+          Write-Host "=== Scheduled Health Check ===" -ForegroundColor Cyan
+
+          # Check dashboard
+          $dashboardOk = $false
+          try {
+            $response = Invoke-WebRequest -Uri "http://127.0.0.1:8080/health" -TimeoutSec 5
+            if ($response.StatusCode -eq 200) {
+              Write-Host "Dashboard: OK" -ForegroundColor Green
+              $dashboardOk = $true
+            }
+          } catch {
+            Write-Host "Dashboard: DOWN" -ForegroundColor Red
+          }
+
+          # Auto-restart if down
+          if (-not $dashboardOk) {
+            Write-Host "Auto-restarting dashboard..." -ForegroundColor Yellow
+            Start-Process -FilePath $python `
+              -ArgumentList "agents/slate_dashboard_server.py" `
+              -WindowStyle Hidden
+            Start-Sleep -Seconds 5
+
+            try {
+              $response = Invoke-WebRequest -Uri "http://127.0.0.1:8080/health" -TimeoutSec 5
+              if ($response.StatusCode -eq 200) {
+                Write-Host "Dashboard restarted successfully" -ForegroundColor Green
+              }
+            } catch {
+              Write-Host "Dashboard restart failed!" -ForegroundColor Red
+              exit 1
+            }
+          }
+
+          # Check runner
+          $runnerOk = Get-Process -Name "Runner.Listener" -ErrorAction SilentlyContinue
+          if ($runnerOk) {
+            Write-Host "Runner: OK" -ForegroundColor Green
+          } else {
+            Write-Host "Runner: Process not found (may be running as service)" -ForegroundColor Yellow
+          }
+        shell: pwsh
+
+      - name: Report Status
+        if: always()
+        run: |
+          $python = ".\.venv\Scripts\python.exe"
+
+          Write-Host ""
+          Write-Host "=== Final Status ===" -ForegroundColor Cyan
+
+          # Dashboard
+          try {
+            $response = Invoke-WebRequest -Uri "http://127.0.0.1:8080/health" -TimeoutSec 3
+            Write-Host "Dashboard: Running on http://127.0.0.1:8080" -ForegroundColor Green
+          } catch {
+            Write-Host "Dashboard: Not responding" -ForegroundColor Red
+          }
+
+          # Watchdog
+          if (Test-Path ".slate_watchdog.pid") {
+            Write-Host "Watchdog: Running" -ForegroundColor Green
+          } else {
+            Write-Host "Watchdog: Stopped" -ForegroundColor Yellow
+          }
+
+          # Orchestrator
+          if (Test-Path ".slate_orchestrator.pid") {
+            Write-Host "Orchestrator: Running" -ForegroundColor Green
+          } else {
+            Write-Host "Orchestrator: Stopped" -ForegroundColor Yellow
+          }
+        shell: pwsh

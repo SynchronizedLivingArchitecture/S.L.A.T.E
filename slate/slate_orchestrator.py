@@ -221,6 +221,49 @@ class SlateOrchestrator:
             print(f"  [!] Workflow monitor skipped: {e}")
             return True  # Non-fatal
 
+    def _auto_restart_service(self, service_name: str) -> bool:
+        """Auto-restart a crashed service with exponential backoff."""
+        MAX_RESTARTS = 5
+        BACKOFF_BASE = 2  # seconds
+
+        now = time.time()
+        count = self._restart_counts.get(service_name, 0)
+        last = self._last_restart.get(service_name, 0)
+
+        # Reset counter if 5+ minutes since last restart
+        if now - last > 300:
+            count = 0
+
+        if count >= MAX_RESTARTS:
+            print(f"  [!] {service_name}: Max restart attempts ({MAX_RESTARTS}) reached")
+            # Reset after 10 minutes
+            if now - last > 600:
+                self._restart_counts[service_name] = 0
+            return False
+
+        # Exponential backoff
+        backoff = BACKOFF_BASE * (2 ** count)
+        if now - last < backoff:
+            return False
+
+        print(f"  [*] Auto-restarting {service_name} (attempt {count + 1}/{MAX_RESTARTS})")
+
+        success = False
+        if service_name == "dashboard":
+            success = self.start_dashboard()
+        elif service_name == "runner":
+            success = self.start_runner()
+
+        self._restart_counts[service_name] = count + 1
+        self._last_restart[service_name] = now
+
+        if success:
+            print(f"  [OK] {service_name} restarted successfully")
+        else:
+            print(f"  [!] {service_name} restart failed")
+
+        return success
+
     def start(self) -> bool:
         """Start all SLATE services."""
         existing_pid = self._check_existing()
@@ -285,15 +328,21 @@ class SlateOrchestrator:
         })
 
         self.running = True
+        self._restart_counts: Dict[str, int] = {}
+        self._last_restart: Dict[str, float] = {}
 
-        # Keep running until shutdown
+        # Keep running until shutdown with auto-restart
         try:
             while self.running and not self._shutdown_event.is_set():
-                # Check if child processes are still running
+                # Check if child processes are still running and restart if needed
                 for name, proc in list(self.processes.items()):
                     if proc.poll() is not None:
-                        print(f"  [!] {name} exited with code {proc.returncode}")
+                        exit_code = proc.returncode
                         del self.processes[name]
+                        print(f"  [!] {name} exited with code {exit_code}")
+
+                        # Auto-restart with backoff
+                        self._auto_restart_service(name)
 
                 time.sleep(5)
         except KeyboardInterrupt:

@@ -941,6 +941,82 @@ def step_runner_check(tracker, args):
     return True
 
 
+def step_watchdog_setup(tracker, args):
+    """Step: Setup and start the service watchdog for auto-restart."""
+    tracker.start_step("watchdog_setup")
+    tracker.update_progress("watchdog_setup", 20, "Checking watchdog availability")
+
+    python_exe = _get_python_exe()
+    watchdog_script = WORKSPACE_ROOT / "slate" / "slate_service_watchdog.py"
+
+    if not python_exe.exists():
+        tracker.skip_step("watchdog_setup", "Python venv not available")
+        return True
+
+    if not watchdog_script.exists():
+        tracker.complete_step("watchdog_setup", success=True, warning=True,
+                              details="Watchdog script not found")
+        return True
+
+    # Check if watchdog is already running
+    tracker.update_progress("watchdog_setup", 40, "Checking if watchdog is already running")
+    try:
+        pid_file = WORKSPACE_ROOT / ".slate_watchdog.pid"
+        if pid_file.exists():
+            pid = int(pid_file.read_text().strip())
+            # Check if process exists
+            if os.name == "nt":
+                result = subprocess.run(
+                    ["tasklist", "/FI", f"PID eq {pid}"],
+                    capture_output=True, text=True
+                )
+                if str(pid) in result.stdout:
+                    tracker.complete_step("watchdog_setup", success=True,
+                                          details=f"Watchdog already running (PID {pid})")
+                    return True
+    except Exception:
+        pass
+
+    # Start the watchdog in background
+    tracker.update_progress("watchdog_setup", 60, "Starting service watchdog")
+    try:
+        if os.name == "nt":
+            # Windows: start detached
+            process = subprocess.Popen(
+                [str(python_exe), str(watchdog_script), "start"],
+                cwd=str(WORKSPACE_ROOT),
+                stdout=subprocess.DEVNULL,
+                stderr=subprocess.DEVNULL,
+                creationflags=subprocess.CREATE_NO_WINDOW | subprocess.DETACHED_PROCESS
+            )
+        else:
+            process = subprocess.Popen(
+                [str(python_exe), str(watchdog_script), "start"],
+                cwd=str(WORKSPACE_ROOT),
+                stdout=subprocess.DEVNULL,
+                stderr=subprocess.DEVNULL,
+                start_new_session=True
+            )
+
+        # Give it a moment to start
+        time.sleep(2)
+
+        # Verify it started
+        pid_file = WORKSPACE_ROOT / ".slate_watchdog.pid"
+        if pid_file.exists():
+            pid = pid_file.read_text().strip()
+            tracker.complete_step("watchdog_setup", success=True,
+                                  details=f"Watchdog started (PID {pid}) - auto-restart enabled")
+        else:
+            tracker.complete_step("watchdog_setup", success=True, warning=True,
+                                  details="Watchdog started but PID file not found")
+        return True
+
+    except Exception as e:
+        tracker.complete_step("watchdog_setup", success=True, warning=True,
+                              details=f"Watchdog start failed: {e}")
+        return True
+
 
 def step_runtime_check(tracker, args):
     # Modified: 2025-07-12T21:30:00Z | Author: COPILOT | Change: Expand to 8 ecosystem checks
@@ -1252,6 +1328,7 @@ def main():
         ("chromadb_check", step_chromadb_check),
         ("gpu_manager",    step_gpu_manager),
         ("runner_check",   step_runner_check),
+        ("watchdog_setup", step_watchdog_setup),
         ("benchmark",      step_benchmark),
         ("runtime_check",  step_runtime_check),
     ]
