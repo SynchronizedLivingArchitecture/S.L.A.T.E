@@ -1,0 +1,250 @@
+# SLATE AI Training Workflow
+# Modified: 2026-02-07T09:30:00Z | Author: Claude | Change: Weekly model training and customization
+#
+# Runs weekly to:
+# - Collect training data from codebase
+# - Train custom SLATE-specific model
+# - Validate model quality
+# - Update model registry
+
+name: AI Training
+
+on:
+  schedule:
+    # Weekly Sunday 5am UTC (after maintenance completes)
+    - cron: '0 5 * * 0'
+  workflow_dispatch:
+    inputs:
+      force_train:
+        description: 'Force training even with insufficient data'
+        required: false
+        default: false
+        type: boolean
+      base_model:
+        description: 'Base model for training'
+        required: false
+        default: 'mistral-nemo'
+        type: choice
+        options:
+          - mistral-nemo
+          - llama3.2
+          - codellama:13b
+
+permissions:
+  contents: write
+
+jobs:
+  collect-training-data:
+    name: Collect Training Data
+    runs-on: [self-hosted, slate]
+    timeout-minutes: 30
+    outputs:
+      samples_collected: ${{ steps.collect.outputs.samples_collected }}
+      training_ready: ${{ steps.collect.outputs.training_ready }}
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0  # Full history for commit messages
+
+      - name: Setup Python
+        run: |
+          "$env:GITHUB_WORKSPACE\.venv\Scripts" | Out-File -Append $env:GITHUB_PATH
+        shell: pwsh
+
+      - name: Verify Ollama
+        id: ollama
+        run: |
+          $available = $false
+          try {
+            $response = Invoke-RestMethod -Uri "http://127.0.0.1:11434/api/tags" -TimeoutSec 10
+            if ($response) {
+              $available = $true
+              $models = $response.models.name -join ','
+              Write-Host "Ollama available with: $models"
+            }
+          } catch {
+            Write-Host "Ollama not available"
+          }
+          "available=$available" | Out-File -Append $env:GITHUB_OUTPUT
+        shell: pwsh
+
+      - name: Collect Training Data
+        id: collect
+        run: |
+          Write-Host ""
+          Write-Host "═══════════════════════════════════════════════════════════════"
+          Write-Host "  Collecting Training Data"
+          Write-Host "═══════════════════════════════════════════════════════════════"
+          Write-Host ""
+
+          python slate/slate_ai_orchestrator.py --collect-training --json > training_data.json
+
+          $data = Get-Content training_data.json -Raw | ConvertFrom-Json
+
+          "samples_collected=$($data.samples_collected)" | Out-File -Append $env:GITHUB_OUTPUT
+          "training_ready=$($data.training_ready)" | Out-File -Append $env:GITHUB_OUTPUT
+
+          Write-Host "Samples collected: $($data.samples_collected)"
+          Write-Host "Training ready: $($data.training_ready)"
+        shell: pwsh
+
+      - name: Generate Training Summary
+        run: |
+          "## Training Data Collection" | Out-File -Append $env:GITHUB_STEP_SUMMARY
+          "**Samples Collected**: ${{ steps.collect.outputs.samples_collected }}" | Out-File -Append $env:GITHUB_STEP_SUMMARY
+          "**Training Ready**: ${{ steps.collect.outputs.training_ready }}" | Out-File -Append $env:GITHUB_STEP_SUMMARY
+        shell: pwsh
+
+      - name: Upload Training Data
+        uses: actions/upload-artifact@v4
+        with:
+          name: training-data
+          path: training_data.json
+          retention-days: 90
+
+  train-model:
+    name: Train Custom Model
+    runs-on: [self-hosted, slate]
+    needs: collect-training-data
+    if: needs.collect-training-data.outputs.training_ready == 'True' || inputs.force_train == true
+    timeout-minutes: 120
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Python
+        run: |
+          "$env:GITHUB_WORKSPACE\.venv\Scripts" | Out-File -Append $env:GITHUB_PATH
+        shell: pwsh
+
+      - name: Download Training Data
+        uses: actions/download-artifact@v4
+        with:
+          name: training-data
+
+      - name: Train Custom Model
+        id: train
+        run: |
+          Write-Host ""
+          Write-Host "═══════════════════════════════════════════════════════════════"
+          Write-Host "  Training Custom SLATE Model"
+          Write-Host "═══════════════════════════════════════════════════════════════"
+          Write-Host ""
+
+          $baseModel = '${{ inputs.base_model }}'
+          if (-not $baseModel) { $baseModel = 'mistral-nemo' }
+
+          Write-Host "Base model: $baseModel"
+          Write-Host ""
+
+          python slate/slate_ai_orchestrator.py --train --json > training_result.json
+
+          $result = Get-Content training_result.json -Raw | ConvertFrom-Json
+
+          "completed=$($result.completed)" | Out-File -Append $env:GITHUB_OUTPUT
+          "model_name=$($result.model_name)" | Out-File -Append $env:GITHUB_OUTPUT
+
+          if ($result.completed) {
+            Write-Host "Training completed successfully!"
+            Write-Host "Model: $($result.model_name)"
+          } else {
+            Write-Host "Training failed"
+          }
+        shell: pwsh
+
+      - name: Validate Trained Model
+        if: steps.train.outputs.completed == 'True'
+        run: |
+          Write-Host ""
+          Write-Host "Validating trained model..."
+          Write-Host ""
+
+          # Test the trained model
+          $testPrompt = "Explain the purpose of the SLATE orchestrator."
+          $result = ollama run ${{ steps.train.outputs.model_name }} "$testPrompt" 2>&1
+
+          if ($LASTEXITCODE -eq 0) {
+            Write-Host "Model validation passed"
+            Write-Host "Response sample:"
+            Write-Host ($result | Select-Object -First 5 | Out-String)
+          } else {
+            Write-Host "::warning::Model validation failed"
+          }
+        shell: pwsh
+
+      - name: Generate Training Summary
+        if: always()
+        run: |
+          "## Model Training Results" | Out-File -Append $env:GITHUB_STEP_SUMMARY
+          "**Training Completed**: ${{ steps.train.outputs.completed || 'false' }}" | Out-File -Append $env:GITHUB_STEP_SUMMARY
+          "**Model Name**: ${{ steps.train.outputs.model_name || 'N/A' }}" | Out-File -Append $env:GITHUB_STEP_SUMMARY
+          "**Base Model**: ${{ inputs.base_model || 'mistral-nemo' }}" | Out-File -Append $env:GITHUB_STEP_SUMMARY
+          "**Training Date**: $(Get-Date -Format 'yyyy-MM-dd HH:mm UTC')" | Out-File -Append $env:GITHUB_STEP_SUMMARY
+        shell: pwsh
+
+      - name: Upload Training Results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: training-results-${{ github.run_number }}
+          path: |
+            training_result.json
+            .slate_training/Modelfile.*
+          retention-days: 90
+          if-no-files-found: ignore
+
+  update-model-registry:
+    name: Update Model Registry
+    runs-on: [self-hosted, slate]
+    needs: train-model
+    if: needs.train-model.outputs.completed == 'True'
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Update Registry
+        run: |
+          $registryFile = ".slate_training/model_registry.json"
+          $modelName = "${{ needs.train-model.outputs.model_name }}"
+
+          # Create or update registry
+          $registry = @{
+            models = @(
+              @{
+                name = $modelName
+                base = "${{ inputs.base_model || 'mistral-nemo' }}"
+                trained = (Get-Date -Format 'o')
+                run_number = ${{ github.run_number }}
+                status = "active"
+              }
+            )
+            last_updated = (Get-Date -Format 'o')
+          }
+
+          New-Item -ItemType Directory -Path ".slate_training" -Force | Out-Null
+          $registry | ConvertTo-Json -Depth 10 | Out-File $registryFile
+
+          Write-Host "Updated model registry"
+        shell: pwsh
+
+      - name: Commit Registry Update
+        run: |
+          git config user.name "SLATE AI Training"
+          git config user.email "slate-ai@slate.local"
+
+          git add .slate_training/
+          git diff --staged --quiet || git commit -m "chore: update AI model registry
+
+          Trained model: ${{ needs.train-model.outputs.model_name }}
+          Run: #${{ github.run_number }}
+
+          Co-Authored-By: SLATE AI <slate-ai@slate.local>"
+
+          git push
+        shell: pwsh
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}

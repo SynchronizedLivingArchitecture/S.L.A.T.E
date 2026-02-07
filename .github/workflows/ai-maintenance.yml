@@ -1,0 +1,432 @@
+# SLATE AI Maintenance Workflow
+# Modified: 2026-02-07T09:00:00Z | Author: Claude | Change: Comprehensive AI-powered codebase maintenance
+#
+# Runs local AI (Ollama) for:
+# - Codebase analysis and quality checks
+# - Documentation generation and updates
+# - Training data collection
+# - Model fine-tuning schedules
+# - GitHub integration monitoring
+#
+# Schedules:
+#   - Every 4 hours: Quick analysis + doc updates
+#   - Daily 2am UTC: Full codebase scan + training
+#   - Weekly Sunday: Model training session
+
+name: AI Maintenance
+
+on:
+  schedule:
+    # Quick maintenance every 4 hours
+    - cron: '0 */4 * * *'
+    # Full daily maintenance at 2am UTC
+    - cron: '0 2 * * *'
+    # Weekly training session Sunday 3am UTC
+    - cron: '0 3 * * 0'
+  workflow_dispatch:
+    inputs:
+      mode:
+        description: 'AI maintenance mode'
+        required: true
+        default: 'quick'
+        type: choice
+        options:
+          - quick          # Quick analysis + doc check
+          - full           # Full codebase analysis
+          - train          # Training data collection
+          - docs           # Documentation update only
+          - monitor        # GitHub integration check
+          - all            # Everything
+      force_training:
+        description: 'Force model training even if not scheduled'
+        required: false
+        default: false
+        type: boolean
+  push:
+    paths:
+      - 'slate/**/*.py'
+      - 'slate_core/**/*.py'
+      - 'tests/**/*.py'
+    branches:
+      - main
+
+permissions:
+  contents: write
+  pull-requests: write
+  issues: write
+
+jobs:
+  ai-maintenance:
+    name: AI-Powered Maintenance
+    runs-on: [self-hosted, slate]
+    timeout-minutes: 120  # 2 hours max for training
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0  # Full history for analysis
+
+      - name: Determine maintenance mode
+        id: mode
+        run: |
+          $mode = '${{ inputs.mode }}'
+          $hour = (Get-Date).ToUniversalTime().Hour
+          $dayOfWeek = (Get-Date).DayOfWeek
+
+          if (-not $mode) {
+            # Auto-determine based on schedule
+            if ($dayOfWeek -eq 'Sunday' -and $hour -eq 3) {
+              $mode = 'train'
+            } elseif ($hour -eq 2) {
+              $mode = 'full'
+            } else {
+              $mode = 'quick'
+            }
+          }
+
+          Write-Host "Maintenance mode: $mode"
+          "mode=$mode" | Out-File -Append $env:GITHUB_OUTPUT
+
+          # Check if training should run
+          $shouldTrain = ($mode -eq 'train') -or ($mode -eq 'all') -or ('${{ inputs.force_training }}' -eq 'true')
+          "should_train=$shouldTrain" | Out-File -Append $env:GITHUB_OUTPUT
+        shell: pwsh
+
+      - name: Verify Ollama
+        id: ollama
+        run: |
+          $ollamaOk = $false
+          $models = @()
+
+          try {
+            $response = Invoke-RestMethod -Uri "http://127.0.0.1:11434/api/tags" -TimeoutSec 10
+            if ($response.models) {
+              $ollamaOk = $true
+              $models = $response.models.name -join ','
+              Write-Host "Ollama running with models: $models"
+            }
+          } catch {
+            Write-Host "::warning::Ollama not available - starting..."
+            try {
+              Start-Process ollama -ArgumentList "serve" -WindowStyle Hidden
+              Start-Sleep -Seconds 10
+              $response = Invoke-RestMethod -Uri "http://127.0.0.1:11434/api/tags" -TimeoutSec 10
+              if ($response.models) {
+                $ollamaOk = $true
+                $models = $response.models.name -join ','
+              }
+            } catch {
+              Write-Host "::error::Failed to start Ollama"
+            }
+          }
+
+          "available=$ollamaOk" | Out-File -Append $env:GITHUB_OUTPUT
+          "models=$models" | Out-File -Append $env:GITHUB_OUTPUT
+        shell: pwsh
+
+      - name: Warm up AI models
+        if: steps.ollama.outputs.available == 'True'
+        run: |
+          $python = ".\.venv\Scripts\python.exe"
+
+          Write-Host ""
+          Write-Host "═══════════════════════════════════════════════════════════════"
+          Write-Host "  Warming up AI models..."
+          Write-Host "═══════════════════════════════════════════════════════════════"
+          Write-Host ""
+
+          & $python slate/slate_ai_orchestrator.py --warmup
+        shell: pwsh
+
+      - name: Quick Analysis
+        if: contains(fromJSON('["quick", "full", "all"]'), steps.mode.outputs.mode) && steps.ollama.outputs.available == 'True'
+        id: quick
+        run: |
+          $python = ".\.venv\Scripts\python.exe"
+
+          Write-Host ""
+          Write-Host "═══════════════════════════════════════════════════════════════"
+          Write-Host "  Quick Codebase Analysis"
+          Write-Host "═══════════════════════════════════════════════════════════════"
+          Write-Host ""
+
+          # Analyze recently changed files
+          & $python slate/slate_ai_orchestrator.py --analyze-recent --json > analysis_quick.json
+
+          $analysis = Get-Content analysis_quick.json -Raw | ConvertFrom-Json -ErrorAction SilentlyContinue
+          if ($analysis) {
+            "files_analyzed=$($analysis.files_analyzed)" | Out-File -Append $env:GITHUB_OUTPUT
+            "issues_found=$($analysis.issues_found)" | Out-File -Append $env:GITHUB_OUTPUT
+          }
+        shell: pwsh
+
+      - name: Full Codebase Analysis
+        if: contains(fromJSON('["full", "all"]'), steps.mode.outputs.mode) && steps.ollama.outputs.available == 'True'
+        id: full
+        run: |
+          $python = ".\.venv\Scripts\python.exe"
+
+          Write-Host ""
+          Write-Host "═══════════════════════════════════════════════════════════════"
+          Write-Host "  Full Codebase Analysis"
+          Write-Host "═══════════════════════════════════════════════════════════════"
+          Write-Host ""
+
+          & $python slate/slate_ai_orchestrator.py --analyze-codebase --json > analysis_full.json
+
+          $analysis = Get-Content analysis_full.json -Raw | ConvertFrom-Json -ErrorAction SilentlyContinue
+          if ($analysis) {
+            "total_files=$($analysis.total_files)" | Out-File -Append $env:GITHUB_OUTPUT
+            "code_quality=$($analysis.code_quality)" | Out-File -Append $env:GITHUB_OUTPUT
+            "recommendations=$($analysis.recommendations_count)" | Out-File -Append $env:GITHUB_OUTPUT
+          }
+        shell: pwsh
+
+      - name: Documentation Update
+        if: contains(fromJSON('["quick", "docs", "all"]'), steps.mode.outputs.mode) && steps.ollama.outputs.available == 'True'
+        id: docs
+        run: |
+          $python = ".\.venv\Scripts\python.exe"
+
+          Write-Host ""
+          Write-Host "═══════════════════════════════════════════════════════════════"
+          Write-Host "  AI Documentation Update"
+          Write-Host "═══════════════════════════════════════════════════════════════"
+          Write-Host ""
+
+          & $python slate/slate_ai_orchestrator.py --update-docs --json > docs_update.json
+
+          $docs = Get-Content docs_update.json -Raw | ConvertFrom-Json -ErrorAction SilentlyContinue
+          if ($docs) {
+            "docs_updated=$($docs.files_updated)" | Out-File -Append $env:GITHUB_OUTPUT
+            "docs_created=$($docs.files_created)" | Out-File -Append $env:GITHUB_OUTPUT
+          }
+
+          # Check for doc changes
+          $changes = git status --porcelain docs/
+          if ($changes) {
+            Write-Host "Documentation changes detected:"
+            Write-Host $changes
+            "has_changes=true" | Out-File -Append $env:GITHUB_OUTPUT
+          } else {
+            "has_changes=false" | Out-File -Append $env:GITHUB_OUTPUT
+          }
+        shell: pwsh
+
+      - name: GitHub Integration Monitor
+        if: contains(fromJSON('["monitor", "full", "all"]'), steps.mode.outputs.mode) && steps.ollama.outputs.available == 'True'
+        id: monitor
+        run: |
+          $python = ".\.venv\Scripts\python.exe"
+
+          Write-Host ""
+          Write-Host "═══════════════════════════════════════════════════════════════"
+          Write-Host "  GitHub Integration Monitor"
+          Write-Host "═══════════════════════════════════════════════════════════════"
+          Write-Host ""
+
+          & $python slate/slate_ai_orchestrator.py --monitor-github --json > github_monitor.json
+
+          $monitor = Get-Content github_monitor.json -Raw | ConvertFrom-Json -ErrorAction SilentlyContinue
+          if ($monitor) {
+            "workflows_analyzed=$($monitor.workflows_analyzed)" | Out-File -Append $env:GITHUB_OUTPUT
+            "issues_open=$($monitor.issues_open)" | Out-File -Append $env:GITHUB_OUTPUT
+            "prs_open=$($monitor.prs_open)" | Out-File -Append $env:GITHUB_OUTPUT
+          }
+        shell: pwsh
+
+      - name: Training Data Collection
+        if: steps.mode.outputs.should_train == 'True' && steps.ollama.outputs.available == 'True'
+        id: training
+        run: |
+          $python = ".\.venv\Scripts\python.exe"
+
+          Write-Host ""
+          Write-Host "═══════════════════════════════════════════════════════════════"
+          Write-Host "  AI Training Data Collection"
+          Write-Host "═══════════════════════════════════════════════════════════════"
+          Write-Host ""
+
+          # Collect training data from codebase
+          & $python slate/slate_ai_orchestrator.py --collect-training --json > training_data.json
+
+          $training = Get-Content training_data.json -Raw | ConvertFrom-Json -ErrorAction SilentlyContinue
+          if ($training) {
+            "samples_collected=$($training.samples_collected)" | Out-File -Append $env:GITHUB_OUTPUT
+            "training_ready=$($training.training_ready)" | Out-File -Append $env:GITHUB_OUTPUT
+          }
+        shell: pwsh
+
+      - name: Model Training Session
+        if: steps.mode.outputs.should_train == 'True' && steps.training.outputs.training_ready == 'True' && steps.ollama.outputs.available == 'True'
+        id: train
+        run: |
+          $python = ".\.venv\Scripts\python.exe"
+
+          Write-Host ""
+          Write-Host "═══════════════════════════════════════════════════════════════"
+          Write-Host "  Local Model Training Session"
+          Write-Host "═══════════════════════════════════════════════════════════════"
+          Write-Host ""
+
+          # Run training session (using collected data to create/update custom model)
+          & $python slate/slate_ai_orchestrator.py --train --json > training_result.json
+
+          $result = Get-Content training_result.json -Raw | ConvertFrom-Json -ErrorAction SilentlyContinue
+          if ($result) {
+            "training_completed=$($result.completed)" | Out-File -Append $env:GITHUB_OUTPUT
+            "model_name=$($result.model_name)" | Out-File -Append $env:GITHUB_OUTPUT
+          }
+        shell: pwsh
+
+      - name: Commit Documentation Updates
+        if: steps.docs.outputs.has_changes == 'true'
+        run: |
+          git config user.name "SLATE AI"
+          git config user.email "slate-ai@slate.local"
+
+          git add docs/
+          git commit -m "docs: AI-generated documentation update
+
+          Updated by SLATE AI Orchestrator
+          Mode: ${{ steps.mode.outputs.mode }}
+          Files updated: ${{ steps.docs.outputs.docs_updated }}
+          Files created: ${{ steps.docs.outputs.docs_created }}
+
+          Co-Authored-By: SLATE AI <slate-ai@slate.local>"
+
+          git push
+        shell: pwsh
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Create Issues for AI Findings
+        if: steps.full.outputs.recommendations > 0
+        run: |
+          $recommendations = ${{ steps.full.outputs.recommendations }}
+
+          if ($recommendations -gt 5) {
+            $title = "AI Analysis: $recommendations code quality recommendations"
+            $body = @"
+          ## SLATE AI Codebase Analysis
+
+          The AI-powered codebase analyzer found **$recommendations** recommendations for code quality improvements.
+
+          ### Analysis Details
+          - **Mode**: ${{ steps.mode.outputs.mode }}
+          - **Files Analyzed**: ${{ steps.full.outputs.total_files }}
+          - **Code Quality Score**: ${{ steps.full.outputs.code_quality }}
+          - **Run Date**: $(Get-Date -Format 'yyyy-MM-dd HH:mm UTC')
+
+          See the workflow artifacts for detailed recommendations.
+
+          ---
+          *Generated by SLATE AI Orchestrator*
+          "@
+
+            # Check if similar issue exists
+            $existing = gh issue list --label "ai-analysis" --state open --json number | ConvertFrom-Json
+
+            if ($existing.Count -eq 0) {
+              gh issue create --title "$title" --body "$body" --label "ai-analysis,automated"
+            }
+          }
+        shell: pwsh
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Generate Summary
+        if: always()
+        run: |
+          $summary = @"
+          ## AI Maintenance Report
+
+          | Metric | Value |
+          |--------|-------|
+          | Mode | ${{ steps.mode.outputs.mode }} |
+          | Ollama Available | ${{ steps.ollama.outputs.available }} |
+          | Models | ${{ steps.ollama.outputs.models }} |
+
+          ### Analysis Results
+          | Check | Result |
+          |-------|--------|
+          | Quick Analysis Files | ${{ steps.quick.outputs.files_analyzed || 'N/A' }} |
+          | Issues Found | ${{ steps.quick.outputs.issues_found || '0' }} |
+          | Full Analysis Files | ${{ steps.full.outputs.total_files || 'N/A' }} |
+          | Code Quality | ${{ steps.full.outputs.code_quality || 'N/A' }} |
+          | Recommendations | ${{ steps.full.outputs.recommendations || '0' }} |
+
+          ### Documentation
+          | Metric | Value |
+          |--------|-------|
+          | Docs Updated | ${{ steps.docs.outputs.docs_updated || '0' }} |
+          | Docs Created | ${{ steps.docs.outputs.docs_created || '0' }} |
+          | Changes Committed | ${{ steps.docs.outputs.has_changes || 'false' }} |
+
+          ### GitHub Integration
+          | Metric | Value |
+          |--------|-------|
+          | Workflows Analyzed | ${{ steps.monitor.outputs.workflows_analyzed || 'N/A' }} |
+          | Open Issues | ${{ steps.monitor.outputs.issues_open || 'N/A' }} |
+          | Open PRs | ${{ steps.monitor.outputs.prs_open || 'N/A' }} |
+
+          ### Training
+          | Metric | Value |
+          |--------|-------|
+          | Samples Collected | ${{ steps.training.outputs.samples_collected || 'N/A' }} |
+          | Training Completed | ${{ steps.train.outputs.training_completed || 'N/A' }} |
+          | Model | ${{ steps.train.outputs.model_name || 'N/A' }} |
+
+          **Run Time**: $(Get-Date -Format 'yyyy-MM-dd HH:mm:ss UTC')
+          "@
+
+          $summary | Out-File -Append $env:GITHUB_STEP_SUMMARY
+        shell: pwsh
+
+      - name: Upload Analysis Artifacts
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: ai-maintenance-${{ github.run_number }}
+          path: |
+            analysis_quick.json
+            analysis_full.json
+            docs_update.json
+            github_monitor.json
+            training_data.json
+            training_result.json
+          retention-days: 30
+          if-no-files-found: ignore
+
+  # Parallel job for fork analysis
+  fork-ai-analysis:
+    name: AI Fork Analysis
+    runs-on: [self-hosted, slate]
+    needs: ai-maintenance
+    if: contains(fromJSON('["full", "all"]'), needs.ai-maintenance.outputs.mode)
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Run Fork Intelligence with AI
+        run: |
+          $python = ".\.venv\Scripts\python.exe"
+
+          Write-Host ""
+          Write-Host "═══════════════════════════════════════════════════════════════"
+          Write-Host "  AI-Powered Fork Intelligence"
+          Write-Host "═══════════════════════════════════════════════════════════════"
+          Write-Host ""
+
+          & $python slate/slate_fork_intelligence.py --analyze --json > fork_ai_analysis.json
+        shell: pwsh
+
+      - name: Upload Fork Analysis
+        uses: actions/upload-artifact@v4
+        with:
+          name: fork-ai-analysis-${{ github.run_number }}
+          path: fork_ai_analysis.json
+          retention-days: 30
+          if-no-files-found: ignore

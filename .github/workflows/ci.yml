@@ -158,10 +158,49 @@ jobs:
         run: |
           python tests/test_gpu_compute.py
 
+  ai-code-review:
+    name: AI Code Review
+    runs-on: [self-hosted, slate]
+    if: github.event_name == 'pull_request'
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Setup Python
+        run: |
+          "$env:GITHUB_WORKSPACE\\.venv\\Scripts" | Out-File -Append $env:GITHUB_PATH
+      - name: Check Ollama
+        id: ollama
+        run: |
+          $available = $false
+          try {
+            $response = Invoke-RestMethod -Uri "http://127.0.0.1:11434/api/tags" -TimeoutSec 5
+            if ($response) { $available = $true }
+          } catch { }
+          "available=$available" | Out-File -Append $env:GITHUB_OUTPUT
+      - name: AI Review Changed Files
+        if: steps.ollama.outputs.available == 'True'
+        run: |
+          Write-Host "AI-powered code review for PR #${{ github.event.pull_request.number }}"
+          Write-Host ""
+
+          # Analyze recently changed files
+          python slate/slate_ai_orchestrator.py --analyze-recent --json > ai_review.json
+
+          $review = Get-Content ai_review.json -Raw | ConvertFrom-Json
+          Write-Host "Files analyzed: $($review.files_analyzed)"
+          Write-Host "Issues found: $($review.issues_found)"
+
+          # Add review summary
+          "## AI Code Review" | Out-File -Append $env:GITHUB_STEP_SUMMARY
+          "**Files Analyzed**: $($review.files_analyzed)" | Out-File -Append $env:GITHUB_STEP_SUMMARY
+          "**Issues Found**: $($review.issues_found)" | Out-File -Append $env:GITHUB_STEP_SUMMARY
+
   summary:
     name: CI Summary
     runs-on: [self-hosted, slate]
-    needs: [lint, unit-tests, sdk-validation, security, slate-checks, gpu-validation]
+    needs: [lint, unit-tests, sdk-validation, security, slate-checks, gpu-validation, ai-code-review]
     if: always()
     steps:
       - name: Generate summary
@@ -175,3 +214,4 @@ jobs:
           "| Security | ${{ needs.security.result }} |" | Out-File -Append $env:GITHUB_STEP_SUMMARY
           "| SLATE Checks | ${{ needs.slate-checks.result }} |" | Out-File -Append $env:GITHUB_STEP_SUMMARY
           "| GPU Validation | ${{ needs.gpu-validation.result }} |" | Out-File -Append $env:GITHUB_STEP_SUMMARY
+          "| AI Code Review | ${{ needs.ai-code-review.result || 'skipped' }} |" | Out-File -Append $env:GITHUB_STEP_SUMMARY

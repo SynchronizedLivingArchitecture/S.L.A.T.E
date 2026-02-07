@@ -151,6 +151,64 @@ planning           -> speckit          (FREE)
 - `slate/inference_instructions.py` - ML-based code generation guidance
 - `slate/action_guard.py` - Security (blocks paid APIs)
 
+## AI Orchestrator (Automated Maintenance)
+
+SLATE includes an AI orchestrator that automatically maintains the codebase using local Ollama models.
+
+### Capabilities
+
+| Feature | Schedule | Description |
+|---------|----------|-------------|
+| Quick Analysis | Every 4 hours | Analyze recently changed files |
+| Full Analysis | Daily 2am | Complete codebase analysis |
+| Documentation | Daily | Auto-generate/update docs |
+| GitHub Monitor | Daily | Analyze workflows and integrations |
+| Model Training | Weekly Sunday | Train custom SLATE model |
+
+### Commands
+
+```powershell
+# Check AI orchestrator status
+.\.venv\Scripts\python.exe slate/slate_ai_orchestrator.py --status
+
+# Warmup AI models
+.\.venv\Scripts\python.exe slate/slate_ai_orchestrator.py --warmup
+
+# Analyze recently changed files
+.\.venv\Scripts\python.exe slate/slate_ai_orchestrator.py --analyze-recent
+
+# Full codebase analysis
+.\.venv\Scripts\python.exe slate/slate_ai_orchestrator.py --analyze-codebase
+
+# Update documentation
+.\.venv\Scripts\python.exe slate/slate_ai_orchestrator.py --update-docs
+
+# Monitor GitHub integrations
+.\.venv\Scripts\python.exe slate/slate_ai_orchestrator.py --monitor-github
+
+# Collect training data
+.\.venv\Scripts\python.exe slate/slate_ai_orchestrator.py --collect-training
+
+# Train custom model
+.\.venv\Scripts\python.exe slate/slate_ai_orchestrator.py --train
+```
+
+### Workflows
+
+| Workflow | Trigger | Purpose |
+|----------|---------|---------|
+| `ai-maintenance.yml` | Every 4h, 2am, push | Codebase analysis and doc updates |
+| `ai-training.yml` | Weekly Sunday 5am | Model training and customization |
+| `fork-intelligence.yml` | Every 6h | AI-powered fork analysis |
+
+### Custom Model
+
+SLATE can train a custom model (`slate-custom`) tuned for the codebase:
+- Based on `mistral-nemo`
+- Trained on SLATE code patterns
+- Understands project architecture
+- Updated weekly with new code
+
 ## Project Structure
 
 ```text

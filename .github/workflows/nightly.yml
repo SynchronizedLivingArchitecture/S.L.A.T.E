@@ -110,10 +110,61 @@ jobs:
                   print(f'  {l}')
           "@
 
+  ai-codebase-analysis:
+    name: AI Codebase Analysis
+    runs-on: [self-hosted, slate]
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@v4
+      - name: Setup Python
+        run: |
+          "$env:GITHUB_WORKSPACE\\.venv\\Scripts" | Out-File -Append $env:GITHUB_PATH
+      - name: Check Ollama
+        id: ollama
+        run: |
+          $available = $false
+          try {
+            $response = Invoke-RestMethod -Uri "http://127.0.0.1:11434/api/tags" -TimeoutSec 5
+            if ($response) { $available = $true }
+          } catch { }
+          "available=$available" | Out-File -Append $env:GITHUB_OUTPUT
+      - name: Warmup AI Models
+        if: steps.ollama.outputs.available == 'True'
+        run: |
+          python slate/slate_ai_orchestrator.py --warmup
+      - name: Full Codebase Analysis
+        if: steps.ollama.outputs.available == 'True'
+        run: |
+          Write-Host "Running AI-powered codebase analysis..."
+          Write-Host ""
+          python slate/slate_ai_orchestrator.py --analyze-codebase --json > codebase_analysis.json
+
+          $analysis = Get-Content codebase_analysis.json -Raw | ConvertFrom-Json
+          Write-Host "Files analyzed: $($analysis.total_files)"
+          Write-Host "Code quality: $($analysis.code_quality)"
+
+          "## AI Codebase Analysis" | Out-File -Append $env:GITHUB_STEP_SUMMARY
+          "**Files Analyzed**: $($analysis.total_files)" | Out-File -Append $env:GITHUB_STEP_SUMMARY
+          "**Code Quality**: $($analysis.code_quality)" | Out-File -Append $env:GITHUB_STEP_SUMMARY
+          "**Recommendations**: $($analysis.recommendations_count)" | Out-File -Append $env:GITHUB_STEP_SUMMARY
+      - name: Update Documentation (if needed)
+        if: steps.ollama.outputs.available == 'True'
+        run: |
+          python slate/slate_ai_orchestrator.py --update-docs
+        continue-on-error: true
+      - name: Upload Analysis
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: ai-codebase-analysis
+          path: codebase_analysis.json
+          retention-days: 30
+          if-no-files-found: ignore
+
   summary:
     name: Nightly Summary
     runs-on: [self-hosted, slate]
-    needs: [full-test-suite, slate-health, sdk-import-audit, dependency-check]
+    needs: [full-test-suite, slate-health, sdk-import-audit, dependency-check, ai-codebase-analysis]
     if: always()
     steps:
       - name: Generate summary
@@ -125,4 +176,5 @@ jobs:
           "| SLATE Health | ${{ needs.slate-health.result }} |" | Out-File -Append $env:GITHUB_STEP_SUMMARY
           "| SDK Import Audit | ${{ needs.sdk-import-audit.result }} |" | Out-File -Append $env:GITHUB_STEP_SUMMARY
           "| Dependency Check | ${{ needs.dependency-check.result }} |" | Out-File -Append $env:GITHUB_STEP_SUMMARY
+          "| AI Analysis | ${{ needs.ai-codebase-analysis.result }} |" | Out-File -Append $env:GITHUB_STEP_SUMMARY
           "Run at $(Get-Date -Format 'yyyy-MM-dd HH:mm UTC')" | Out-File -Append $env:GITHUB_STEP_SUMMARY
