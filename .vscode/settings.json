@@ -1,0 +1,89 @@
+{
+	// Modified: 2026-02-06T23:30:00Z | Author: COPILOT | Change: Add multi-runner support and plugin SDK paths
+
+	// ========================================
+	// PYTHON ENVIRONMENT
+	// ========================================
+	"python.defaultInterpreterPath": "${workspaceFolder}/.venv/Scripts/python.exe",
+	"python.terminal.activateEnvironment": true,
+	"python.analysis.extraPaths": [
+		"${workspaceFolder}",
+		"${workspaceFolder}/plugins/slate-sdk",
+		"${workspaceFolder}/plugins/slate-copilot"
+	],
+	"python.analysis.autoSearchPaths": true,
+
+	// ========================================
+	// COPILOT / SLATE AGENT
+	// ========================================
+	"chat.promptFiles": true,
+	"github.copilot.chat.codeGeneration.instructions": [
+		{
+			"file": "AGENTS.md"
+		},
+		{
+			"file": ".github/copilot-instructions.md"
+		},
+		{
+			"file": ".github/agents/slate.agent.md"
+		},
+		{
+			"text": "All code edits must include a timestamp+author comment: # Modified: YYYY-MM-DDTHH:MM:SSZ | Author: COPILOT | Change: description"
+		},
+		{
+			"text": "Use isBackground=true for long-running terminal commands. Never use curl.exe. Never bind to 0.0.0.0."
+		},
+		{
+			"text": "This is the S.L.A.T.E. (Synchronized Living Architecture for Transformation and Evolution) project. Key modules: slate/ (core SDK), agents/ (API servers), plugins/ (VSCode extensions). Multi-runner system supports 19 parallel runners across 2 GPUs."
+		}
+	],
+	"github.copilot.chat.testGeneration.instructions": [
+		{
+			"text": "Use pytest for all tests. Place tests in tests/ directory. Use pytest-asyncio for async tests."
+		}
+	],
+
+	// ========================================
+	// SLATE PLUGINS (LOCAL SDK)
+	// ========================================
+	"slate.plugins.path": "${workspaceFolder}/plugins",
+	"slate.multiRunner.enabled": true,
+	"slate.multiRunner.configPath": "${workspaceFolder}/.slate_runners.json",
+
+	// ========================================
+	// EDITOR
+	// ========================================
+	"files.associations": {
+		"*.jsonl": "json",
+		"*.agent.md": "markdown"
+	},
+	"files.exclude": {
+		"**/__pycache__": true,
+		"**/*.egg-info": true,
+		"**/node_modules": true,
+		"**/.slate_cas": true
+	},
+	"search.exclude": {
+		"actions-runner/externals/**": true,
+		"actions-runner/bin/**": true,
+		"actions-runner/_work/**": true,
+		"actions-runner/slate_work/**": true,
+		"actions-runner/_diag/**": true,
+		"**/__pycache__": true,
+		"slate.egg-info/**": true,
+		"_temp/**": true,
+		"plugins/**/node_modules/**": true
+	},
+
+	// ========================================
+	// TERMINAL
+	// ========================================
+	"terminal.integrated.defaultProfile.windows": "PowerShell",
+	"terminal.integrated.env.windows": {
+		"PYTHONPATH": "${workspaceFolder}",
+		"SLATE_WORKSPACE": "${workspaceFolder}",
+		"PYTHONIOENCODING": "utf-8",
+		"CUDA_VISIBLE_DEVICES": "0,1",
+		"SLATE_MULTI_RUNNER": "true"
+	}
+}

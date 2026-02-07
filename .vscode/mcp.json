@@ -1,0 +1,16 @@
+{
+  "servers": {
+    "slate": {
+      "type": "stdio",
+      "command": "E:\\11132025\\.venv\\Scripts\\python.exe",
+      "args": ["slate/mcp_server.py"],
+      "cwd": "E:\\11132025",
+      "env": {
+        "PYTHONPATH": "E:\\11132025",
+        "PYTHONIOENCODING": "utf-8",
+        "CUDA_VISIBLE_DEVICES": "0,1",
+        "SLATE_WORKSPACE": "E:\\11132025"
+      }
+    }
+  }
+}

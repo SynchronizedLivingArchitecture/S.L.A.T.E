@@ -28,10 +28,15 @@ env/
 
 # IDE
 .idea/
-.vscode/
 *.swp
 *.swo
 *~
+
+# VS Code — track workspace config (tasks, settings, extensions, MCP)
+# but ignore user-specific transient files
+.vscode/*.log
+.vscode/.ropeproject/
+.vscode/ipch/
 
 # Testing
 .pytest_cache/

@@ -1,0 +1,15 @@
+{
+	"recommendations": [
+		"ms-python.python",
+		"ms-python.vscode-pylance",
+		"ms-python.debugpy",
+		"github.copilot",
+		"github.copilot-chat",
+		"charliermarsh.ruff",
+		"redhat.vscode-yaml",
+		"github.vscode-github-actions",
+		"eamodio.gitlens",
+		"ms-vscode.powershell"
+	],
+	"unwantedRecommendations": []
+}
