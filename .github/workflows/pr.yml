@@ -112,7 +112,7 @@ jobs:
   # ------------ AI-Powered PR Review (GPU Inference) ------------
   ai-pr-review:
     name: AI PR Review (GPU)
-    runs-on: [self-hosted, slate, gpu]
+    runs-on: [self-hosted, slate, gpu, gpu-2]
     timeout-minutes: 15
     env:
       CUDA_VISIBLE_DEVICES: '0,1'

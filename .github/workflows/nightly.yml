@@ -116,7 +116,7 @@ jobs:
 
   ai-codebase-analysis:
     name: AI Codebase Analysis
-    runs-on: [self-hosted, slate, gpu]
+    runs-on: [self-hosted, slate, gpu, gpu-2]
     timeout-minutes: 60
     env:
       CUDA_VISIBLE_DEVICES: '0,1'

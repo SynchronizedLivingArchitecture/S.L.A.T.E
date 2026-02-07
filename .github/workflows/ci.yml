@@ -143,7 +143,7 @@ jobs:
 
   gpu-validation:
     name: GPU Compute Validation
-    runs-on: [self-hosted, slate, gpu]
+    runs-on: [self-hosted, slate, gpu, gpu-2]
     timeout-minutes: 10
     env:
       CUDA_VISIBLE_DEVICES: '0,1'
@@ -201,7 +201,7 @@ jobs:
   # ------------ AI Inference on Code Changes (GPU) ------------
   ai-inference:
     name: AI Code Inference
-    runs-on: [self-hosted, slate, gpu]
+    runs-on: [self-hosted, slate, gpu, gpu-2]
     timeout-minutes: 20
     env:
       CUDA_VISIBLE_DEVICES: '0,1'

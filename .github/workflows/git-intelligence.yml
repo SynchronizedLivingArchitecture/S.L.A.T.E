@@ -45,8 +45,10 @@ jobs:
   # ---- Verify AI Services ----
   verify-ai:
     name: Verify AI Services
-    runs-on: [self-hosted, slate, gpu]
+    runs-on: [self-hosted, slate, gpu, gpu-2]
     timeout-minutes: 5
+    env:
+      CUDA_VISIBLE_DEVICES: '0,1'
     outputs:
       ollama_ok: ${{ steps.check.outputs.ollama_ok }}
       model_available: ${{ steps.check.outputs.model_available }}
@@ -93,7 +95,7 @@ jobs:
     name: Git History Analysis
     needs: verify-ai
     if: needs.verify-ai.outputs.ollama_ok == 'true'
-    runs-on: [self-hosted, slate, gpu]
+    runs-on: [self-hosted, slate, gpu, gpu-2]
     timeout-minutes: 30
     env:
       CUDA_VISIBLE_DEVICES: '0,1'
@@ -295,7 +297,7 @@ jobs:
     if: |
       needs.verify-ai.outputs.ollama_ok == 'true' && 
       (github.event.inputs.analysis_mode == 'failures' || github.event.inputs.analysis_mode == 'full')
-    runs-on: [self-hosted, slate, gpu]
+    runs-on: [self-hosted, slate, gpu, gpu-2]
     timeout-minutes: 15
     env:
       CUDA_VISIBLE_DEVICES: '0,1'
@@ -423,7 +425,7 @@ jobs:
     if: |
       needs.verify-ai.outputs.ollama_ok == 'true' && 
       (github.event.inputs.analysis_mode == 'security' || github.event.inputs.analysis_mode == 'full')
-    runs-on: [self-hosted, slate, gpu]
+    runs-on: [self-hosted, slate, gpu, gpu-2]
     timeout-minutes: 20
     env:
       CUDA_VISIBLE_DEVICES: '0,1'
@@ -534,7 +536,7 @@ jobs:
     if: |
       needs.verify-ai.outputs.ollama_ok == 'true' && 
       (github.event.inputs.analysis_mode == 'codebase' || github.event.inputs.analysis_mode == 'full')
-    runs-on: [self-hosted, slate, gpu]
+    runs-on: [self-hosted, slate, gpu, gpu-2]
     timeout-minutes: 20
     env:
       CUDA_VISIBLE_DEVICES: '0,1'

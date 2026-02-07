@@ -63,7 +63,7 @@ permissions:
 jobs:
   ai-maintenance:
     name: AI-Powered Maintenance
-    runs-on: [self-hosted, slate, gpu]
+    runs-on: [self-hosted, slate, gpu, gpu-2]
     timeout-minutes: 120  # 2 hours max for training
     env:
       CUDA_VISIBLE_DEVICES: '0,1'
@@ -437,7 +437,7 @@ jobs:
   # Parallel job for fork analysis
   fork-ai-analysis:
     name: AI Fork Analysis
-    runs-on: [self-hosted, slate, gpu]
+    runs-on: [self-hosted, slate, gpu, gpu-2]
     needs: ai-maintenance
     if: contains(fromJSON('["full", "all"]'), needs.ai-maintenance.outputs.mode)
     timeout-minutes: 30

@@ -56,8 +56,10 @@ jobs:
   # ═══════════════════════════════════════════════════════════════════════
   collect-training-data:
     name: Secure Data Collection
-    runs-on: [self-hosted, slate, gpu]
+    runs-on: [self-hosted, slate, gpu, gpu-2]
     timeout-minutes: 45
+    env:
+      CUDA_VISIBLE_DEVICES: '0,1'
     outputs:
       samples_collected: ${{ steps.collect.outputs.samples_collected }}
       secrets_blocked: ${{ steps.collect.outputs.secrets_blocked }}
@@ -187,7 +189,7 @@ jobs:
   # ═══════════════════════════════════════════════════════════════════════
   train-model:
     name: Train Custom Model (Local)
-    runs-on: [self-hosted, slate, gpu]
+    runs-on: [self-hosted, slate, gpu, gpu-2]
     needs: collect-training-data
     if: |
       (needs.collect-training-data.outputs.training_ready == 'True' || inputs.force_train == true) &&
