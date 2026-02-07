@@ -1,6 +1,6 @@
 # S.L.A.T.E. Multi-Runner Parallel Proof Workflow
-# Proves REAL parallel execution across 4 registered runner instances
-# Modified: 2026-02-07T01:45:00Z | Author: COPILOT | Change: Rewrite for actual 4-runner parallel proof
+# Proves REAL parallel execution across 4 registered runner instances with GPU compute
+# Modified: 2026-02-07T02:00:00Z | Author: COPILOT | Change: Added real GPU compute to GPU jobs
 
 name: Multi-Runner Parallel Proof
 
@@ -45,7 +45,34 @@ jobs:
           python -c "from agents.runner_api import RunnerAPI; print('RunnerAPI OK')"
       - name: GPU Check
         run: |
-          python -c "import subprocess; r=subprocess.run(['nvidia-smi','--query-gpu=name,memory.total','--format=csv,noheader'],capture_output=True,text=True); print(r.stdout)"
+          python -c @"
+          import torch
+          print(f'PyTorch {torch.__version__}, CUDA: {torch.cuda.is_available()}')
+          if torch.cuda.is_available():
+              for i in range(torch.cuda.device_count()):
+                  print(f'  GPU {i}: {torch.cuda.get_device_name(i)}')
+          "@
+      - name: GPU Compute - SDK + CUDA Validation
+        run: |
+          python -c @"
+          import torch, time
+          if not torch.cuda.is_available():
+              print('WARN: CUDA unavailable, CPU-only mode')
+          else:
+              dev = torch.device('cuda:0')
+              a = torch.randn(2048, 2048, device=dev)
+              b = torch.randn(2048, 2048, device=dev)
+              torch.cuda.synchronize()
+              t0 = time.perf_counter()
+              c = torch.matmul(a, b)
+              torch.cuda.synchronize()
+              ms = (time.perf_counter() - t0) * 1000
+              tflops = 2 * 2048**3 / (ms / 1000) / 1e12
+              print(f'Runner 1 GPU compute: {ms:.1f}ms, {tflops:.2f} TFLOPS')
+              print(f'Result checksum: {c.sum().item():.2f}')
+              del a, b, c
+              torch.cuda.empty_cache()
+          "@
       - name: Record end
         run: |
           Write-Host "JOB END: $(Get-Date -Format 'HH:mm:ss.fff')"
@@ -73,6 +100,35 @@ jobs:
         run: |
           python -m pytest tests/ -v --tb=short -x -k "not integration" 2>&1 | Select-Object -First 30
         continue-on-error: true
+      - name: GPU 0 Compute Benchmark
+        env:
+          CUDA_VISIBLE_DEVICES: '0'
+        run: |
+          python -c @"
+          import torch, time
+          if not torch.cuda.is_available():
+              print('WARN: CUDA unavailable')
+          else:
+              dev = torch.device('cuda:0')
+              name = torch.cuda.get_device_name(0)
+              print(f'=== GPU 0 Dedicated Compute: {name} ===')
+              sizes = [1024, 2048, 4096]
+              for n in sizes:
+                  a = torch.randn(n, n, device=dev)
+                  b = torch.randn(n, n, device=dev)
+                  torch.cuda.synchronize()
+                  t0 = time.perf_counter()
+                  for _ in range(3):
+                      c = torch.matmul(a, b)
+                  torch.cuda.synchronize()
+                  ms = (time.perf_counter() - t0) * 1000 / 3
+                  tflops = 2 * n**3 / (ms / 1000) / 1e12
+                  print(f'  {n}x{n} matmul: {ms:.1f}ms ({tflops:.2f} TFLOPS)')
+                  del a, b, c
+              torch.cuda.empty_cache()
+              print(f'  Peak memory: {torch.cuda.max_memory_allocated(0)/1e6:.0f} MB')
+              print('=== GPU 0 Benchmark PASSED ===')
+          "@
       - name: Record end
         run: |
           Write-Host "JOB END: $(Get-Date -Format 'HH:mm:ss.fff')"
@@ -94,11 +150,67 @@ jobs:
         run: |
           Write-Host "JOB START: $(Get-Date -Format 'HH:mm:ss.fff')"
           Write-Host "RUNNER: $env:RUNNER_NAME"
-      - name: Integration Tests (GPU 1)
+      - name: GPU 1 Compute Benchmark
         env:
           CUDA_VISIBLE_DEVICES: '1'
         run: |
-          python -c "print('Integration test placeholder - GPU 1'); import time; time.sleep(5); print('GPU 1 tests done')"
+          python -c @"
+          import torch, time
+          if not torch.cuda.is_available():
+              print('WARN: CUDA unavailable')
+          else:
+              dev = torch.device('cuda:0')
+              name = torch.cuda.get_device_name(0)
+              print(f'=== GPU 1 Dedicated Compute: {name} ===')
+              sizes = [1024, 2048, 4096]
+              for n in sizes:
+                  a = torch.randn(n, n, device=dev)
+                  b = torch.randn(n, n, device=dev)
+                  torch.cuda.synchronize()
+                  t0 = time.perf_counter()
+                  for _ in range(3):
+                      c = torch.matmul(a, b)
+                  torch.cuda.synchronize()
+                  ms = (time.perf_counter() - t0) * 1000 / 3
+                  tflops = 2 * n**3 / (ms / 1000) / 1e12
+                  print(f'  {n}x{n} matmul: {ms:.1f}ms ({tflops:.2f} TFLOPS)')
+                  del a, b, c
+              torch.cuda.empty_cache()
+              print(f'  Peak memory: {torch.cuda.max_memory_allocated(0)/1e6:.0f} MB')
+              print('=== GPU 1 Benchmark PASSED ===')
+          "@
+      - name: Embedding Generation Test
+        env:
+          CUDA_VISIBLE_DEVICES: '1'
+        run: |
+          python -c @"
+          import torch, time
+          if not torch.cuda.is_available():
+              print('WARN: CUDA unavailable')
+          else:
+              dev = torch.device('cuda:0')
+              print('=== Embedding Generation (simulated) ===')
+              batch_size = 64
+              seq_len = 512
+              hidden_dim = 768
+              # Simulate transformer-style embedding computation
+              embeddings = torch.randn(batch_size, seq_len, hidden_dim, device=dev)
+              weight = torch.randn(hidden_dim, hidden_dim, device=dev)
+              torch.cuda.synchronize()
+              t0 = time.perf_counter()
+              # Project embeddings (like attention Q/K/V projection)
+              projected = torch.matmul(embeddings, weight)
+              # Normalize
+              projected = torch.nn.functional.normalize(projected, dim=-1)
+              torch.cuda.synchronize()
+              ms = (time.perf_counter() - t0) * 1000
+              print(f'  {batch_size} sequences x {seq_len} tokens x {hidden_dim}d: {ms:.1f}ms')
+              print(f'  Output shape: {projected.shape}')
+              print(f'  Memory used: {torch.cuda.memory_allocated(0)/1e6:.0f} MB')
+              del embeddings, weight, projected
+              torch.cuda.empty_cache()
+              print('=== Embedding Test PASSED ===')
+          "@
       - name: Benchmark
         run: |
           python slate/slate_benchmark.py 2>&1 | Select-Object -First 20

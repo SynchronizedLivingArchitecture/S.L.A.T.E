@@ -98,10 +98,11 @@ jobs:
           docker run --rm ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:latest-gpu python -c "import slate; print(f'SLATE v{slate.__version__}')"
         shell: powershell
 
-  # Build CPU variant on GitHub-hosted runner
+  # Modified: 2026-02-07T01:00:00Z | Author: COPILOT | Change: Moved all jobs to self-hosted runners
+  # Build CPU variant on self-hosted runner
   build-cpu:
     name: Build CPU Image
-    runs-on: ubuntu-latest
+    runs-on: [self-hosted, slate, cpu-only]
     timeout-minutes: 20
     outputs:
       digest: ${{ steps.build.outputs.digest }}
@@ -151,7 +152,7 @@ jobs:
   # Tag latest after both builds succeed
   tag-latest:
     name: Tag Latest
-    runs-on: ubuntu-latest
+    runs-on: [self-hosted, slate]
     needs: [build-gpu, build-cpu]
     if: github.event_name != 'pull_request' && github.ref == 'refs/heads/main'
     steps:
@@ -171,7 +172,7 @@ jobs:
   # Summary
   summary:
     name: Build Summary
-    runs-on: ubuntu-latest
+    runs-on: [self-hosted, slate]
     needs: [build-gpu, build-cpu, tag-latest]
     if: always()
     steps:
