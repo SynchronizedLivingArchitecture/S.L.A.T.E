@@ -1,0 +1,184 @@
+# SLATE Fork Intelligence Workflow
+# Runs on self-hosted runner with local AI (Ollama)
+# Analyzes upstream deps and downstream forks
+
+name: Fork Intelligence
+
+on:
+  schedule:
+    # Every 6 hours
+    - cron: '0 */6 * * *'
+  workflow_dispatch:
+    inputs:
+      mode:
+        description: 'Analysis mode'
+        required: true
+        default: 'analyze'
+        type: choice
+        options:
+          - analyze
+          - sync
+          - report
+          - upstream-only
+          - downstream-only
+
+jobs:
+  fork-intelligence:
+    name: Fork Analysis
+    runs-on: [self-hosted, slate]
+    timeout-minutes: 30
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Verify Ollama
+        id: ollama
+        run: |
+          $ollamaRunning = $false
+          try {
+            $response = Invoke-RestMethod -Uri "http://127.0.0.1:11434/api/tags" -TimeoutSec 5
+            if ($response) {
+              Write-Host "Ollama is running with models: $($response.models.name -join ', ')"
+              $ollamaRunning = $true
+            }
+          } catch {
+            Write-Host "Ollama not available - AI analysis will be limited"
+          }
+          "ollama_available=$ollamaRunning" | Out-File -Append $env:GITHUB_OUTPUT
+        shell: pwsh
+
+      - name: Run Fork Intelligence
+        id: analyze
+        run: |
+          $python = ".\.venv\Scripts\python.exe"
+          $mode = "${{ inputs.mode }}"
+          if (-not $mode) { $mode = "analyze" }
+
+          Write-Host "═══════════════════════════════════════════════════════════════"
+          Write-Host "  SLATE Fork Intelligence - Mode: $mode"
+          Write-Host "═══════════════════════════════════════════════════════════════"
+          Write-Host ""
+
+          switch ($mode) {
+            "analyze" {
+              & $python slate/slate_fork_intelligence.py --analyze --json > fork_analysis.json
+              $analysis = Get-Content fork_analysis.json -Raw | ConvertFrom-Json
+
+              "upstream_changes=$($analysis.summary.upstream_changes)" | Out-File -Append $env:GITHUB_OUTPUT
+              "downstream_changes=$($analysis.summary.downstream_changes)" | Out-File -Append $env:GITHUB_OUTPUT
+              "breaking_changes=$($analysis.summary.breaking_changes)" | Out-File -Append $env:GITHUB_OUTPUT
+            }
+            "sync" {
+              & $python slate/slate_fork_intelligence.py --sync
+            }
+            "report" {
+              & $python slate/slate_fork_intelligence.py --report > fork_report.md
+              Get-Content fork_report.md
+            }
+            "upstream-only" {
+              & $python slate/slate_fork_intelligence.py --upstream
+            }
+            "downstream-only" {
+              & $python slate/slate_fork_intelligence.py --downstream
+            }
+          }
+        shell: pwsh
+
+      - name: Sync Forks (if scheduled)
+        if: github.event_name == 'schedule'
+        run: |
+          $python = ".\.venv\Scripts\python.exe"
+
+          Write-Host ""
+          Write-Host "Scheduled sync of upstream forks..."
+          & $python slate/slate_fork_intelligence.py --sync
+        shell: pwsh
+
+      - name: Check for Breaking Changes
+        if: steps.analyze.outputs.breaking_changes > 0
+        run: |
+          Write-Host "::warning::${{ steps.analyze.outputs.breaking_changes }} breaking change(s) detected in upstream dependencies!"
+
+          # Create issue for breaking changes
+          $issueTitle = "Fork Intelligence: Breaking changes detected"
+          $issueBody = @"
+          ## Breaking Changes Detected
+
+          The fork intelligence system has detected potential breaking changes in upstream dependencies.
+
+          - **Upstream changes**: ${{ steps.analyze.outputs.upstream_changes }}
+          - **Breaking changes**: ${{ steps.analyze.outputs.breaking_changes }}
+          - **Run date**: $(Get-Date -Format 'yyyy-MM-dd HH:mm UTC')
+
+          Please review the changes and update SLATE accordingly.
+
+          See workflow run for details.
+          "@
+
+          # Check if similar issue exists
+          $existingIssue = gh issue list --label "fork-intelligence" --state open --json number | ConvertFrom-Json
+
+          if ($existingIssue.Count -eq 0) {
+            gh issue create --title "$issueTitle" --body "$issueBody" --label "fork-intelligence,automated"
+            Write-Host "Created issue for breaking changes"
+          } else {
+            Write-Host "Issue already exists: #$($existingIssue[0].number)"
+          }
+        shell: pwsh
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Analyze Downstream Contributions
+        if: steps.analyze.outputs.downstream_changes > 0
+        run: |
+          Write-Host ""
+          Write-Host "Downstream fork activity detected..."
+          Write-Host "${{ steps.analyze.outputs.downstream_changes }} fork(s) have contributions"
+
+          # Could auto-create PRs or issues for valuable contributions
+        shell: pwsh
+
+      - name: Generate Summary
+        if: always()
+        run: |
+          $summary = @"
+          ## Fork Intelligence Report
+
+          | Metric | Value |
+          |--------|-------|
+          | Upstream Dependencies | Checked |
+          | Upstream Changes | ${{ steps.analyze.outputs.upstream_changes || 'N/A' }} |
+          | Breaking Changes | ${{ steps.analyze.outputs.breaking_changes || '0' }} |
+          | Downstream Forks | Monitored |
+          | Fork Contributions | ${{ steps.analyze.outputs.downstream_changes || 'N/A' }} |
+          | AI Analysis | ${{ steps.ollama.outputs.ollama_available }} |
+
+          **Run Time**: $(Get-Date -Format 'yyyy-MM-dd HH:mm:ss UTC')
+          "@
+
+          $summary | Out-File -Append $env:GITHUB_STEP_SUMMARY
+        shell: pwsh
+
+      - name: Upload Analysis Artifact
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: fork-intelligence-${{ github.run_number }}
+          path: |
+            fork_analysis.json
+            fork_report.md
+          retention-days: 30
+          if-no-files-found: ignore
+
+  notify-on-breaking:
+    name: Notify on Breaking Changes
+    needs: fork-intelligence
+    if: failure() || needs.fork-intelligence.outputs.breaking_changes > 0
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Log notification
+        run: |
+          echo "Breaking changes or failure detected"
+          echo "Would send notification here (Slack, Discord, etc.)"
