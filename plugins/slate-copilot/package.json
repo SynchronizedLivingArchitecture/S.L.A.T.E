@@ -11,9 +11,10 @@
 	"slateMetadata": {
 		"modified": "2026-02-07T04:57:00Z",
 		"author": "COPILOT",
-		"change": "Add repository and license metadata for packaging"
+		"change": "Add icon and bump version for new packaging"
 	},
-	"version": "2.5.0",
+	"version": "2.5.2",
+	"icon": "media/icon.png",
 	"engines": {
 		"vscode": "^1.100.0"
 	},
