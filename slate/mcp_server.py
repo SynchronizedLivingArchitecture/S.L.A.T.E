@@ -1,12 +1,16 @@
 #!/usr/bin/env python3
+# Modified: 2026-02-07T00:30:00Z | Author: COPILOT | Change: Add hardware, benchmark, runtime tools; fix AI tool
 """
-SLATE MCP Server - Model Context Protocol server for Claude Code integration.
+SLATE MCP Server - Model Context Protocol server for Claude Code / Copilot integration.
 
 Provides tools for:
 - System status checking
+- Runtime integration checks
+- Hardware & GPU optimization
 - Workflow management
 - Orchestrator control
 - Runner management
+- Benchmark execution
 """
 
 import asyncio
@@ -160,7 +164,45 @@ async def list_tools() -> list[Tool]:
                     }
                 }
             }
-        )
+        ),
+        Tool(
+            name="slate_runtime",
+            description="Check all SLATE runtime integrations and dependencies (Python, GPU, PyTorch, Ollama, venv)",
+            inputSchema={
+                "type": "object",
+                "properties": {
+                    "format": {
+                        "type": "string",
+                        "enum": ["text", "json"],
+                        "description": "Output format",
+                        "default": "text"
+                    }
+                }
+            }
+        ),
+        Tool(
+            name="slate_hardware",
+            description="Detect GPUs and optimize hardware configuration for PyTorch/CUDA",
+            inputSchema={
+                "type": "object",
+                "properties": {
+                    "action": {
+                        "type": "string",
+                        "enum": ["detect", "optimize", "install-pytorch"],
+                        "description": "detect: show GPU info, optimize: apply settings, install-pytorch: install correct PyTorch for GPU arch",
+                        "default": "detect"
+                    }
+                }
+            }
+        ),
+        Tool(
+            name="slate_benchmark",
+            description="Run SLATE performance benchmarks (GPU, inference, system throughput)",
+            inputSchema={
+                "type": "object",
+                "properties": {}
+            }
+        ),
     ]
 
 
@@ -205,6 +247,26 @@ async def call_tool(name: str, arguments: dict[str, Any]) -> list[TextContent]:
                 }
             else:
                 result = run_slate_command("unified_ai_backend.py", "--task", task)
+
+    elif name == "slate_runtime":
+        fmt = arguments.get("format", "text")
+        if fmt == "json":
+            result = run_slate_command("slate_runtime.py", "--check-all", "--json")
+        else:
+            result = run_slate_command("slate_runtime.py", "--check-all")
+
+    elif name == "slate_hardware":
+        action = arguments.get("action", "detect")
+        if action == "optimize":
+            result = run_slate_command("slate_hardware_optimizer.py", "--optimize")
+        elif action == "install-pytorch":
+            result = run_slate_command("slate_hardware_optimizer.py", "--install-pytorch")
+        else:
+            result = run_slate_command("slate_hardware_optimizer.py")
+
+    elif name == "slate_benchmark":
+        result = run_slate_command("slate_benchmark.py")
+
     else:
         result = {
             "success": False,

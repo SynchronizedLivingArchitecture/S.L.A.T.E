@@ -38,10 +38,9 @@ jobs:
       is_tag: ${{ steps.ver.outputs.is_tag }}
     steps:
       - uses: actions/checkout@v4
-      - name: Setup Python PATH
+      - name: Setup Python
         run: |
-          'C:\Users\Dan\AppData\Local\Programs\Python\Python311' | Out-File -Append $env:GITHUB_PATH
-          'C:\Users\Dan\AppData\Local\Programs\Python\Python311\Scripts' | Out-File -Append $env:GITHUB_PATH
+          'E:\11132025\.venv\Scripts' | Out-File -Append $env:GITHUB_PATH
       - id: ver
         run: |
           if ("${{ github.ref }}".StartsWith("refs/tags/v")) {
@@ -62,10 +61,9 @@ jobs:
     timeout-minutes: 30
     steps:
       - uses: actions/checkout@v4
-      - name: Setup Python PATH
+      - name: Setup Python
         run: |
-          'C:\Users\Dan\AppData\Local\Programs\Python\Python311' | Out-File -Append $env:GITHUB_PATH
-          'C:\Users\Dan\AppData\Local\Programs\Python\Python311\Scripts' | Out-File -Append $env:GITHUB_PATH
+          'E:\11132025\.venv\Scripts' | Out-File -Append $env:GITHUB_PATH
       - name: Install dependencies
         run: |
           python -m pip install --upgrade pip
@@ -111,10 +109,9 @@ jobs:
     timeout-minutes: 10
     steps:
       - uses: actions/checkout@v4
-      - name: Setup Python PATH
+      - name: Setup Python
         run: |
-          'C:\Users\Dan\AppData\Local\Programs\Python\Python311' | Out-File -Append $env:GITHUB_PATH
-          'C:\Users\Dan\AppData\Local\Programs\Python\Python311\Scripts' | Out-File -Append $env:GITHUB_PATH
+          'E:\11132025\.venv\Scripts' | Out-File -Append $env:GITHUB_PATH
       - uses: actions/download-artifact@v4
         with:
           name: SLATEPI-exe-${{ needs.version.outputs.version }}
