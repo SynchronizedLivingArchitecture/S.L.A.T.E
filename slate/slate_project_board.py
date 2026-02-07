@@ -312,6 +312,175 @@ def process_kanban() -> dict[str, int]:
     return stats
 
 
+def categorize_task(task: dict[str, Any]) -> str:
+    """Categorize a task to determine which board it belongs to."""
+    title = task.get("title", "").lower()
+    desc = task.get("description", "").lower()
+    source = task.get("source", "")
+
+    # Bug-related keywords
+    if any(kw in title or kw in desc for kw in ["bug", "fix", "crash", "error", "broken"]):
+        return "bugs"
+
+    # Feature/enhancement keywords
+    if any(kw in title or kw in desc for kw in ["feat", "add", "new", "implement", "create", "enhancement"]):
+        return "roadmap"
+
+    # Planning keywords
+    if any(kw in title or kw in desc for kw in ["plan", "design", "architect", "research"]):
+        return "planning"
+
+    # Future release keywords
+    if any(kw in title or kw in desc for kw in ["future", "next", "phase", "v2", "v3"]):
+        return "future"
+
+    # Default to kanban for active work
+    return "kanban"
+
+
+def push_completed_to_roadmap() -> dict[str, int]:
+    """Push completed feature tasks to ROADMAP board."""
+    stats = {"added": 0, "skipped": 0, "errors": 0}
+
+    task_data = load_tasks()
+    completed_tasks = [
+        t for t in task_data.get("tasks", [])
+        if t.get("status") == "completed"
+    ]
+
+    if not completed_tasks:
+        print("No completed tasks to push")
+        return stats
+
+    # Get existing ROADMAP items to avoid duplicates
+    roadmap_items = get_project_items(PROJECTS["roadmap"])
+    existing_titles = {item.get("title", "") for item in roadmap_items}
+
+    for task in completed_tasks:
+        title = task.get("title", "")
+        if not title or title in existing_titles:
+            stats["skipped"] += 1
+            continue
+
+        category = categorize_task(task)
+        if category in ["roadmap", "kanban"]:  # Features go to roadmap
+            success, output = add_item_to_project(PROJECTS["roadmap"], title)
+            if success:
+                stats["added"] += 1
+                print(f"  + ROADMAP: {title[:60]}")
+            else:
+                stats["errors"] += 1
+
+    print(f"\nPushed {stats['added']} completed tasks to ROADMAP")
+    return stats
+
+
+def push_bugs_to_tracking() -> dict[str, int]:
+    """Push bug-related tasks to BUG TRACKING board."""
+    stats = {"added": 0, "skipped": 0, "errors": 0}
+
+    task_data = load_tasks()
+    all_tasks = task_data.get("tasks", [])
+
+    # Get existing BUG TRACKING items
+    bug_items = get_project_items(PROJECTS["bugs"])
+    existing_titles = {item.get("title", "") for item in bug_items}
+
+    for task in all_tasks:
+        title = task.get("title", "")
+        if not title or title in existing_titles:
+            stats["skipped"] += 1
+            continue
+
+        category = categorize_task(task)
+        if category == "bugs":
+            success, output = add_item_to_project(PROJECTS["bugs"], title)
+            if success:
+                stats["added"] += 1
+                print(f"  + BUG TRACKING: {title[:60]}")
+            else:
+                stats["errors"] += 1
+
+    if stats["added"] > 0:
+        print(f"\nPushed {stats['added']} bug tasks to BUG TRACKING")
+    return stats
+
+
+def update_all_boards() -> dict[str, Any]:
+    """Update all project boards based on current_tasks.json."""
+    print("=" * 60)
+    print("  Updating All SLATE Project Boards")
+    print("=" * 60)
+    print()
+
+    results = {
+        "kanban": {"added": 0, "skipped": 0},
+        "roadmap": {"added": 0, "skipped": 0},
+        "bugs": {"added": 0, "skipped": 0},
+        "iterative": {"added": 0, "skipped": 0},
+    }
+
+    task_data = load_tasks()
+    all_tasks = task_data.get("tasks", [])
+
+    # Get existing items from all boards
+    kanban_items = get_project_items(PROJECTS["kanban"])
+    roadmap_items = get_project_items(PROJECTS["roadmap"])
+    bug_items = get_project_items(PROJECTS["bugs"])
+    iterative_items = get_project_items(PROJECTS["iterative"])
+
+    kanban_titles = {item.get("title", "") for item in kanban_items}
+    roadmap_titles = {item.get("title", "") for item in roadmap_items}
+    bug_titles = {item.get("title", "") for item in bug_items}
+    iterative_titles = {item.get("title", "") for item in iterative_items}
+
+    print("Processing tasks...")
+    for task in all_tasks:
+        title = task.get("title", "")
+        if not title:
+            continue
+
+        status = task.get("status", "pending")
+        category = categorize_task(task)
+
+        # Pending tasks go to KANBAN
+        if status == "pending" and title not in kanban_titles:
+            success, _ = add_item_to_project(PROJECTS["kanban"], title)
+            if success:
+                results["kanban"]["added"] += 1
+                print(f"  + KANBAN: {title[:55]}")
+            kanban_titles.add(title)
+
+        # Completed feature tasks go to ROADMAP
+        if status == "completed" and category in ["roadmap", "kanban"]:
+            if title not in roadmap_titles:
+                success, _ = add_item_to_project(PROJECTS["roadmap"], title)
+                if success:
+                    results["roadmap"]["added"] += 1
+                    print(f"  + ROADMAP: {title[:55]}")
+                roadmap_titles.add(title)
+
+        # Bug tasks go to BUG TRACKING
+        if category == "bugs" and title not in bug_titles:
+            success, _ = add_item_to_project(PROJECTS["bugs"], title)
+            if success:
+                results["bugs"]["added"] += 1
+                print(f"  + BUG TRACKING: {title[:55]}")
+            bug_titles.add(title)
+
+    print()
+    print("-" * 60)
+    print("  Summary")
+    print("-" * 60)
+    total = sum(r["added"] for r in results.values())
+    print(f"  KANBAN:       +{results['kanban']['added']} items")
+    print(f"  ROADMAP:      +{results['roadmap']['added']} items")
+    print(f"  BUG TRACKING: +{results['bugs']['added']} items")
+    print(f"  Total:        +{total} items added")
+
+    return results
+
+
 def print_status() -> None:
     """Print status of all project boards."""
     print("=" * 60)
@@ -378,9 +547,16 @@ def main() -> int:
     parser.add_argument("--sync", action="store_true", help="Sync KANBAN to tasks")
     parser.add_argument("--push", action="store_true", help="Push tasks to KANBAN")
     parser.add_argument("--process", action="store_true", help="Process KANBAN items")
+    parser.add_argument("--update-all", action="store_true", help="Update all boards")
     parser.add_argument("--json", action="store_true", help="Output as JSON")
 
     args = parser.parse_args()
+
+    if args.update_all:
+        results = update_all_boards()
+        if args.json:
+            print(json.dumps(results))
+        return 0
 
     if args.sync:
         stats = sync_kanban_to_tasks()
