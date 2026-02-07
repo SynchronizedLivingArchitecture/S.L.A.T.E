@@ -90,6 +90,37 @@ Project board mapping:
 & "E:\11132025\.venv\Scripts\python.exe" slate/slate_benchmark.py   # Run benchmarks
 ```
 
+### Agentic AI (GPU Inference)
+```powershell
+# ML Orchestrator — local Ollama + PyTorch inference
+& "E:\11132025\.venv\Scripts\python.exe" slate/ml_orchestrator.py --status        # ML status
+& "E:\11132025\.venv\Scripts\python.exe" slate/ml_orchestrator.py --benchmarks    # Inference benchmarks
+& "E:\11132025\.venv\Scripts\python.exe" slate/ml_orchestrator.py --index-now     # Index codebase
+& "E:\11132025\.venv\Scripts\python.exe" slate/ml_orchestrator.py --infer "prompt" # Direct inference
+
+# Unified Autonomous Loop — task discovery + execution
+& "E:\11132025\.venv\Scripts\python.exe" slate/slate_unified_autonomous.py --discover     # Discover tasks
+& "E:\11132025\.venv\Scripts\python.exe" slate/slate_unified_autonomous.py --single       # Execute one task
+& "E:\11132025\.venv\Scripts\python.exe" slate/slate_unified_autonomous.py --run --max 10 # Run loop
+& "E:\11132025\.venv\Scripts\python.exe" slate/slate_unified_autonomous.py --status       # Loop status
+
+# Copilot Runner — bridges chat participant to autonomous system
+& "E:\11132025\.venv\Scripts\python.exe" slate/copilot_slate_runner.py --status            # Runner status
+& "E:\11132025\.venv\Scripts\python.exe" slate/copilot_slate_runner.py --start --max-tasks 50  # Start runner
+& "E:\11132025\.venv\Scripts\python.exe" slate/copilot_slate_runner.py --stop              # Stop runner
+& "E:\11132025\.venv\Scripts\python.exe" slate/copilot_slate_runner.py --queue "task desc" # Queue a task
+
+# Integrated Autonomous Loop — top-level brain with self-healing
+& "E:\11132025\.venv\Scripts\python.exe" slate/integrated_autonomous_loop.py --status      # Full status
+& "E:\11132025\.venv\Scripts\python.exe" slate/integrated_autonomous_loop.py --generate    # Generate tasks
+& "E:\11132025\.venv\Scripts\python.exe" slate/integrated_autonomous_loop.py --max 100     # Run full loop
+
+# Dispatch agentic workflow via runner
+& "E:\11132025\.venv\Scripts\python.exe" slate/slate_runner_manager.py --agentic autonomous       # Run agent loop via CI
+& "E:\11132025\.venv\Scripts\python.exe" slate/slate_runner_manager.py --agentic inference-bench  # Benchmarks via CI
+& "E:\11132025\.venv\Scripts\python.exe" slate/slate_runner_manager.py --agentic health-check     # Health check via CI
+```
+
 ### RunnerAPI (Python)
 ```powershell
 & "E:\11132025\.venv\Scripts\python.exe" -c "from agents.runner_api import RunnerAPI; api = RunnerAPI(); api.print_full_status()"
@@ -104,6 +135,7 @@ All workflows run on `runs-on: [self-hosted, slate]` with `shell: powershell`.
 | CI | `ci.yml` | Lint, tests, SDK validation, security |
 | CD | `cd.yml` | Build & deploy artifacts |
 | Integration | `slate.yml` | SLATE integration tests |
+| **Agentic AI** | `agentic.yml` | **GPU inference, autonomous agent loop, benchmarks** |
 | CodeQL | `codeql.yml` | Security analysis |
 | Docs | `docs.yml` | Documentation validation |
 | PR | `pr.yml` | Pull request checks |

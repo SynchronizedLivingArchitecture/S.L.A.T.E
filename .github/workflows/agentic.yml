@@ -1,0 +1,251 @@
+# Modified: 2026-02-07T04:45:00Z | Author: COPILOT | Change: Agentic AI inference workflow for self-hosted runners
+name: SLATE Agentic AI
+
+on:
+  workflow_dispatch:
+    inputs:
+      mode:
+        description: 'Agent execution mode'
+        required: true
+        default: 'autonomous'
+        type: choice
+        options:
+          - autonomous       # Run autonomous loop (discover + execute tasks)
+          - single-task      # Execute one task and exit
+          - inference-bench  # Run GPU inference benchmarks
+          - discover         # Discover tasks only (no execution)
+          - health-check     # Full system health + ML status
+      max_tasks:
+        description: 'Max tasks to execute (autonomous mode)'
+        required: false
+        default: '10'
+        type: string
+      task_description:
+        description: 'Task description (single-task mode)'
+        required: false
+        default: ''
+        type: string
+  schedule:
+    # Run autonomous agent every 6 hours
+    - cron: '0 */6 * * *'
+
+concurrency:
+  group: agentic-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: write
+
+defaults:
+  run:
+    shell: powershell
+
+jobs:
+  # ─── GPU Inference Health ───
+  inference-health:
+    name: Inference Health
+    runs-on: [self-hosted, slate, gpu]
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - name: Setup Python
+        run: |
+          'E:\11132025\.venv\Scripts' | Out-File -Append $env:GITHUB_PATH
+      - name: Check Ollama
+        run: |
+          python -c @"
+          import urllib.request, json
+          try:
+              r = urllib.request.urlopen('http://127.0.0.1:11434/api/tags', timeout=5)
+              data = json.loads(r.read())
+              models = data.get('models', [])
+              print(f'Ollama: RUNNING ({len(models)} models)')
+              for m in models:
+                  name = m.get('name','?')
+                  size_gb = m.get('size',0) / 1e9
+                  print(f'  {name} ({size_gb:.1f}GB)')
+          except Exception as e:
+              print(f'Ollama: NOT RUNNING - {e}')
+              exit(1)
+          "@
+      - name: Check GPUs
+        run: |
+          nvidia-smi --query-gpu=index,name,memory.used,memory.total,utilization.gpu --format=csv,noheader
+      - name: Check PyTorch + CUDA
+        run: |
+          python -c @"
+          import torch
+          print(f'PyTorch: {torch.__version__}')
+          print(f'CUDA: {torch.cuda.is_available()}')
+          print(f'GPUs: {torch.cuda.device_count()}')
+          for i in range(torch.cuda.device_count()):
+              print(f'  GPU {i}: {torch.cuda.get_device_name(i)}')
+              mem = torch.cuda.get_device_properties(i).total_mem / 1e9
+              print(f'         {mem:.1f} GB')
+          "@
+      - name: ML Orchestrator Status
+        run: python slate/ml_orchestrator.py --status
+
+  # ─── Autonomous Agent Loop (GPU 0) ───
+  autonomous-agent:
+    name: Autonomous Agent
+    needs: inference-health
+    if: github.event.inputs.mode == 'autonomous' || github.event_name == 'schedule'
+    runs-on: [self-hosted, slate, gpu]
+    timeout-minutes: 60
+    env:
+      CUDA_VISIBLE_DEVICES: '0,1'
+      SLATE_RUNNER: 'true'
+      SLATE_AGENT_MODE: 'autonomous'
+    steps:
+      - uses: actions/checkout@v4
+      - name: Setup Python
+        run: |
+          'E:\11132025\.venv\Scripts' | Out-File -Append $env:GITHUB_PATH
+      - name: Sync KANBAN tasks
+        run: python slate/slate_project_board.py --sync
+        continue-on-error: true
+      - name: Discover tasks
+        run: python slate/slate_unified_autonomous.py --discover
+      - name: Run autonomous loop
+        run: |
+          $max = '${{ github.event.inputs.max_tasks }}'
+          if (-not $max) { $max = '10' }
+          python slate/slate_unified_autonomous.py --run --max $max --stop-on-empty
+      - name: Push results to KANBAN
+        run: python slate/slate_project_board.py --push
+        continue-on-error: true
+      - name: Report status
+        if: always()
+        run: python slate/slate_unified_autonomous.py --status
+
+  # ─── Single Task Execution (GPU 0) ───
+  single-task:
+    name: Single Task
+    needs: inference-health
+    if: github.event.inputs.mode == 'single-task'
+    runs-on: [self-hosted, slate, gpu]
+    timeout-minutes: 15
+    env:
+      CUDA_VISIBLE_DEVICES: '0,1'
+      SLATE_RUNNER: 'true'
+    steps:
+      - uses: actions/checkout@v4
+      - name: Setup Python
+        run: |
+          'E:\11132025\.venv\Scripts' | Out-File -Append $env:GITHUB_PATH
+      - name: Queue task from dispatch
+        if: github.event.inputs.task_description != ''
+        run: |
+          python slate/copilot_slate_runner.py --queue '${{ github.event.inputs.task_description }}'
+      - name: Execute single task
+        run: python slate/slate_unified_autonomous.py --single
+      - name: Report
+        if: always()
+        run: python slate/slate_unified_autonomous.py --json
+
+  # ─── GPU Inference Benchmarks (Dual GPU) ───
+  inference-benchmarks:
+    name: Inference Benchmarks
+    needs: inference-health
+    if: github.event.inputs.mode == 'inference-bench'
+    runs-on: [self-hosted, slate, gpu]
+    timeout-minutes: 20
+    env:
+      CUDA_VISIBLE_DEVICES: '0,1'
+    steps:
+      - uses: actions/checkout@v4
+      - name: Setup Python
+        run: |
+          'E:\11132025\.venv\Scripts' | Out-File -Append $env:GITHUB_PATH
+      - name: Run ML benchmarks
+        run: python slate/ml_orchestrator.py --benchmarks
+      - name: Run SLATE benchmarks
+        run: python slate/slate_benchmark.py
+        continue-on-error: true
+      - name: Inference speed test
+        run: |
+          python -c @"
+          import json, time, urllib.request
+          models = ['llama3.2:3b', 'mistral:latest', 'phi:latest']
+          results = []
+          for model in models:
+              payload = json.dumps({
+                  'model': model,
+                  'prompt': 'Write a Python function that sorts a list using quicksort.',
+                  'stream': False,
+                  'options': {'num_predict': 256}
+              }).encode()
+              req = urllib.request.Request(
+                  'http://127.0.0.1:11434/api/generate',
+                  data=payload,
+                  headers={'Content-Type': 'application/json'},
+                  method='POST'
+              )
+              try:
+                  start = time.time()
+                  with urllib.request.urlopen(req, timeout=120) as resp:
+                      data = json.loads(resp.read())
+                  elapsed = time.time() - start
+                  tokens = data.get('eval_count', 0)
+                  tps = tokens / max(data.get('eval_duration', 1) / 1e9, 0.001)
+                  results.append({'model': model, 'tokens': tokens, 'tok_per_sec': round(tps, 1), 'elapsed': round(elapsed, 1)})
+                  print(f'{model}: {tokens} tokens @ {tps:.1f} tok/s ({elapsed:.1f}s)')
+              except Exception as e:
+                  print(f'{model}: FAILED - {e}')
+                  results.append({'model': model, 'error': str(e)})
+          print(json.dumps(results, indent=2))
+          "@
+
+  # ─── Task Discovery Report ───
+  discover-tasks:
+    name: Task Discovery
+    needs: inference-health
+    if: github.event.inputs.mode == 'discover'
+    runs-on: [self-hosted, slate]
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - name: Setup Python
+        run: |
+          'E:\11132025\.venv\Scripts' | Out-File -Append $env:GITHUB_PATH
+      - name: Sync from KANBAN
+        run: python slate/slate_project_board.py --sync
+        continue-on-error: true
+      - name: Discover all tasks
+        run: python slate/slate_unified_autonomous.py --discover
+      - name: Generate tech tree tasks
+        run: python slate/integrated_autonomous_loop.py --generate
+      - name: Integrated status
+        run: python slate/integrated_autonomous_loop.py --json
+
+  # ─── Full Health Check ───
+  full-health:
+    name: Full Health Check
+    needs: inference-health
+    if: github.event.inputs.mode == 'health-check'
+    runs-on: [self-hosted, slate, gpu]
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - name: Setup Python
+        run: |
+          'E:\11132025\.venv\Scripts' | Out-File -Append $env:GITHUB_PATH
+      - name: SLATE system status
+        run: python slate/slate_status.py --quick
+      - name: Runtime integrations
+        run: python slate/slate_runtime.py --check-all
+      - name: Hardware optimizer
+        run: python slate/slate_hardware_optimizer.py
+      - name: Integrated autonomous status
+        run: python slate/integrated_autonomous_loop.py --status
+      - name: Unified autonomous status
+        run: python slate/slate_unified_autonomous.py --status
+      - name: Copilot runner status
+        run: python slate/copilot_slate_runner.py --status
+      - name: ML orchestrator status
+        run: python slate/ml_orchestrator.py --status
+      - name: Workflow manager status
+        run: python slate/slate_workflow_manager.py --status
+      - name: Orchestrator status
+        run: python slate/slate_orchestrator.py status

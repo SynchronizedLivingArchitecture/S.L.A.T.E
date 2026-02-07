@@ -512,6 +512,11 @@ def main():
     parser.add_argument("--force", action="store_true", help="Force reconfiguration")
     parser.add_argument("--status", action="store_true", help="Show runner status")
     parser.add_argument("--dispatch", metavar="WORKFLOW", help="Dispatch a workflow")
+    # Modified: 2026-02-07T04:45:00Z | Author: COPILOT | Change: Add agentic dispatch shortcuts
+    parser.add_argument("--agentic", metavar="MODE", nargs="?", const="autonomous",
+                        choices=["autonomous", "single-task", "inference-bench", "discover", "health-check"],
+                        help="Dispatch agentic AI workflow (default: autonomous)")
+    parser.add_argument("--max-tasks", type=str, default="10", help="Max tasks for agentic mode")
     parser.add_argument("--json", action="store_true", help="Output as JSON")
 
     args = parser.parse_args()
@@ -554,6 +559,20 @@ def main():
         else:
             if result["success"]:
                 print(f"[OK] Dispatched {args.dispatch}")
+                if result["run_id"]:
+                    print(f"     Run ID: {result['run_id']}")
+            else:
+                print(f"[X] Failed: {result['error']}")
+
+    # Modified: 2026-02-07T04:45:00Z | Author: COPILOT | Change: Agentic dispatch shortcut
+    elif args.agentic:
+        inputs = {"mode": args.agentic, "max_tasks": args.max_tasks}
+        result = manager.dispatch_workflow("agentic.yml", inputs=inputs)
+        if args.json:
+            print(json.dumps(result, indent=2))
+        else:
+            if result["success"]:
+                print(f"[OK] Dispatched agentic AI ({args.agentic}, max={args.max_tasks})")
                 if result["run_id"]:
                     print(f"     Run ID: {result['run_id']}")
             else:
