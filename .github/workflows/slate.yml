@@ -1,4 +1,4 @@
-# Modified: 2026-02-07T00:00:00Z | Author: COPILOT | Change: Simplified after repo rename (removed trailing dot)
+# Modified: 2026-02-07T03:00:00Z | Author: COPILOT | Change: Add SLATE agent validation + extension build jobs
 name: SLATE Integration
 
 on:
@@ -112,6 +112,94 @@ jobs:
           python -c "from agents.install_api import InstallAPI; print('install_api OK')"
         continue-on-error: true
 
+  slate-agent:
+    name: SLATE Agent Validation
+    runs-on: [self-hosted, slate]
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - name: Setup Python
+        run: |
+          'E:\11132025\.venv\Scripts' | Out-File -Append $env:GITHUB_PATH
+      - name: Validate agent definition
+        run: |
+          python -c @"
+          # Modified: 2026-02-07T03:00:00Z | Author: COPILOT | Change: CI validation for @slate agent
+          import pathlib, re, sys
+
+          agent = pathlib.Path('.github/agents/slate.agent.md')
+          if not agent.exists():
+              print('SKIP: No agent file found')
+              sys.exit(0)
+
+          content = agent.read_text(encoding='utf-8')
+          parts = content.split('---', 2)
+          assert len(parts) >= 3, 'Agent frontmatter incomplete'
+
+          # Validate frontmatter fields
+          fm = parts[1]
+          assert 'name: slate' in fm, 'Agent name must be slate'
+          assert 'description:' in fm, 'Missing description'
+          assert 'tools:' in fm, 'Missing tools list'
+          print('Frontmatter: OK')
+
+          # Validate required sections
+          body = parts[2]
+          for section in ['Protocol Commands', 'Behavior Rules', 'Agent Routing', 'Project Structure', 'Handling Requests']:
+              assert section in body, f'Missing section: {section}'
+              print(f'  Section: {section} OK')
+
+          # Validate referenced SLATE scripts exist
+          scripts = set(re.findall(r'slate/(\w+\.py)', body))
+          missing = [s for s in scripts if not (pathlib.Path('slate') / s).exists()]
+          print(f'Scripts: {len(scripts)} referenced, {len(missing)} missing')
+          assert not missing, f'Missing scripts: {missing}'
+
+          # Validate SLATE protocol commands are executable
+          import importlib
+          for mod in ['slate_status', 'slate_runtime', 'slate_runner_manager', 'slate_hardware_optimizer', 'slate_orchestrator', 'slate_workflow_manager', 'slate_benchmark']:
+              importlib.import_module(f'slate.{mod}')
+              print(f'  Import slate.{mod}: OK')
+
+          print('SLATE Agent Validation: PASSED')
+          "@
+      - name: Smoke test SLATE protocols
+        run: |
+          python slate/slate_status.py --quick
+          python slate/slate_runtime.py --check-all
+
+  extension-build:
+    name: Extension Build Check
+    runs-on: [self-hosted, slate]
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - name: Check Node.js
+        run: |
+          node --version
+          npm --version
+      - name: Install extension deps
+        run: |
+          Set-Location plugins/slate-copilot
+          npm install --ignore-scripts
+      - name: Compile extension
+        run: |
+          Set-Location plugins/slate-copilot
+          npm run compile
+      - name: Verify outputs
+        run: |
+          $files = @(
+            'plugins/slate-copilot/out/extension.js',
+            'plugins/slate-copilot/out/slateParticipant.js',
+            'plugins/slate-copilot/out/tools.js',
+            'plugins/slate-copilot/out/slateRunner.js'
+          )
+          foreach ($f in $files) {
+            if (Test-Path $f) { Write-Host "  OK: $f" }
+            else { Write-Host "  FAIL: $f"; exit 1 }
+          }
+          Write-Host 'Extension build: PASSED'
+
   task-queue:
     name: Task Queue Validation
     runs-on: [self-hosted, slate]
@@ -144,7 +232,7 @@ jobs:
   summary:
     name: SLATE Summary
     runs-on: [self-hosted, slate]
-    needs: [slate-status, sdk-validation, tech-tree, dashboard, agents, task-queue]
+    needs: [slate-status, sdk-validation, tech-tree, dashboard, agents, slate-agent, extension-build, task-queue]
     if: always()
     steps:
       - name: Generate summary
@@ -157,4 +245,6 @@ jobs:
           "| Tech Tree | ${{ needs.tech-tree.result }} |" | Out-File -Append $env:GITHUB_STEP_SUMMARY
           "| Dashboard | ${{ needs.dashboard.result }} |" | Out-File -Append $env:GITHUB_STEP_SUMMARY
           "| Agents | ${{ needs.agents.result }} |" | Out-File -Append $env:GITHUB_STEP_SUMMARY
+          "| SLATE Agent | ${{ needs.slate-agent.result }} |" | Out-File -Append $env:GITHUB_STEP_SUMMARY
+          "| Extension Build | ${{ needs.extension-build.result }} |" | Out-File -Append $env:GITHUB_STEP_SUMMARY
           "| Task Queue | ${{ needs.task-queue.result }} |" | Out-File -Append $env:GITHUB_STEP_SUMMARY

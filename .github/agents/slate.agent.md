@@ -133,6 +133,7 @@ slate/                    # Core SDK modules
   slate_runner_manager.py # GitHub Actions runner management
   slate_orchestrator.py   # Unified service orchestrator
   slate_workflow_manager.py   # Task lifecycle & PR workflows
+  slate_workflow_analyzer.py  # Meta-workflow analysis & deprecation detection
   slate_benchmark.py      # Performance benchmarks
   slate_fork_manager.py   # Fork contribution workflow
   mcp_server.py           # MCP server for Claude Code
@@ -158,6 +159,39 @@ skills/                   # Copilot Chat skill definitions
   slate-workflow/         # Workflow management skill
   slate-help/             # Help & documentation skill
 ```
+
+## Development Workflow Categories
+
+SLATE uses self-managing workflows. Each development area has dedicated workflows and paths.
+
+### Analyze Workflows
+```powershell
+& "E:\11132025\.venv\Scripts\python.exe" slate/slate_workflow_analyzer.py           # Full report
+& "E:\11132025\.venv\Scripts\python.exe" slate/slate_workflow_analyzer.py --json    # JSON output
+& "E:\11132025\.venv\Scripts\python.exe" slate/slate_workflow_analyzer.py --deprecated  # Deprecated only
+```
+
+### Development Categories
+
+| Category | Description | Workflow | Key Paths |
+|----------|-------------|----------|-----------|
+| **Core SLATE** | SDK, orchestrator, system | `ci.yml`, `slate.yml` | `slate/`, `slate_core/` |
+| **UI Development** | Dashboard, tech tree viz | `slate.yml` | `agents/slate_dashboard_server.py` |
+| **Copilot** | Instructions, prompts, skills | `ci.yml` | `.github/copilot-instructions.md`, `skills/` |
+| **Claude** | Commands, MCP, CLAUDE.md | `ci.yml` | `.claude/commands/`, `slate/mcp_server.py` |
+| **Docker** | Containers, compose, registry | `docker.yml` | `Dockerfile*`, `docker-compose.yml` |
+| **Runner** | Self-hosted runner, GPU | `runner-check.yml` | `actions-runner/`, `slate/slate_runner_manager.py` |
+| **Security** | Scanning, guards, validation | `codeql.yml`, `fork-validation.yml` | `slate/action_guard.py` |
+| **Release** | CD, versioning, deployment | `cd.yml`, `release.yml` | `pyproject.toml` |
+
+### Workflow Self-Management
+
+SLATE workflows are self-documenting and self-maintaining:
+
+1. **Deprecation Detection**: `slate_workflow_analyzer.py` identifies outdated patterns
+2. **Redundancy Check**: Finds overlapping workflow triggers
+3. **Coverage Analysis**: Ensures all development areas have workflows
+4. **Health Monitoring**: Tracks workflow categorization status
 
 ## Behavior Rules
 
