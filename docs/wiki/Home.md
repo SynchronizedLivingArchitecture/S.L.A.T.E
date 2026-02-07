@@ -1,7 +1,17 @@
 # S.L.A.T.E. Wiki
-<!-- Modified: 2026-02-07T12:00:00Z | Author: CLAUDE | Change: Add Claude Code integration and v2.5 features -->
+<!-- Modified: 2026-02-07T14:30:00Z | Author: CLAUDE | Change: Add themed visuals and enhanced content -->
 
-Welcome to **S.L.A.T.E.** (Synchronized Living Architecture for Transformation and Evolution) - turn your local hardware into an AI operations center for GitHub.
+<div align="center">
+
+![SLATE Logo](../assets/slate-logo-v2.svg)
+
+**Synchronized Living Architecture for Transformation and Evolution**
+
+*Turn your local hardware into an AI operations center for GitHub*
+
+</div>
+
+---
 
 ## Why SLATE?
 
@@ -11,14 +21,21 @@ GitHub Actions is powerful. But if you want AI in your pipeline, you're paying p
 
 ## What You Get
 
-| Feature | Description |
-|---------|-------------|
-| **Local AI Engine** | Ollama + Foundry running on your GPU. No API bills. |
-| **Persistent Memory** | ChromaDB stores codebase context across sessions. |
-| **Live Dashboard** | Monitor services, tasks, and GPU in real-time. |
-| **GitHub Bridge** | Self-hosted runner syncs with Issues, PRs, and Projects. |
-| **Claude Code Integration** | MCP server + slash commands for Claude Code. |
-| **Guided Experience** | AI-driven setup wizard for zero-config onboarding. |
+<table>
+<tr>
+<th colspan="3" align="center">Core Capabilities</th>
+</tr>
+<tr>
+<td align="center" width="33%"><strong>Local AI Engine</strong><br><sub>Ollama + Foundry on your GPU<br>No API bills</sub></td>
+<td align="center" width="33%"><strong>Persistent Memory</strong><br><sub>ChromaDB codebase context<br>Learns over time</sub></td>
+<td align="center" width="33%"><strong>Live Dashboard</strong><br><sub>Real-time monitoring<br>localhost:8080</sub></td>
+</tr>
+<tr>
+<td align="center"><strong>GitHub Bridge</strong><br><sub>Self-hosted runner<br>Issues, PRs, Projects</sub></td>
+<td align="center"><strong>Claude Code Integration</strong><br><sub>MCP server + 26 tools<br>Slash commands</sub></td>
+<td align="center"><strong>Guided Experience</strong><br><sub>AI-driven setup<br>Zero-config onboarding</sub></td>
+</tr>
+</table>
 
 ## Quick Navigation
 

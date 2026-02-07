@@ -1,16 +1,62 @@
 # Configuration
+<!-- Modified: 2026-02-07T14:30:00Z | Author: CLAUDE | Change: Add themed styling and Claude Code config -->
 
 Complete guide to configuring SLATE for your environment.
 
+---
+
+## Configuration Hierarchy
+
+```
+1. Environment Variables     (highest priority)
+       │
+       ▼
+2. Local Configuration       (.env, config/*.yaml)
+       │
+       ▼
+3. Project Configuration     (CLAUDE.md, pyproject.toml)
+       │
+       ▼
+4. Constitution              (.specify/memory/constitution.md)
+       │
+       ▼
+5. Default Values            (lowest priority)
+```
+
 ## Configuration Files
 
-| File | Purpose |
-|------|---------|
-| `CLAUDE.md` | Project instructions and guidelines |
-| `.env` | Environment variables (create from `.env.template`) |
-| `pyproject.toml` | Python dependencies and project metadata |
-| `.specify/memory/constitution.md` | Project constitution (supersedes all) |
-| `current_tasks.json` | Task queue state |
+<table>
+<tr>
+<th>File</th>
+<th>Purpose</th>
+<th>Priority</th>
+</tr>
+<tr>
+<td><code>.specify/memory/constitution.md</code></td>
+<td>Project constitution (supersedes all practices)</td>
+<td>Highest</td>
+</tr>
+<tr>
+<td><code>CLAUDE.md</code></td>
+<td>Claude Code project instructions</td>
+<td>High</td>
+</tr>
+<tr>
+<td><code>.env</code></td>
+<td>Environment variables</td>
+<td>Medium</td>
+</tr>
+<tr>
+<td><code>pyproject.toml</code></td>
+<td>Python project metadata</td>
+<td>Medium</td>
+</tr>
+<tr>
+<td><code>current_tasks.json</code></td>
+<td>Task queue state</td>
+<td>Runtime</td>
+</tr>
+</table>
 
 ## Environment Variables
 
@@ -293,6 +339,71 @@ python slate/slate_runtime.py --check ollama
 python slate/slate_runtime.py --check gpu
 python slate/slate_runtime.py --check chromadb
 ```
+
+## Claude Code Configuration
+
+### MCP Server Setup
+
+Add SLATE's MCP server to `~/.claude/config.json`:
+
+```json
+{
+  "mcpServers": {
+    "slate": {
+      "command": "<workspace>\\.venv\\Scripts\\python.exe",
+      "args": ["<workspace>\\slate\\mcp_server.py"],
+      "env": {
+        "SLATE_WORKSPACE": "<workspace>",
+        "PYTHONPATH": "<workspace>"
+      }
+    }
+  }
+}
+```
+
+### Available MCP Tools
+
+<table>
+<tr>
+<th>Tool</th>
+<th>Description</th>
+</tr>
+<tr><td><code>slate_status</code></td><td>Check all services and GPU status</td></tr>
+<tr><td><code>slate_workflow</code></td><td>Manage task queue</td></tr>
+<tr><td><code>slate_orchestrator</code></td><td>Start/stop services</td></tr>
+<tr><td><code>slate_runner</code></td><td>Manage GitHub runner</td></tr>
+<tr><td><code>slate_ai</code></td><td>Execute AI tasks via local LLMs</td></tr>
+<tr><td><code>slate_gpu</code></td><td>Manage dual-GPU load balancing</td></tr>
+<tr><td><code>slate_claude_code</code></td><td>Validate Claude Code configuration</td></tr>
+<tr><td><code>slate_spec_kit</code></td><td>Process specs, run AI analysis</td></tr>
+</table>
+
+### Slash Commands
+
+Commands in `.claude/commands/`:
+
+| Command | Description |
+|:--------|:------------|
+| `/slate` | Manage orchestrator |
+| `/slate-status` | System status |
+| `/slate-workflow` | Task queue |
+| `/slate-gpu` | GPU management |
+| `/slate-spec-kit` | Specification processing |
+
+### Validation
+
+```bash
+# Validate Claude Code configuration
+python slate/claude_code_manager.py --validate
+
+# Test MCP server
+python slate/claude_code_manager.py --test-mcp slate
+
+# Generate validation report
+python slate/claude_code_manager.py --report
+```
+
+---
 
 ## Next Steps
 

@@ -1,20 +1,67 @@
 # CLI Reference
+<!-- Modified: 2026-02-07T14:30:00Z | Author: CLAUDE | Change: Fix command names and add themed styling -->
 
 Complete reference for SLATE command-line tools.
 
 ## Quick Reference
 
-| Command | Description |
-|---------|-------------|
-| `slatepi_status.py` | System status check |
-| `slatepi_runtime.py` | Integration verification |
-| `slatepi_benchmark.py` | Performance testing |
-| `slatepi_hardware_optimizer.py` | Hardware detection/optimization |
-| `unified_ai_backend.py` | AI backend management |
+<table>
+<tr>
+<th>Category</th>
+<th>Command</th>
+<th>Description</th>
+</tr>
+<tr>
+<td rowspan="3"><strong>System</strong></td>
+<td><code>slate_status.py</code></td>
+<td>System status check</td>
+</tr>
+<tr>
+<td><code>slate_runtime.py</code></td>
+<td>Integration verification</td>
+</tr>
+<tr>
+<td><code>slate_benchmark.py</code></td>
+<td>Performance testing</td>
+</tr>
+<tr>
+<td rowspan="2"><strong>Hardware</strong></td>
+<td><code>slate_hardware_optimizer.py</code></td>
+<td>Hardware detection/optimization</td>
+</tr>
+<tr>
+<td><code>slate_gpu_manager.py</code></td>
+<td>Dual-GPU load balancing</td>
+</tr>
+<tr>
+<td rowspan="2"><strong>AI</strong></td>
+<td><code>unified_ai_backend.py</code></td>
+<td>AI backend management</td>
+</tr>
+<tr>
+<td><code>foundry_local.py</code></td>
+<td>Foundry + Ollama client</td>
+</tr>
+<tr>
+<td rowspan="3"><strong>Workflow</strong></td>
+<td><code>slate_orchestrator.py</code></td>
+<td>Service lifecycle</td>
+</tr>
+<tr>
+<td><code>slate_workflow_manager.py</code></td>
+<td>Task queue management</td>
+</tr>
+<tr>
+<td><code>slate_multi_runner.py</code></td>
+<td>Multi-runner coordination</td>
+</tr>
+</table>
+
+---
 
 ## Status Commands
 
-### slatepi_status.py
+### slate_status.py
 
 Check overall system status.
 
@@ -36,7 +83,7 @@ python slate/slate_status.py --json
 ```
 SLATE Status
 ============
-Version: 2.4.0
+Version: 2.5.0
 Python: 3.11.9
 Platform: Windows 11
 
@@ -57,7 +104,7 @@ Tasks:
 Status: Ready
 ```
 
-### slatepi_runtime.py
+### slate_runtime.py
 
 Verify all integrations.
 
@@ -88,7 +135,7 @@ python slate/slate_runtime.py --check-all --json
 
 ## Hardware Commands
 
-### slatepi_hardware_optimizer.py
+### slate_hardware_optimizer.py
 
 Detect and optimize for your hardware.
 
@@ -127,7 +174,7 @@ Apply with: --optimize
 
 ## Benchmark Commands
 
-### slatepi_benchmark.py
+### slate_benchmark.py
 
 Run performance benchmarks.
 

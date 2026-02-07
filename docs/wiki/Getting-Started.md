@@ -1,7 +1,15 @@
 # Getting Started
-<!-- Modified: 2026-02-07T08:00:00Z | Author: CLAUDE | Change: Simplify install, add GitHub integration -->
+<!-- Modified: 2026-02-07T14:30:00Z | Author: CLAUDE | Change: Add themed styling and visual elements -->
 
-Turn your local hardware into an AI operations center for GitHub. One command.
+<div align="center">
+
+**Turn your local hardware into an AI operations center for GitHub**
+
+*One command. Full ecosystem.*
+
+</div>
+
+---
 
 ## Quick Install
 
@@ -9,35 +17,67 @@ Turn your local hardware into an AI operations center for GitHub. One command.
 git clone https://github.com/SynchronizedLivingArchitecture/S.L.A.T.E.git && cd S.L.A.T.E && python install_slate.py
 ```
 
-That's it. The installer handles everything:
-- Python virtual environment
-- PyTorch with GPU detection
-- Ollama local LLM setup
-- VS Code extension
-- GitHub runner configuration
-- ChromaDB vector store
+The installer handles everything automatically with a live dashboard at **http://127.0.0.1:8080**
 
 ## Prerequisites
 
-### Required
-- **Python 3.11+** - [Download](https://www.python.org/downloads/)
-- **Git** - [Download](https://git-scm.com/downloads)
-- **8GB RAM** minimum
-
-### Recommended
-- **NVIDIA GPU** with CUDA support (RTX 20xx or newer)
-- **16GB+ RAM**
-- **VS Code** with Claude Code extension
+<table>
+<tr>
+<th>Required</th>
+<th>Recommended</th>
+</tr>
+<tr>
+<td>
+<ul>
+<li><strong>Python 3.11+</strong> - <a href="https://www.python.org/downloads/">Download</a></li>
+<li><strong>Git</strong> - <a href="https://git-scm.com/downloads">Download</a></li>
+<li><strong>8GB RAM</strong> minimum</li>
+</ul>
+</td>
+<td>
+<ul>
+<li><strong>NVIDIA GPU</strong> with CUDA (RTX 20xx+)</li>
+<li><strong>16GB+ RAM</strong></li>
+<li><strong>VS Code</strong> with Claude Code extension</li>
+</ul>
+</td>
+</tr>
+</table>
 
 ## What Gets Installed
 
-| Component | Purpose |
-|-----------|---------|
-| **Ollama** | Local LLM inference (mistral-nemo, llama3.2) |
-| **ChromaDB** | Vector store for codebase memory |
-| **PyTorch** | GPU-optimized for your hardware |
-| **GitHub Runner** | Self-hosted Actions runner with AI access |
-| **Dashboard** | Real-time monitoring at localhost:8080 |
+<table>
+<tr>
+<th>Component</th>
+<th>Purpose</th>
+<th>Cost</th>
+</tr>
+<tr>
+<td><strong>Ollama</strong></td>
+<td>Local LLM inference (mistral-nemo, llama3.2)</td>
+<td align="center"><code>FREE</code></td>
+</tr>
+<tr>
+<td><strong>ChromaDB</strong></td>
+<td>Vector store for codebase memory</td>
+<td align="center"><code>FREE</code></td>
+</tr>
+<tr>
+<td><strong>PyTorch</strong></td>
+<td>GPU-optimized for your hardware</td>
+<td align="center"><code>FREE</code></td>
+</tr>
+<tr>
+<td><strong>GitHub Runner</strong></td>
+<td>Self-hosted Actions runner with AI access</td>
+<td align="center"><code>FREE</code></td>
+</tr>
+<tr>
+<td><strong>Dashboard</strong></td>
+<td>Real-time monitoring at localhost:8080</td>
+<td align="center"><code>FREE</code></td>
+</tr>
+</table>
 
 ## Manual Installation
 
@@ -73,7 +113,7 @@ Expected output:
 ```
 SLATE Status
 ============
-Version: 2.4.0
+Version: 2.5.0
 Python: 3.11.x
 GPU: NVIDIA RTX xxxx (detected)
 Ollama: Connected
