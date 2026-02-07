@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="docs/assets/slate-logo.svg" alt="SLATE Logo" width="200" height="200">
+  <img src="docs/assets/slate-logo-v2.svg" alt="SLATE Logo" width="200" height="200">
 </p>
 
 <h1 align="center">S.L.A.T.E.</h1>
