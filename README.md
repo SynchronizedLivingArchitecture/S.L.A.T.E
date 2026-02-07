@@ -23,24 +23,21 @@
 
 ---
 
-> **Warning**: This project is experimental and entirely "vibe-coded" - its accuracy relies on AI assistance. Not suitable for production use.
+> **Status**: v2.4 - Production-ready local AI orchestration with GitHub Actions integration
 
 ## Table of Contents
 
 - [Overview](#overview)
+- [System Architecture](#system-architecture)
 - [Key Features](#key-features)
-- [Architecture](#architecture)
 - [Quick Start](#quick-start)
-- [System Requirements](#system-requirements)
-- [Core Modules](#core-modules)
-- [Task Execution](#task-execution)
+- [GitHub Project Boards](#github-project-boards)
+- [Multi-Runner System](#multi-runner-system)
+- [Docker Deployment](#docker-deployment)
 - [Local AI Providers](#local-ai-providers)
-- [Dashboard](#dashboard)
 - [CLI Reference](#cli-reference)
-- [Configuration](#configuration)
 - [Security](#security)
 - [Contributing](#contributing)
-- [Roadmap](#roadmap)
 - [License](#license)
 
 ## Overview
@@ -50,30 +47,93 @@ SLATE is a local-first AI orchestration system that:
 - **Runs entirely on your machine** - No cloud dependencies, no data leaves localhost
 - **Coordinates multiple AI models** - Ollama, Foundry Local, and API-based models
 - **Optimizes for your hardware** - Auto-detects GPUs and configures optimal settings
-- **Manages complex workflows** - Task queuing, agent routing, and parallel execution
+- **Manages complex workflows** - GitHub Projects, multi-runner execution, parallel processing
+
+## System Architecture
 
 ```
-┌─────────────────────────────────────────────────────────────────┐
-│                        S.L.A.T.E.                               │
-├─────────────────────────────────────────────────────────────────┤
-│  ┌───────────────────────────────────────────────────────┐     │
-│  │                 Task Queue & Scheduler                 │     │
-│  └────────────────────────┬──────────────────────────────┘     │
-│                           │                                     │
-│  ┌────────────────────────┴──────────────────────────────┐     │
-│  │                 GitHub Actions Runner                  │     │
-│  │               (Self-hosted, GPU-enabled)               │     │
-│  └────────────────────────┬──────────────────────────────┘     │
-│                           │                                     │
-│  ┌────────────────────────┴──────────────────────────────┐     │
-│  │                  AI Backend Selector                   │     │
-│  └──────┬──────────────────┬──────────────────┬─────────┘     │
-│         │                  │                  │                 │
-│  ┌──────┴──────┐    ┌──────┴──────┐    ┌──────┴──────┐        │
-│  │   Ollama    │    │   Foundry   │    │  External   │        │
-│  │ mistral-nemo│    │    Local    │    │    APIs     │        │
-│  └─────────────┘    └─────────────┘    └─────────────┘        │
-└─────────────────────────────────────────────────────────────────┘
+┌─────────────────────────────────────────────────────────────────────────────────┐
+│                              S.L.A.T.E. v2.4                                     │
+├─────────────────────────────────────────────────────────────────────────────────┤
+│                                                                                  │
+│  ┌─────────────────────────────────────────────────────────────────────────┐    │
+│  │                    GitHub Projects V2 (Task Source)                      │    │
+│  │  ┌──────────┐  ┌──────────┐  ┌──────────┐  ┌──────────┐  ┌──────────┐   │    │
+│  │  │  KANBAN  │  │   BUGS   │  │ ITERATIVE│  │ ROADMAP  │  │ PLANNING │   │    │
+│  │  │  (5)     │  │   (7)    │  │   (8)    │  │  (10)    │  │   (4)    │   │    │
+│  │  └────┬─────┘  └────┬─────┘  └────┬─────┘  └────┬─────┘  └────┬─────┘   │    │
+│  └───────┼─────────────┼─────────────┼─────────────┼─────────────┼─────────┘    │
+│          │             │             │             │             │               │
+│          └─────────────┴──────┬──────┴─────────────┴─────────────┘               │
+│                               ▼                                                  │
+│  ┌─────────────────────────────────────────────────────────────────────────┐    │
+│  │                     slate_project_board.py                               │    │
+│  │                   (Bidirectional Sync Engine)                            │    │
+│  └──────────────────────────────┬──────────────────────────────────────────┘    │
+│                                 ▼                                                │
+│  ┌─────────────────────────────────────────────────────────────────────────┐    │
+│  │                        current_tasks.json                                │    │
+│  │                      (Local Task Queue)                                  │    │
+│  └──────────────────────────────┬──────────────────────────────────────────┘    │
+│                                 ▼                                                │
+│  ┌─────────────────────────────────────────────────────────────────────────┐    │
+│  │                     Multi-Runner System (19 Runners)                     │    │
+│  │  ┌───────────────────────────────────────────────────────────────────┐  │    │
+│  │  │  GPU Runners (7)           │  CPU Runners (12)                    │  │    │
+│  │  │  ├─ 6x Light (2GB VRAM)    │  ├─ 12x Parallel Workers             │  │    │
+│  │  │  └─ 1x Heavy (12GB VRAM)   │  └─ 24 CPU Threads                   │  │    │
+│  │  └───────────────────────────────────────────────────────────────────┘  │    │
+│  └──────────────────────────────┬──────────────────────────────────────────┘    │
+│                                 ▼                                                │
+│  ┌─────────────────────────────────────────────────────────────────────────┐    │
+│  │                        AI Backend Router                                 │    │
+│  │  ┌──────────────┐    ┌──────────────┐    ┌──────────────┐               │    │
+│  │  │    Ollama    │    │   Foundry    │    │  External    │               │    │
+│  │  │ mistral-nemo │    │    Local     │    │    APIs      │               │    │
+│  │  │ :11434       │    │   :5272      │    │  (optional)  │               │    │
+│  │  └──────────────┘    └──────────────┘    └──────────────┘               │    │
+│  └─────────────────────────────────────────────────────────────────────────┘    │
+│                                                                                  │
+└─────────────────────────────────────────────────────────────────────────────────┘
+```
+
+### Component Map
+
+```
+┌──────────────────────────────────────────────────────────────────────────┐
+│                         SLATE Module Architecture                         │
+├──────────────────────────────────────────────────────────────────────────┤
+│                                                                           │
+│  slate/                                                                   │
+│  ├── Orchestration                                                        │
+│  │   ├── slate_orchestrator.py      # Service lifecycle management        │
+│  │   ├── slate_project_board.py     # GitHub Projects V2 sync             │
+│  │   ├── slate_workflow_manager.py  # Task lifecycle & cleanup            │
+│  │   └── slate_workflow_analyzer.py # Meta-workflow self-management       │
+│  │                                                                        │
+│  ├── Execution                                                            │
+│  │   ├── slate_multi_runner.py      # 19 parallel runner coordination     │
+│  │   ├── slate_runner_manager.py    # GitHub Actions runner setup         │
+│  │   ├── slate_runner_benchmark.py  # Resource capacity benchmarking      │
+│  │   └── runner_fallback.py         # Cost-aware runner selection         │
+│  │                                                                        │
+│  ├── AI Backends                                                          │
+│  │   ├── unified_ai_backend.py      # Central routing (FREE local first)  │
+│  │   ├── foundry_local.py           # Ollama + Foundry client             │
+│  │   └── ollama_client.py           # Direct Ollama integration           │
+│  │                                                                        │
+│  ├── System                                                               │
+│  │   ├── slate_status.py            # Quick system health check           │
+│  │   ├── slate_runtime.py           # Integration verification            │
+│  │   ├── slate_hardware_optimizer.py# GPU detection & PyTorch setup       │
+│  │   └── slate_benchmark.py         # Performance testing                 │
+│  │                                                                        │
+│  └── Security                                                             │
+│      ├── action_guard.py            # API blocking & action validation    │
+│      ├── sdk_source_guard.py        # Package publisher verification      │
+│      └── pii_scanner.py             # PII detection for public boards     │
+│                                                                           │
+└──────────────────────────────────────────────────────────────────────────┘
 ```
 
 ## Key Features
@@ -82,11 +142,21 @@ SLATE is a local-first AI orchestration system that:
 - All services bind to `127.0.0.1` only
 - No telemetry or external data collection
 - Your code and prompts stay on your machine
+- FREE local AI inference (no cloud costs)
 
-### Multi-Model Orchestration
-- **Ollama**: mistral-nemo, llama3.2, phi, codellama
-- **Foundry Local**: ONNX-optimized models (Phi-3, Mistral-7B)
-- **External APIs**: Optional Claude, GPT integration
+### GitHub Projects Integration
+- **KANBAN** (Project 5): Primary workflow source
+- **BUG TRACKING** (Project 7): Auto-routed bug fixes
+- **ITERATIVE DEV** (Project 8): PR tracking
+- **ROADMAP** (Project 10): Completed features
+- Scheduled sync every 30 minutes
+
+### Multi-Runner Execution
+- **19 parallel runners** across dual GPUs
+- 6 GPU light runners (2GB VRAM each)
+- 1 GPU heavy runner (12GB VRAM)
+- 12 CPU parallel workers
+- Resource-aware task distribution
 
 ### Hardware Optimization
 | Architecture | GPUs | Optimizations |
@@ -94,15 +164,7 @@ SLATE is a local-first AI orchestration system that:
 | **Blackwell** | RTX 50xx | TF32, BF16, Flash Attention 2, CUDA Graphs |
 | **Ada Lovelace** | RTX 40xx | TF32, BF16, Flash Attention, CUDA Graphs |
 | **Ampere** | RTX 30xx, A100 | TF32, BF16, Flash Attention |
-| **Turing** | RTX 20xx | FP16, Flash Attention |
 | **CPU-Only** | Any | AVX2/AVX-512 optimizations |
-
-### Development Tools
-- Real-time dashboard (port 8080)
-- Task queue with priority management
-- Metrics aggregation and profiling
-- Feature flags for safe rollouts
-- Audit trail logging
 
 ## Quick Start
 
@@ -114,30 +176,14 @@ cd S.L.A.T.E
 
 # Create virtual environment
 python -m venv .venv
-
-# Activate (Windows)
-.venv\Scripts\activate
-
-# Activate (Linux/macOS)
-source .venv/bin/activate
+.venv\Scripts\activate  # Windows
+source .venv/bin/activate  # Linux/macOS
 
 # Install dependencies
 pip install -r requirements.txt
 ```
 
-### 2. Install SLATE
-
-```bash
-python install_slate.py
-```
-
-This will:
-- Detect your hardware configuration
-- Install appropriate PyTorch version
-- Configure Ollama integration
-- Set up the dashboard
-
-### 3. Verify Installation
+### 2. Verify Installation
 
 ```bash
 # Quick status check
@@ -145,99 +191,166 @@ python slate/slate_status.py --quick
 
 # Full system check
 python slate/slate_runtime.py --check-all
+
+# Check project boards
+python slate/slate_project_board.py --status
 ```
 
-### 4. Start the Dashboard
+### 3. Start SLATE
 
 ```bash
+# Start all services (dashboard, runner, workflow monitor)
+python slate/slate_orchestrator.py start
+
+# Or start dashboard only
 python agents/slate_dashboard_server.py
 ```
 
 Open http://127.0.0.1:8080 in your browser.
 
-## System Requirements
+## GitHub Project Boards
 
-### Minimum
-- **OS**: Windows 10/11, Ubuntu 20.04+, macOS 12+
-- **Python**: 3.11+
-- **RAM**: 8GB
-- **Disk**: 5GB free space
+SLATE uses GitHub Projects V2 as the task management layer with bidirectional sync.
 
-### Recommended
-- **GPU**: NVIDIA RTX 3060 or better
-- **RAM**: 16GB+
-- **VRAM**: 8GB+
-- **Disk**: 20GB+ (for models)
+### Board Structure
 
-### Optional
-- **Ollama**: For local LLM inference
-- **Foundry Local**: For ONNX-optimized models
-- **Redis**: For distributed task queuing
+| # | Board | Purpose | Auto-Route Keywords |
+|---|-------|---------|---------------------|
+| 5 | **KANBAN** | Active work queue | Default for pending tasks |
+| 7 | **BUG TRACKING** | Bug fixes | bug, fix, crash, error |
+| 8 | **ITERATIVE DEV** | Pull requests | PRs auto-added |
+| 10 | **ROADMAP** | Completed features | feat, add, implement |
+| 4 | **PLANNING** | Design work | plan, design, architect |
 
-## Core Modules
+### Project Board Commands
 
-```
-slate/
-├── Core Infrastructure
-│   ├── message_broker.py      # Redis/memory pub-sub messaging
-│   ├── rag_memory.py          # ChromaDB vector memory
-│   ├── gpu_scheduler.py       # GPU workload distribution
-│   ├── file_lock.py           # Thread-safe task queue
-│   └── llm_cache.py           # Response caching
-│
-├── AI Backends
-│   ├── unified_ai_backend.py  # Central routing
-│   ├── ollama_client.py       # Ollama integration
-│   ├── foundry_local.py       # Foundry Local client
-│   └── action_guard.py        # Security layer
-│
-├── System Tooling
-│   ├── metrics_aggregator.py  # Prometheus-format metrics
-│   ├── integration_health_check.py  # Health diagnostics
-│   ├── performance_profiler.py  # CPU/memory profiling
-│   ├── load_balancer.py       # Agent work distribution
-│   ├── feature_flags.py       # Feature toggles
-│   └── audit_trail.py         # Action logging
-│
-└── CLI Tools
-    ├── slatepi_status.py      # System status
-    ├── slatepi_runtime.py     # Integration checker
-    └── slatepi_benchmark.py   # Performance testing
+```bash
+# Check all boards status
+python slate/slate_project_board.py --status
+
+# Update all boards from current_tasks.json
+python slate/slate_project_board.py --update-all
+
+# Sync KANBAN items to local tasks
+python slate/slate_project_board.py --sync
+
+# Push pending tasks to KANBAN
+python slate/slate_project_board.py --push
+
+# Process KANBAN items
+python slate/slate_project_board.py --process
 ```
 
-## Task Execution
+### Automation
 
-SLATE uses GitHub Actions with a self-hosted runner for task execution:
+The `project-automation.yml` workflow:
+- **Scheduled**: Runs every 30 minutes
+- **PII Scanning**: Blocks sensitive data from public boards
+- **Auto-routing**: Issues/PRs added to boards by labels
+- **Bidirectional sync**: current_tasks.json ↔ GitHub Projects
 
-| Component | Purpose | Features |
-|-----------|---------|----------|
-| **Task Queue** | Work management | Priority-based, FIFO ordering |
-| **Workflow System** | Execution engine | CI/CD integration, parallel jobs |
-| **Self-hosted Runner** | Local execution | GPU-enabled, secure |
+## Multi-Runner System
 
-### Task Management
+SLATE maximizes hardware utilization with 19 parallel runners.
 
-Tasks are managed via GitHub Actions workflows:
+### Runner Configuration
 
-```python
-# Example: Create a task
-from slate import create_task
+```
+┌─────────────────────────────────────────────────────────────────┐
+│                  Multi-Runner Distribution                       │
+├─────────────────────────────────────────────────────────────────┤
+│                                                                  │
+│  GPU 0 (RTX 5070 Ti - 16GB)          GPU 1 (RTX 5070 Ti - 16GB) │
+│  ┌─────────────────────────┐         ┌─────────────────────────┐│
+│  │ Light Runners (3)       │         │ Light Runners (3)       ││
+│  │ ├─ 2GB VRAM each        │         │ ├─ 2GB VRAM each        ││
+│  │ └─ Inference tasks      │         │ └─ Inference tasks      ││
+│  │                         │         │                         ││
+│  │ Heavy Runner (shared)   │◄────────┤ Heavy Runner (shared)   ││
+│  │ └─ 12GB VRAM            │         │ └─ Fine-tuning, batch   ││
+│  └─────────────────────────┘         └─────────────────────────┘│
+│                                                                  │
+│  CPU Pool (24 threads)                                          │
+│  ┌─────────────────────────────────────────────────────────────┐│
+│  │ CPU Runners (12) - 2 threads each                           ││
+│  │ └─ Linting, testing, file operations, git commands          ││
+│  └─────────────────────────────────────────────────────────────┘│
+│                                                                  │
+└─────────────────────────────────────────────────────────────────┘
+```
 
-task = create_task(
-    title="Implement user authentication",
-    description="Add JWT-based auth to the API",
-    priority=2,  # 1=highest, 5=lowest
-    assigned_to="workflow"
-)
+### Multi-Runner Commands
+
+```bash
+# Check runner capacity and status
+python slate/slate_multi_runner.py --status
+
+# Run benchmark to calibrate runners
+python slate/slate_runner_benchmark.py
+
+# Dispatch task with resource awareness
+python slate/slate_multi_runner.py --dispatch "task_type=inference"
+```
+
+### Task Routing
+
+| Task Type | Runner Type | Resource |
+|-----------|-------------|----------|
+| Inference | GPU Light | 2GB VRAM |
+| Fine-tuning | GPU Heavy | 12GB VRAM |
+| Code generation | GPU Light | 2GB VRAM |
+| Linting | CPU | 2 threads |
+| Testing | CPU | 2 threads |
+| Git operations | CPU | 2 threads |
+
+## Docker Deployment
+
+SLATE provides GPU and CPU Docker variants.
+
+### Docker Images
+
+| Image | Base | Size | Use Case |
+|-------|------|------|----------|
+| `slate:latest` | CUDA 12.4 | ~8GB | GPU inference |
+| `slate:cpu` | Python 3.11-slim | ~500MB | CPU-only deployment |
+
+### Quick Start with Docker
+
+```bash
+# GPU version with Ollama sidecar
+docker-compose up -d
+
+# CPU-only version
+docker build -f Dockerfile.cpu -t slate:cpu .
+docker run -p 8080:8080 slate:cpu
+```
+
+### Docker Compose Services
+
+```yaml
+services:
+  slate:           # Main SLATE container (GPU)
+  slate-ollama:    # Ollama sidecar for LLM inference
 ```
 
 ## Local AI Providers
 
-### Ollama (Recommended)
+SLATE prioritizes FREE local AI backends.
+
+### Provider Priority
+
+```
+1. Ollama (localhost:11434)      - FREE, GPU-optimized
+2. Foundry Local (localhost:5272) - FREE, ONNX efficiency
+3. External APIs                  - Blocked by default (ActionGuard)
+```
+
+### Ollama Setup
 
 ```bash
-# Install Ollama (Windows)
-winget install Ollama.Ollama
+# Install Ollama
+winget install Ollama.Ollama  # Windows
+curl -fsSL https://ollama.com/install.sh | sh  # Linux
 
 # Pull recommended models
 ollama pull mistral-nemo
@@ -248,128 +361,60 @@ ollama pull codellama
 curl http://127.0.0.1:11434/api/tags
 ```
 
-### Foundry Local
-
-```bash
-# Install via foundry CLI
-foundry model download microsoft/Phi-3.5-mini-instruct-onnx
-
-# Check status
-python slate/foundry_local.py --check
-```
-
-### Provider Priority
-
-SLATE automatically selects the best available backend:
-
-```
-1. Ollama (localhost:11434) - Fast, GPU-optimized
-2. Foundry Local (localhost:5272) - ONNX efficiency
-3. External APIs - Fallback only
-```
-
-## Dashboard
-
-The web dashboard provides:
-
-- **System Overview**: CPU, GPU, memory usage
-- **Task Queue**: Pending, in-progress, completed tasks
-- **Workflow Status**: Running and completed workflows
-- **Metrics**: Response times, token usage, error rates
-- **Logs**: Real-time log streaming
-
-### Glassmorphism Theme
-
-The UI uses a modern glassmorphism design:
-- 75% opacity panels
-- Muted pastel accents
-- System fonts (Consolas, Segoe UI)
-
-## CLI Reference
-
-### Status Commands
-
-```bash
-# Quick status
-python slate/slate_status.py --quick
-
-# Task summary
-python slate/slate_status.py --tasks
-
-# Full integration check
-python slate/slate_runtime.py --check-all
-```
-
-### Hardware Commands
-
-```bash
-# Detect hardware
-python slate/slate_hardware_optimizer.py
-
-# Install optimal PyTorch
-python slate/slate_hardware_optimizer.py --install-pytorch
-
-# Apply optimizations
-python slate/slate_hardware_optimizer.py --optimize
-```
-
-### Benchmark Commands
-
-```bash
-# Full benchmark
-python slate/slate_benchmark.py
-
-# CPU only
-python slate/slate_benchmark.py --cpu-only
-
-# Quick benchmark
-python slate/slate_benchmark.py --quick
-```
-
 ### AI Backend Commands
 
 ```bash
 # Check all backends
 python slate/unified_ai_backend.py --status
 
-# Generate with specific backend
-python slate/foundry_local.py --generate "Explain async/await"
-
 # List local models
 python slate/foundry_local.py --models
+
+# Generate with local model
+python slate/foundry_local.py --generate "Explain async/await"
 ```
 
-## Configuration
+## CLI Reference
 
-### Main Configuration
-
-Configuration is stored in multiple locations:
-
-| File | Purpose |
-|------|---------|
-| `pyproject.toml` | Package configuration |
-| `.github/copilot-instructions.md` | AI agent instructions |
-| `current_tasks.json` | Active task queue |
-| `.specify/memory/constitution.md` | Project principles |
-
-### Environment Variables
+### System Status
 
 ```bash
-# Optional: Override defaults
-export SLATE_OLLAMA_HOST=127.0.0.1
-export SLATE_OLLAMA_PORT=11434
-export SLATE_DASHBOARD_PORT=8080
-export SLATE_LOG_LEVEL=INFO
+python slate/slate_status.py --quick          # Quick health check
+python slate/slate_status.py --json           # JSON output
+python slate/slate_runtime.py --check-all     # Full integration check
 ```
 
-### Feature Flags
+### Orchestrator
 
-```python
-from slate import is_enabled
+```bash
+python slate/slate_orchestrator.py start      # Start all services
+python slate/slate_orchestrator.py stop       # Stop all services
+python slate/slate_orchestrator.py status     # Check service status
+```
 
-if is_enabled("slate.new_router"):
-    # Use new ML-based routing
-    pass
+### Project Boards
+
+```bash
+python slate/slate_project_board.py --status      # Board status
+python slate/slate_project_board.py --update-all  # Sync all boards
+python slate/slate_project_board.py --push        # Push to KANBAN
+python slate/slate_project_board.py --sync        # Pull from KANBAN
+```
+
+### Workflow Management
+
+```bash
+python slate/slate_workflow_manager.py --status   # Task status
+python slate/slate_workflow_manager.py --cleanup  # Clean stale tasks
+python slate/slate_workflow_manager.py --enforce  # Enforce completion
+```
+
+### Hardware
+
+```bash
+python slate/slate_hardware_optimizer.py              # Detect GPUs
+python slate/slate_hardware_optimizer.py --optimize   # Apply optimizations
+python slate/slate_benchmark.py                       # Run benchmarks
 ```
 
 ## Security
@@ -377,249 +422,52 @@ if is_enabled("slate.new_router"):
 ### Local-Only Architecture
 
 - All servers bind to `127.0.0.1`
-- No external network calls without explicit request
-- ActionGuard validates all agent actions
+- ActionGuard blocks ALL paid cloud APIs
+- SDK Source Guard validates package publishers
+- PII Scanner protects public project boards
 
-### Content Security
+### Protected Components
 
-- CSP headers enforced
-- No external CDN or fonts
-- Rate limiting on API endpoints
+| Guard | Purpose |
+|-------|---------|
+| `action_guard.py` | Block unauthorized API calls |
+| `sdk_source_guard.py` | Verify package publishers |
+| `pii_scanner.py` | Detect PII before public exposure |
 
-### API Key Management
+### Trusted Publishers Only
 
-- BYOK (Bring Your Own Key) model
-- Keys stored in local environment
-- Never transmitted or logged
+Only packages from verified sources are allowed:
+- Microsoft (azure-*, onnxruntime)
+- NVIDIA (nvidia-cuda-*, triton)
+- Meta (torch, torchvision)
+- Google (tensorflow, jax)
+- Hugging Face (transformers, datasets)
 
 ## Contributing
 
-We welcome contributions! Please follow these guidelines:
+### Fork Validation
+
+External contributors must pass security checks:
+
+```bash
+# Initialize fork
+python slate/slate_fork_manager.py --init
+
+# Validate before PR
+python slate/slate_fork_manager.py --validate
+```
+
+### Required Checks
+
+- **Security Gate**: No workflow modifications
+- **SDK Source Guard**: Trusted publishers only
+- **SLATE Prerequisites**: Core modules valid
+- **Malicious Code Scan**: No obfuscated code
 
 ### Code Style
 
 - Python: Type hints required, Google-style docstrings
-- Use `Annotated` for tool parameters
-- Include modification timestamps and author attribution
-
-### Commit Format
-
-```
-feat(module): Short description
-
-- Detailed change 1
-- Detailed change 2
-
-Co-Authored-By: Your Name <email>
-```
-
-### Pull Request Process
-
-1. Fork the repository
-2. Create a feature branch (`git checkout -b feature/amazing-feature`)
-3. Write tests for new functionality
-4. Ensure all tests pass (`pytest tests/ -v`)
-5. Submit a pull request
-
-## Roadmap
-
-### v2.5 (Current Focus)
-- [ ] Enhanced documentation and wiki
-- [ ] Improved error handling
-- [ ] Performance optimizations
-
-### v3.0 (Planned)
-- [ ] Distributed agent coordination
-- [ ] Model fine-tuning pipeline
-- [ ] Visual workflow editor
-
-### Future
-- [ ] Multi-machine clustering
-- [ ] Custom model training
-- [ ] Plugin ecosystem
-
-## GitHub Workflow System
-
-SLATE uses GitHub as a **task execution platform**. The entire project lifecycle is managed via workflows: issues become tasks, workflows execute, and PRs track completion.
-
-### Architecture
-
-```
-GitHub Issues → current_tasks.json → Workflow Dispatch → Self-hosted Runner → PR/Commit
-     ↓                 ↓                    ↓                    ↓               ↓
-  Tracking         Task Queue           CI/CD Jobs           Execution       Completion
-```
-
-### Workflow Overview
-
-| Workflow | Trigger | Purpose |
-|----------|---------|---------|
-| `ci.yml` | Push/PR | Smoke tests, linting, unit tests, security scans |
-| `slate.yml` | Push to core paths | SLATE-specific validation (tech tree, task queue) |
-| `nightly.yml` | Daily at 4am UTC | Full test suite, dependency checks, SDK import audit |
-| `cd.yml` | Push to main/tags | Build EXE, create releases |
-| `fork-validation.yml` | Fork PRs | Security gate, prerequisite validation |
-
-### Auto-Configured Runner
-
-SLATE **automatically detects and configures** the GitHub Actions runner. No manual setup required:
-
-```bash
-# Check runner status, GPU config, and GitHub state
-python slate/slate_runner_manager.py --status
-
-# Auto-configure hooks, environment, and labels
-python slate/slate_runner_manager.py --setup
-
-# Dispatch a workflow
-python slate/slate_runner_manager.py --dispatch "ci.yml"
-
-# JSON output for automation
-python slate/slate_runner_manager.py --detect --json
-```
-
-The runner manager automatically:
-- **Detects** GPU configuration (count, architecture, CUDA capability)
-- **Creates** pre-job hooks for SLATE environment
-- **Generates** labels (self-hosted, slate, gpu, cuda, blackwell, multi-gpu)
-- **Configures** workspace paths and Python venv
-
-### Workflow Management
-
-```bash
-# Check workflow health and task status
-python slate/slate_workflow_manager.py --status
-
-# Auto-cleanup stale, abandoned, and duplicate tasks
-python slate/slate_workflow_manager.py --cleanup
-
-# Check if new tasks can be accepted
-python slate/slate_workflow_manager.py --enforce
-```
-
-Automatic task lifecycle:
-- **Stale tasks** (in-progress > 4h) → auto-reset to pending
-- **Abandoned tasks** (pending > 24h) → flagged for review
-- **Duplicates** → auto-archived
-- **Max concurrent** → 5 in-progress before blocking
-
-### Required Status Checks
-
-All PRs to `main` must pass:
-- CodeQL Advanced
-- SLATE Integration / SLATE Status Check
-- SLATE Integration / Tech Tree Validation
-- Fork Validation / Security Gate
-- Fork Validation / SLATE Prerequisites
-
-## Dual-Repository Development
-
-SLATE uses a dual-repo model for structured development:
-
-```
-SLATE (origin)         = Main repository (the product)
-       ↑
-       │ contribute-to-main.yml
-       │
-SLATE-BETA (beta)      = Developer fork
-```
-
-### Setup
-
-```bash
-# Verify remotes
-git remote -v
-# Should show:
-# origin  https://github.com/SynchronizedLivingArchitecture/S.L.A.T.E.git
-# beta    https://github.com/SynchronizedLivingArchitecture/S.L.A.T.E-BETA.git
-
-# Add beta remote if missing
-git remote add beta https://github.com/SynchronizedLivingArchitecture/S.L.A.T.E-BETA.git
-```
-
-### Development Workflow
-
-1. **Create feature branch**: `git checkout -b feature/my-feature`
-2. **Sync with main**: `git fetch origin && git merge origin/main`
-3. **Push to beta**: `git push beta HEAD:main`
-4. **Contribute to main**: Run `contribute-to-main.yml` workflow
-
-### Required Secrets
-
-Set `MAIN_REPO_TOKEN` in BETA repo (Settings → Secrets → Actions):
-- PAT with `repo` and `workflow` scope
-
-## System Architecture
-
-### Core Services
-
-| Service | Port | Purpose |
-|---------|------|---------|
-| Dashboard | 8080 | Web UI for monitoring |
-| Ollama | 11434 | Local LLM inference |
-| Foundry Local | 5272 | ONNX model inference |
-
-### Directory Structure
-
-```
-slate/                 # Core SDK modules
-agents/                # Dashboard server
-slate_core/            # Shared infrastructure
-slate/                 # SLATE workflow tools
-.github/               # CI/CD workflows
-actions-runner/        # Self-hosted runner (optional)
-  hooks/               # Pre/post job scripts
-  _work/               # Workflow workspace
-.slate_tech_tree/      # Tech tree state
-.slate_nemo/           # Nemo knowledge base
-.slate_errors/         # Error logs
-.slate_index/          # ChromaDB index
-```
-
-### Key Configuration Files
-
-| File | Purpose |
-|------|---------|
-| `.github/slate.config.yaml` | SLATE system configuration |
-| `.github/workflows/*.yml` | CI/CD pipelines |
-| `current_tasks.json` | Active task queue |
-| `.slate_tech_tree/tech_tree.json` | Development roadmap |
-| `pyproject.toml` | Package configuration |
-
-## Fork Contribution System
-
-External contributors use a secure fork validation system:
-
-### Getting Started
-
-```bash
-# 1. Fork the repository on GitHub
-# 2. Clone your fork
-git clone https://github.com/YOUR-USERNAME/S.L.A.T.E.git
-
-# 3. Initialize SLATE workspace
-python slate/slate_fork_manager.py --init --name "Your Name" --email "you@example.com"
-
-# 4. Validate before PR
-python slate/slate_fork_manager.py --validate
-```
-
-### Security Checks
-
-Fork PRs must pass:
-- **Security Gate**: No workflow modifications
-- **SDK Source Guard**: Trusted publishers only
-- **SLATE Prerequisites**: Core modules valid
-- **ActionGuard Audit**: No security bypasses
-- **Malicious Code Scan**: No obfuscated code
-
-### Protected Files
-
-These cannot be modified by forks:
-- `.github/workflows/*`
-- `.github/CODEOWNERS`
-- `slate/action_guard.py`
-- `slate/sdk_source_guard.py`
+- Modification timestamp format: `# Modified: YYYY-MM-DDTHH:MM:SSZ | Author: NAME | Change: description`
 
 ## License
 
@@ -630,7 +478,7 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 - [GitHub Repository](https://github.com/SynchronizedLivingArchitecture/S.L.A.T.E)
 - [Wiki Documentation](https://github.com/SynchronizedLivingArchitecture/S.L.A.T.E/wiki)
 - [Issue Tracker](https://github.com/SynchronizedLivingArchitecture/S.L.A.T.E/issues)
-- [Discussions](https://github.com/SynchronizedLivingArchitecture/S.L.A.T.E/discussions)
+- [Project Boards](https://github.com/orgs/SynchronizedLivingArchitecture/projects)
 
 ---
 
@@ -639,5 +487,5 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 </p>
 
 <p align="center">
-  Made with AI assistance
+  Made with AI assistance | Local-first by design
 </p>
