@@ -1280,12 +1280,13 @@ class SlateInstaller:
 
         self._log("→", f"Configuring GitHub Pages for {repo_slug}")
 
+        # Modified: 2026-02-07T22:00:00Z | Author: COPILOT | Change: Use /docs folder source for Pages (simpler for forks)
         # Enable Pages via GitHub API (gh api)
-        # Use GitHub Actions as the build source
+        # Use /docs folder on main branch as the source (contains Watchmaker dashboard, components, etc.)
         enable_result = _run([
             "gh", "api", f"repos/{repo_slug}/pages",
             "--method", "POST",
-            "--field", "build_type=workflow",
+            "--raw-field", 'source={"branch":"main","path":"/docs"}',
             "--silent",
         ], timeout=30)
 
