@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 # Modified: 2026-02-08T14:00:00Z | Author: COPILOT | Change: Create copilot-sdk bridge for SLATE agent integration
+# Modified: 2026-02-09T03:30:00Z | Author: COPILOT | Change: Add functional SDK integration — tools, sessions, MCP, event bridge
 """
 SLATE Copilot SDK Bridge
 =========================
@@ -11,14 +12,22 @@ orchestration framework. Provides:
 3. Agent-to-SDK tool mapping (SLATE agents ↔ Copilot SDK tools)
 4. Upstream sync status monitoring
 5. BYOK configuration for local-first operation
+6. Functional tool registration (14 SLATE tools via define_tool)
+7. Session management (create, resume, destroy with SLATE context)
+8. MCP server configuration for SLATE local services
+9. Custom agent definitions (Alpha/Beta/Gamma/Delta → SDK agents)
+10. Event bridge between SDK sessions and SLATE event system
 
 Architecture:
     SLATE Agents  →  CopilotSDKBridge  →  vendor/copilot-sdk/python
+                                       →  copilot_sdk_tools.py (14 tools)
+                                       →  copilot_sdk_session.py (session manager)
                                        →  vendor/copilot-sdk/nodejs (for extension)
 
 Security:
     - LOCAL ONLY (127.0.0.1) — no external API calls without BYOK config
     - SDK Source Guard approved (GitHub is a trusted publisher)
+    - ActionGuard integration — permission handler blocks dangerous operations
     - No eval/exec — uses importlib only
 """
 
@@ -195,6 +204,197 @@ class CopilotSDKBridge:
             print(f"  ✗ Cannot import define_tool: {e}", file=sys.stderr)
             return None
 
+    def import_session_types(self):
+        """Import and return key SDK session types."""
+        self.ensure_python_path()
+        try:
+            from copilot.types import (
+                SessionConfig, Tool, ToolResult, ToolInvocation,
+                MCPLocalServerConfig, MCPServerConfig, CustomAgentConfig,
+                ProviderConfig, PermissionRequest, PermissionRequestResult,
+                SessionHooks, MessageOptions, ModelInfo,
+            )
+            return {
+                "SessionConfig": SessionConfig,
+                "Tool": Tool,
+                "ToolResult": ToolResult,
+                "ToolInvocation": ToolInvocation,
+                "MCPLocalServerConfig": MCPLocalServerConfig,
+                "MCPServerConfig": MCPServerConfig,
+                "CustomAgentConfig": CustomAgentConfig,
+                "ProviderConfig": ProviderConfig,
+                "PermissionRequest": PermissionRequest,
+                "PermissionRequestResult": PermissionRequestResult,
+                "SessionHooks": SessionHooks,
+                "MessageOptions": MessageOptions,
+                "ModelInfo": ModelInfo,
+            }
+        except ImportError as e:
+            print(f"  ✗ Cannot import session types: {e}", file=sys.stderr)
+            return None
+
+    # ─── Functional Integration (SLATE tools + sessions) ──────────────────
+
+    # Modified: 2026-02-09T03:30:00Z | Author: COPILOT | Change: Add functional SDK integration methods
+
+    def get_slate_sdk_tools(self) -> list:
+        """
+        Get all SLATE tools as Copilot SDK Tool objects (functional, with handlers).
+        These are ready to pass to SessionConfig.tools for full SDK integration.
+        
+        Returns:
+            List of Tool objects with Pydantic-validated handlers.
+        """
+        if not self.is_available():
+            return []
+        try:
+            from slate.copilot_sdk_tools import get_all_slate_tools
+            return get_all_slate_tools()
+        except ImportError as e:
+            print(f"  ✗ Cannot import SLATE SDK tools: {e}", file=sys.stderr)
+            return []
+
+    def get_tool_manifest(self) -> list[dict]:
+        """Get JSON-serializable manifest of all registered SDK tools."""
+        if not self.is_available():
+            return []
+        try:
+            from slate.copilot_sdk_tools import get_tool_manifest
+            return get_tool_manifest()
+        except ImportError:
+            return []
+
+    def get_session_manager(self):
+        """
+        Get the SLATE Session Manager instance (singleton).
+        Returns SLATESessionManager for creating/managing SDK sessions.
+        """
+        if not self.is_available():
+            return None
+        try:
+            from slate.copilot_sdk_session import SLATESessionManager
+            return SLATESessionManager(workspace_root=self.workspace_root)
+        except ImportError as e:
+            print(f"  ✗ Cannot import SLATESessionManager: {e}", file=sys.stderr)
+            return None
+
+    def get_mcp_configs(self) -> dict:
+        """Get SLATE MCP server configurations for SDK sessions."""
+        if not self.is_available():
+            return {}
+        try:
+            from slate.copilot_sdk_session import SLATE_MCP_SERVERS
+            return SLATE_MCP_SERVERS
+        except ImportError:
+            return {}
+
+    def get_custom_agents(self) -> list[dict]:
+        """Get SLATE custom agent configurations for SDK sessions."""
+        if not self.is_available():
+            return []
+        try:
+            from slate.copilot_sdk_session import SLATE_AGENT_CONFIGS
+            return SLATE_AGENT_CONFIGS
+        except ImportError:
+            return []
+
+    def get_byok_providers(self) -> dict:
+        """Get available BYOK provider preset functions."""
+        if not self.is_available():
+            return {}
+        try:
+            from slate.copilot_sdk_session import (
+                ollama_provider, azure_provider, anthropic_provider
+            )
+            return {
+                "ollama": ollama_provider,
+                "azure": azure_provider,
+                "anthropic": anthropic_provider,
+            }
+        except ImportError:
+            return {}
+
+    def verify_full_integration(self) -> dict[str, Any]:
+        """
+        Verify the complete SDK integration stack:
+        1. SDK submodule present
+        2. Protocol version compatible
+        3. Python SDK importable
+        4. SLATE tools loadable
+        5. Session manager importable
+        6. MCP configs valid
+        7. Custom agents defined
+        8. BYOK providers available
+        """
+        checks = {
+            "sdk_submodule": False,
+            "protocol_version": False,
+            "python_imports": False,
+            "slate_tools": False,
+            "session_manager": False,
+            "mcp_configs": False,
+            "custom_agents": False,
+            "byok_providers": False,
+            "issues": [],
+        }
+
+        # 1. Submodule
+        checks["sdk_submodule"] = self.is_available()
+        if not checks["sdk_submodule"]:
+            checks["issues"].append("SDK submodule not found")
+            return checks
+
+        # 2. Protocol
+        proto = self.get_protocol_version()
+        checks["protocol_version"] = proto in SUPPORTED_PROTOCOL_VERSIONS
+        if not checks["protocol_version"]:
+            checks["issues"].append(f"Protocol v{proto} not supported")
+
+        # 3. Python imports
+        client = self.import_copilot_client()
+        tools = self.import_copilot_tools()
+        types = self.import_session_types()
+        checks["python_imports"] = all([client, tools, types])
+        if not checks["python_imports"]:
+            checks["issues"].append("Python SDK imports failed")
+
+        # 4. SLATE tools
+        slate_tools = self.get_slate_sdk_tools()
+        checks["slate_tools"] = len(slate_tools) > 0
+        if not checks["slate_tools"]:
+            checks["issues"].append("No SLATE SDK tools loaded")
+
+        # 5. Session manager
+        mgr = self.get_session_manager()
+        checks["session_manager"] = mgr is not None
+        if not checks["session_manager"]:
+            checks["issues"].append("Session manager not available")
+
+        # 6. MCP configs
+        mcp = self.get_mcp_configs()
+        checks["mcp_configs"] = len(mcp) > 0
+        if not checks["mcp_configs"]:
+            checks["issues"].append("No MCP server configs")
+
+        # 7. Custom agents
+        agents = self.get_custom_agents()
+        checks["custom_agents"] = len(agents) > 0
+        if not checks["custom_agents"]:
+            checks["issues"].append("No custom agent configs")
+
+        # 8. BYOK providers
+        providers = self.get_byok_providers()
+        checks["byok_providers"] = len(providers) > 0
+        if not checks["byok_providers"]:
+            checks["issues"].append("No BYOK provider presets")
+
+        checks["all_passed"] = all(
+            checks[k] for k in checks
+            if k not in ("issues", "all_passed")
+        )
+
+        return checks
+
     # ─── Upstream Sync Status ─────────────────────────────────────────────
 
     def get_sync_status(self) -> dict[str, Any]:
@@ -277,13 +477,29 @@ class CopilotSDKBridge:
         """
         Generate SLATE-compatible tool definitions from the Copilot SDK.
         Maps SDK capabilities to SLATE agent patterns.
+        
+        NOTE: For functional SDK Tool objects (with handlers), use
+        get_slate_sdk_tools() instead. This method returns metadata only.
         """
         tools = []
 
         if not self.is_available():
             return tools
 
-        # The SDK exposes these core capabilities that map to SLATE agents:
+        # Get functional tool manifest if available
+        manifest = self.get_tool_manifest()
+        if manifest:
+            for t in manifest:
+                tools.append({
+                    "name": t["name"],
+                    "description": t["description"],
+                    "has_handler": t.get("has_handler", False),
+                    "parameters": t.get("parameters"),
+                    "sdk_type": "define_tool",
+                })
+            return tools
+
+        # Fallback: basic definitions
         tools.extend([
             {
                 "name": "copilot_sdk_session",
@@ -317,9 +533,16 @@ class CopilotSDKBridge:
         compat = self.check_compatibility()
         sync = self.get_sync_status()
 
+        # Functional integration status
+        tools = self.get_slate_sdk_tools()
+        mcp = self.get_mcp_configs()
+        agents = self.get_custom_agents()
+        providers = self.get_byok_providers()
+
         return {
             "timestamp": datetime.now(timezone.utc).isoformat(),
             "sdk_bridge": "copilot-sdk",
+            "version": "2.0.0",
             "available": compat["sdk_available"],
             "compatible": compat["compatible"],
             "protocol_version": compat["protocol_version"],
@@ -330,6 +553,14 @@ class CopilotSDKBridge:
             "issues": compat["issues"],
             "upstream_repo": "github/copilot-sdk",
             "fork_repo": "SynchronizedLivingArchitecture/copilot-sdk",
+            "integration": {
+                "sdk_tools": len(tools),
+                "mcp_servers": list(mcp.keys()) if mcp else [],
+                "custom_agents": [a.get("name", "?") for a in agents] if agents else [],
+                "byok_providers": list(providers.keys()) if providers else [],
+                "hooks_available": True,
+                "permission_handler": "ActionGuard",
+            },
         }
 
     def print_status(self):
@@ -337,7 +568,7 @@ class CopilotSDKBridge:
         s = self.status()
 
         print("=" * 60)
-        print("  SLATE Copilot SDK Bridge")
+        print("  SLATE Copilot SDK Bridge v2.0")
         print("=" * 60)
         print()
 
@@ -367,6 +598,20 @@ class CopilotSDKBridge:
         print(f"  Upstream:           {s['upstream_repo']}")
         print(f"  Fork:               {s['fork_repo']}")
 
+        # Functional integration section
+        integ = s.get("integration", {})
+        print()
+        print("  ─── Functional Integration ───")
+        print(f"  SDK Tools:          {integ.get('sdk_tools', 0)} registered")
+        mcp_servers = integ.get('mcp_servers', [])
+        print(f"  MCP Servers:        {', '.join(mcp_servers) if mcp_servers else 'none'}")
+        custom_agents = integ.get('custom_agents', [])
+        print(f"  Custom Agents:      {', '.join(custom_agents) if custom_agents else 'none'}")
+        byok = integ.get('byok_providers', [])
+        print(f"  BYOK Providers:     {', '.join(byok) if byok else 'none'}")
+        print(f"  Hooks Available:    {'✓' if integ.get('hooks_available') else '✗'}")
+        print(f"  Permission Handler: {integ.get('permission_handler', 'none')}")
+
         if s["issues"]:
             print()
             print("  Issues:")
@@ -387,9 +632,51 @@ def main():
     parser.add_argument("--sync-status", action="store_true", help="Check upstream sync status")
     parser.add_argument("--json", action="store_true", help="Output as JSON")
     parser.add_argument("--verify-import", action="store_true", help="Verify Python SDK can be imported")
+    parser.add_argument("--verify-integration", action="store_true", help="Verify full SDK integration stack")
+    parser.add_argument("--tools", action="store_true", help="List registered SDK tools")
 
     args = parser.parse_args()
     bridge = CopilotSDKBridge()
+
+    if args.verify_integration:
+        result = bridge.verify_full_integration()
+        if args.json:
+            print(json.dumps(result, indent=2))
+        else:
+            print("\n  SLATE Copilot SDK Integration Verification")
+            print("  " + "─" * 50)
+            checks = [
+                ("SDK Submodule", result["sdk_submodule"]),
+                ("Protocol Version", result["protocol_version"]),
+                ("Python Imports", result["python_imports"]),
+                ("SLATE Tools", result["slate_tools"]),
+                ("Session Manager", result["session_manager"]),
+                ("MCP Configs", result["mcp_configs"]),
+                ("Custom Agents", result["custom_agents"]),
+                ("BYOK Providers", result["byok_providers"]),
+            ]
+            for name, passed in checks:
+                icon = "✓" if passed else "✗"
+                print(f"  [{icon}] {name}")
+            total = sum(1 for _, p in checks if p)
+            print(f"\n  Result: {total}/{len(checks)} checks passed")
+            if result.get("issues"):
+                print("  Issues:")
+                for issue in result["issues"]:
+                    print(f"    ⚠ {issue}")
+        return
+
+    if args.tools:
+        tools = bridge.get_slate_sdk_tools()
+        if args.json:
+            manifest = bridge.get_tool_manifest()
+            print(json.dumps(manifest, indent=2))
+        else:
+            print(f"\n  SLATE Copilot SDK Tools: {len(tools)}")
+            print("  " + "─" * 50)
+            for t in tools:
+                print(f"  • {t.name}: {t.description[:60]}...")
+        return
 
     if args.verify_import:
         if bridge.ensure_python_path():

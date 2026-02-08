@@ -101,6 +101,30 @@ def chromadb_details():
     return chromadb.__version__
 
 
+# Modified: 2026-02-09T03:45:00Z | Author: COPILOT | Change: Add Copilot SDK integration check (8th integration)
+def check_copilot_sdk():
+    try:
+        sdk_path = Path(__file__).parent.parent / "vendor" / "copilot-sdk" / "python"
+        if not sdk_path.exists():
+            return False
+        if str(sdk_path) not in sys.path:
+            sys.path.insert(0, str(sdk_path))
+        from copilot import CopilotClient, define_tool  # noqa: F401
+        return True
+    except ImportError:
+        return False
+
+
+def copilot_sdk_details():
+    sdk_path = Path(__file__).parent.parent / "vendor" / "copilot-sdk"
+    proto_file = sdk_path / "sdk-protocol-version.json"
+    if proto_file.exists():
+        with open(proto_file, "r", encoding="utf-8") as f:
+            data = json.load(f)
+        return f"protocol v{data.get('version', '?')}"
+    return "unknown"
+
+
 INTEGRATIONS = [
     ("Python 3.11+", check_python, python_details),
     ("Virtual Env", check_venv, None),
@@ -109,6 +133,7 @@ INTEGRATIONS = [
     ("Transformers", check_transformers, None),
     ("Ollama", check_ollama, None),
     ("ChromaDB", check_chromadb, chromadb_details),
+    ("Copilot SDK", check_copilot_sdk, copilot_sdk_details),
 ]
 
 def check_all():
