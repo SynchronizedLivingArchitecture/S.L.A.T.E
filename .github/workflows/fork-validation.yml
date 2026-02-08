@@ -75,7 +75,7 @@ jobs:
     runs-on: [self-hosted, slate]
     timeout-minutes: 5
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
         with:
           ref: ${{ github.event.pull_request.head.sha }}
       - name: Check requirements.txt for untrusted packages
@@ -97,7 +97,7 @@ jobs:
     runs-on: [self-hosted, slate]
     timeout-minutes: 5
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
         with:
           ref: ${{ github.event.pull_request.head.sha }}
       - name: Setup Python
@@ -166,7 +166,7 @@ jobs:
     runs-on: [self-hosted, slate]
     timeout-minutes: 5
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
         with:
           ref: ${{ github.event.pull_request.head.sha }}
       - name: Check for ActionGuard Bypass Attempts
@@ -215,7 +215,7 @@ jobs:
     runs-on: [self-hosted, slate]
     timeout-minutes: 5
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
         with:
           ref: ${{ github.event.pull_request.head.sha }}
       - name: Scan for Obfuscated Code

@@ -45,7 +45,7 @@ jobs:
           - suite: ml
             pattern: 'test_ml_orchestrator or test_slate_model_trainer or test_slate_gpu_manager or test_slate_warmup or test_slate_unified_autonomous or test_integrated_autonomous_loop or test_slate_hardware_optimizer'
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
       - name: Setup Python
         run: |
           "$env:GITHUB_WORKSPACE\\.venv\\Scripts" | Out-File -Append $env:GITHUB_PATH
@@ -61,7 +61,7 @@ jobs:
     runs-on: [self-hosted, slate]
     timeout-minutes: 10
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
       - name: Setup Python
         run: |
           "$env:GITHUB_WORKSPACE\\.venv\\Scripts" | Out-File -Append $env:GITHUB_PATH
@@ -89,7 +89,7 @@ jobs:
     runs-on: [self-hosted, slate]
     timeout-minutes: 5
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
       - name: Setup Python
         run: |
           "$env:GITHUB_WORKSPACE\\.venv\\Scripts" | Out-File -Append $env:GITHUB_PATH
@@ -117,7 +117,7 @@ jobs:
     runs-on: [self-hosted, slate]
     timeout-minutes: 5
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
       - name: Setup Python
         run: |
           "$env:GITHUB_WORKSPACE\\.venv\\Scripts" | Out-File -Append $env:GITHUB_PATH
@@ -143,7 +143,7 @@ jobs:
     env:
       CUDA_VISIBLE_DEVICES: '0,1'
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
       - name: Setup Python
         run: |
           "$env:GITHUB_WORKSPACE\\.venv\\Scripts" | Out-File -Append $env:GITHUB_PATH
@@ -231,7 +231,7 @@ jobs:
               print(json.dumps(r, indent=2))
               "
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
       - name: Setup Python
         run: |
           "$env:GITHUB_WORKSPACE\\.venv\\Scripts" | Out-File -Append $env:GITHUB_PATH
@@ -266,7 +266,7 @@ jobs:
     if: always()
     timeout-minutes: 10
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
         with:
           submodules: recursive
       - name: Setup Python
