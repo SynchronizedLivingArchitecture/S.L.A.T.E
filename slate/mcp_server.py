@@ -426,10 +426,12 @@ async def call_tool(name: str, arguments: dict[str, Any]) -> list[TextContent]:
     return [TextContent(type="text", text=output)]
 
 
+# Modified: 2026-02-08T06:30:00Z | Author: COPILOT | Change: Fix Server.run() for MCP SDK 1.26.0 (requires initialization_options)
 async def main():
     """Run the MCP server."""
     async with stdio_server() as (read_stream, write_stream):
-        await server.run(read_stream, write_stream)
+        init_options = server.create_initialization_options()
+        await server.run(read_stream, write_stream, init_options)
 
 
 if __name__ == "__main__":
