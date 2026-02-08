@@ -18,6 +18,7 @@
 
 <p align="center">
   <a href="LICENSE"><img src="https://img.shields.io/badge/Status-EXPERIMENTAL-red.svg" alt="Status: EXPERIMENTAL"></a>
+  <a href="LICENSE"><img src="https://img.shields.io/badge/Built_With-AI_%2F_Vibe_Coding-blueviolet.svg" alt="Built With: AI / Vibe Coding"></a>
   <a href="LICENSE"><img src="https://img.shields.io/badge/License-Experimental-orange.svg" alt="License: Experimental"></a>
   <a href="https://www.python.org/downloads/"><img src="https://img.shields.io/badge/python-3.11+-blue.svg" alt="Python 3.11+"></a>
   <a href="https://pytorch.org/"><img src="https://img.shields.io/badge/PyTorch-2.7+-ee4c2c.svg" alt="PyTorch 2.7+"></a>
@@ -35,7 +36,9 @@
 
 ---
 
-> **Status**: v2.5 — ⚠️ **EXPERIMENTAL** — Local AI orchestration with a production-ready aim. Active development, not yet suitable for critical systems.
+> ⚠️ **WARNING: AI HOBBYIST PROJECT — EXPERIMENTAL SOFTWARE**
+>
+> This project is **entirely created and managed by AI** (GitHub Copilot, Claude Code) through **vibe coding**. It is an AI hobbyist experiment with a production-ready aim — but it is **not production-ready**. Not yet suitable for critical systems. Use at your own risk.
 >
 > **Quick Install**:
 > ```bash
@@ -900,7 +903,7 @@ This represents the upper end of SLATE's capabilities. SLATE scales down to work
 
 ## License
 
-S.L.A.T.E. is experimental software. Use at your own risk. The author is not liable for any damages arising from use of this software.
+S.L.A.T.E. is **experimental software** — an AI hobbyist project entirely created and managed by AI through vibe coding. Use at your own risk. The author is not liable for any damages arising from use of this software.
 
 See the [LICENSE](LICENSE) file for complete terms and conditions.
 
