@@ -1,0 +1,297 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Watchmaker component showcase for SLATE. Gear system, status jewels, flow lines, and schematic layout components.">
+    <meta name="robots" content="index, follow">
+    <title>SLATE Watchmaker Component Showcase</title>
+    <link rel="icon" type="image/svg+xml" href="assets/slate-logo-v2.svg">
+    <link rel="stylesheet" href="css/watchmaker.css">
+    <!-- Modified: 2026-02-09T06:45:00Z | Author: COPILOT | Change: Add watchmaker component showcase page -->
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;600;700&family=IBM+Plex+Mono:wght@400;600&display=swap');
+
+        :root {
+            --slate-primary: #B85A3C;
+            --slate-primary-dark: #8B4530;
+            --slate-surface: #1A1816;
+            --slate-surface-variant: #2A2624;
+            --slate-on-surface: #E8E2DE;
+            --slate-on-surface-variant: #A59B90;
+            --slate-outline-variant: #4D4845;
+            --blueprint-bg: #0D1B2A;
+            --blueprint-grid: #1B3A4B;
+            --blueprint-accent: #98C1D9;
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            font-family: 'Space Grotesk', sans-serif;
+            background: radial-gradient(circle at 20% 10%, #1B2838 0%, #0A0A0A 40%, #050505 100%);
+            color: var(--slate-on-surface);
+            min-height: 100vh;
+        }
+
+        .page-shell {
+            max-width: 1100px;
+            margin: 0 auto;
+            padding: 32px 24px 80px;
+        }
+
+        .top-bar {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 24px;
+        }
+
+        .brand {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-weight: 700;
+            letter-spacing: 0.06em;
+        }
+
+        .brand img {
+            width: 32px;
+            height: 32px;
+        }
+
+        .link-chip {
+            border: 1px solid var(--slate-outline-variant);
+            padding: 8px 14px;
+            border-radius: 999px;
+            text-decoration: none;
+            color: var(--slate-on-surface);
+            font-size: 0.85rem;
+            font-family: 'IBM Plex Mono', monospace;
+        }
+
+        .warning-banner {
+            border: 2px solid #EF4444;
+            background: linear-gradient(135deg, rgba(90, 20, 20, 0.8), rgba(30, 15, 10, 0.9));
+            border-radius: 12px;
+            padding: 16px 20px;
+            margin-bottom: 32px;
+            font-family: 'IBM Plex Mono', monospace;
+            font-size: 0.85rem;
+            line-height: 1.6;
+        }
+
+        .warning-banner strong {
+            color: #FCA5A5;
+        }
+
+        .hero {
+            display: grid;
+            gap: 16px;
+            margin-bottom: 40px;
+        }
+
+        .hero h1 {
+            font-size: clamp(2.2rem, 4vw, 3.4rem);
+            margin: 0;
+        }
+
+        .hero p {
+            color: var(--slate-on-surface-variant);
+            font-size: 1rem;
+            margin: 0;
+        }
+
+        .section-grid {
+            display: grid;
+            gap: 24px;
+            grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+        }
+
+        .showcase-section {
+            background: rgba(26, 24, 22, 0.85);
+            border: 1px solid var(--slate-outline-variant);
+            border-radius: 16px;
+            padding: 24px;
+            box-shadow: 0 16px 32px rgba(0, 0, 0, 0.25);
+        }
+
+        .showcase-section h2 {
+            margin: 0 0 8px 0;
+            font-size: 1.1rem;
+        }
+
+        .showcase-section p {
+            margin: 0 0 16px 0;
+            color: var(--slate-on-surface-variant);
+            font-size: 0.9rem;
+        }
+
+        .component-row {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            flex-wrap: wrap;
+        }
+
+        .code-label {
+            font-family: 'IBM Plex Mono', monospace;
+            font-size: 0.75rem;
+            color: var(--slate-on-surface-variant);
+        }
+
+        .flow-demo svg {
+            width: 100%;
+            max-width: 260px;
+        }
+
+        .schematic-demo {
+            display: grid;
+            gap: 12px;
+        }
+
+        .schematic-demo .schematic-connector {
+            width: 100%;
+        }
+
+        footer {
+            margin-top: 48px;
+            text-align: center;
+            font-size: 0.8rem;
+            color: var(--slate-on-surface-variant);
+        }
+    </style>
+</head>
+<body>
+    <div class="page-shell">
+        <div class="top-bar">
+            <div class="brand">
+                <img src="assets/slate-logo-v2.svg" alt="SLATE logo">
+                <span>S.L.A.T.E. Watchmaker Components</span>
+            </div>
+            <a class="link-chip" href="index.html">Back to Home</a>
+        </div>
+
+        <div class="warning-banner" role="alert">
+            <strong>WARNING:</strong> EXPERIMENTAL AI hobbyist project. Entirely created and managed by AI via vibe coding. Production-ready aim - not for critical systems.
+        </div>
+
+        <div class="hero">
+            <h1>Watchmaker Component Showcase</h1>
+            <p>Reference implementations for gears, status jewels, flow lines, cards, and schematic layout primitives. Use these patterns to keep the dashboard consistent and precise.</p>
+        </div>
+
+        <div class="section-grid">
+            <section class="showcase-section">
+                <h2>Gear System</h2>
+                <p>Animated SVG gears with slow, medium, and reverse rotation speeds.</p>
+                <div class="component-row">
+                    <svg class="gear gear-spin-slow" viewBox="0 0 100 100" width="70" height="70" xmlns="http://www.w3.org/2000/svg">
+                        <g style="transform-origin:50% 50%">
+                            <circle cx="50" cy="50" r="28" fill="none" stroke="#B85A3C" stroke-width="3"/>
+                            <path d="M50,8 L54,18 L46,18Z M92,50 L82,54 L82,46Z M50,92 L46,82 L54,82Z M8,50 L18,46 L18,54Z M79,21 L72,29 L73,27Z M79,79 L72,72 L27,73Z M21,79 L29,72 L27,73Z M21,21 L29,29 L27,27Z" fill="#B85A3C"/>
+                            <circle cx="50" cy="50" r="10" fill="#B85A3C" opacity="0.3"/>
+                        </g>
+                    </svg>
+                    <svg class="gear gear-spin-medium" viewBox="0 0 100 100" width="60" height="60" xmlns="http://www.w3.org/2000/svg">
+                        <g style="transform-origin:50% 50%">
+                            <circle cx="50" cy="50" r="24" fill="none" stroke="#98C1D9" stroke-width="2"/>
+                            <path d="M50,10 L53,20 L47,20Z M90,50 L80,53 L80,47Z M50,90 L47,80 L53,80Z M10,50 L20,47 L20,53Z M78,22 L72,28Z M78,78 L72,72Z M22,78 L28,72Z M22,22 L28,28Z" fill="#98C1D9"/>
+                        </g>
+                    </svg>
+                    <svg class="gear gear-spin-reverse" viewBox="0 0 100 100" width="54" height="54" xmlns="http://www.w3.org/2000/svg">
+                        <g style="transform-origin:50% 50%">
+                            <circle cx="50" cy="50" r="20" fill="none" stroke="#B85A3C" stroke-width="2.5"/>
+                            <path d="M50,14 L53,24 L47,24Z M86,50 L76,53 L76,47Z M50,86 L47,76 L53,76Z M14,50 L24,47 L24,53Z M74,26 L68,32Z M74,74 L68,68Z M26,74 L32,68Z M26,26 L32,32Z" fill="#B85A3C"/>
+                        </g>
+                    </svg>
+                </div>
+                <div class="code-label">Classes: .gear .gear-spin-slow .gear-spin-medium .gear-spin-reverse</div>
+            </section>
+
+            <section class="showcase-section">
+                <h2>Status Jewels</h2>
+                <p>Compact health indicators with glow and pulse states.</p>
+                <div class="component-row">
+                    <span class="status-jewel active"></span>
+                    <span class="status-jewel pending"></span>
+                    <span class="status-jewel error"></span>
+                    <span class="status-jewel inactive"></span>
+                </div>
+                <div class="code-label">Classes: .status-jewel .active .pending .error .inactive</div>
+            </section>
+
+            <section class="showcase-section flow-demo">
+                <h2>Flow Lines</h2>
+                <p>Animated data flow connectors for schematic signals.</p>
+                <svg viewBox="0 0 260 40" xmlns="http://www.w3.org/2000/svg">
+                    <line class="flow-line active" x1="10" y1="20" x2="250" y2="20" />
+                </svg>
+                <div class="code-label">Class: .flow-line (use .slow or .fast variants)</div>
+            </section>
+
+            <section class="showcase-section">
+                <h2>Watchmaker Card</h2>
+                <p>Primary information container with depth polish and header gear icon.</p>
+                <div class="watchmaker-card active">
+                    <div class="watchmaker-card-header">
+                        <svg class="gear" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                            <circle cx="12" cy="12" r="3" fill="none" stroke="currentColor" stroke-width="2"/>
+                            <path d="M12 1v3m0 16v3M1 12h3m16 0h3M4.22 4.22l2.12 2.12m11.3 11.3l2.12 2.12M4.22 19.78l2.12-2.12m11.3-11.3l2.12-2.12" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+                        </svg>
+                        <div class="watchmaker-card-title">Command Core</div>
+                        <span class="status-jewel active"></span>
+                    </div>
+                    <div style="color: var(--slate-on-surface-variant); font-size: 0.85rem;">Use cards for key system surfaces and controls.</div>
+                </div>
+                <div class="code-label">Classes: .watchmaker-card .watchmaker-card-header .watchmaker-card-title</div>
+            </section>
+
+            <section class="showcase-section schematic-demo">
+                <h2>Schematic Layout</h2>
+                <p>Blueprint container with nodes and connectors.</p>
+                <div class="schematic-container">
+                    <div class="schematic-node">
+                        <span class="status-jewel active"></span>
+                        <span>Dashboard</span>
+                    </div>
+                    <div class="schematic-connector"></div>
+                    <div class="schematic-node">
+                        <span class="status-jewel pending"></span>
+                        <span>Ollama</span>
+                    </div>
+                </div>
+                <div class="code-label">Classes: .schematic-container .schematic-node .schematic-connector</div>
+            </section>
+
+            <section class="showcase-section">
+                <h2>Mechanism Indicators</h2>
+                <p>Motion primitives for activity visualization.</p>
+                <div class="component-row">
+                    <div class="balance-wheel"></div>
+                    <div class="mainspring charging">
+                        <svg viewBox="0 0 60 60" width="60" height="60" xmlns="http://www.w3.org/2000/svg">
+                            <circle class="mainspring-coil" cx="30" cy="30" r="18" />
+                            <circle class="mainspring-coil" cx="30" cy="30" r="12" />
+                        </svg>
+                    </div>
+                    <div class="escapement">
+                        <span class="escapement-tick"></span>
+                        <span class="escapement-tick"></span>
+                        <span class="escapement-tick"></span>
+                        <span class="escapement-tick"></span>
+                    </div>
+                </div>
+                <div class="code-label">Classes: .balance-wheel .mainspring .escapement</div>
+            </section>
+        </div>
+
+        <footer>
+            Watchmaker Component Showcase - SLATE Experimental UI Kit
+        </footer>
+    </div>
+</body>
+</html>
