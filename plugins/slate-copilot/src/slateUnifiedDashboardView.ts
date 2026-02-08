@@ -1,4 +1,4 @@
-// Modified: 2026-02-08T18:00:00Z | Author: COPILOT | Change: Unified dashboard combining guided setup, control board, and dashboard into one view
+// Modified: 2026-02-07T18:00:00Z | Author: COPILOT | Change: Unified dashboard combining guided setup, control board, and dashboard into one view
 /**
  * SLATE Unified Dashboard View
  * ==============================

@@ -1,8 +1,8 @@
-// Modified: 2026-02-08T18:00:00Z | Author: COPILOT | Change: Unified dashboard — merge guided setup, control board, and dashboard into single view
+// Modified: 2026-02-07T18:00:00Z | Author: COPILOT | Change: Unified dashboard — merge guided setup, control board, and dashboard into single view
 import * as vscode from 'vscode';
 import { registerSlateParticipant } from './slateParticipant';
 import { registerSlateTools } from './tools';
-import { SlateUnifiedDashboardViewProvider, registerUnifiedDashboard } from './slateUnifiedDashboardView';
+import { SlateUnifiedDashboardViewProvider } from './slateUnifiedDashboardView';
 import { registerServiceMonitor } from './slateServiceMonitor';
 import {
 	applySchematicBackground,
