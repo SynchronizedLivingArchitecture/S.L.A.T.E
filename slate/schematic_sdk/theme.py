@@ -1,8 +1,10 @@
 """
 SLATE Schematic SDK - Theme Integration
+# Modified: 2026-02-08T02:00:00Z | Author: COPILOT | Change: Unified tokens with Spec 014 watchmaker golden ratio
 
-Integrates with locked design tokens (v3.0.0) for consistent theming.
-Part of SLATE Generative UI protocols.
+Integrates with locked design tokens (v4.0.0) for consistent theming.
+Part of SLATE Generative UI protocols — Watchmaker + Golden Ratio (Spec 014).
+ISO 128 · IEC 60617 · ASME Y14.44 · φ = 1.618
 """
 
 from dataclasses import dataclass, field
@@ -14,74 +16,106 @@ from pathlib import Path
 WORKSPACE_ROOT = Path(__file__).parent.parent.parent
 sys.path.insert(0, str(WORKSPACE_ROOT))
 
+# Golden ratio constant — governs all proportions
+PHI = 1.6180339887
+
 
 @dataclass
 class SchematicColors:
-    """Color palette for schematic rendering."""
-    # Background
+    """Color palette for schematic rendering — unified with Spec 014."""
+    # Background (watchmaker case texture)
     background: str = "#0D1B2A"
     background_gradient_end: str = "#1B3A4B"
 
-    # Grid
+    # Grid (engineering drawing — ISO 128)
     grid_lines: str = "#1B3A4B"
     grid_opacity: float = 0.3
 
-    # Primary accent (Anthropic rust)
-    primary: str = "#B85A3C"
-    primary_light: str = "#D4785A"
-    primary_dark: str = "#8B4530"
+    # Primary accent — copper (the watchmaker's metal — Spec 014)
+    primary: str = "#B87333"
+    primary_light: str = "#C9956B"
+    primary_dark: str = "#8B5E2B"
 
     # Blueprint accents
     blueprint_accent: str = "#98C1D9"
     blueprint_node: str = "#E0FBFC"
 
-    # Surface colors
-    surface: str = "#1A1816"
-    surface_container: str = "#2A2624"
-    surface_elevated: str = "#3A3634"
+    # Surface colors (watchmaker case)
+    surface: str = "#0a0a0a"
+    surface_variant: str = "#111111"
+    surface_container: str = "#141210"
+    surface_container_high: str = "#1a1816"
+    surface_elevated: str = "#222020"
 
-    # Status colors
+    # Status colors — unified Spec 014
     status_active: str = "#22C55E"
-    status_pending: str = "#F59E0B"
-    status_error: str = "#EF4444"
-    status_inactive: str = "#6B7280"
+    status_pending: str = "#D4A054"
+    status_error: str = "#C47070"
+    status_inactive: str = "#78716C"
+    status_info: str = "#7EA8BE"
 
-    # Component type colors
-    service_fill: str = "#2A2624"
-    database_fill: str = "#1E3A5F"
-    gpu_fill: str = "#3D2914"
-    ai_fill: str = "#3D1E10"
-    api_fill: str = "#1A2436"
-    queue_fill: str = "#2A2436"
-    external_fill: str = "transparent"
+    # Component type colors (IEC 60617 conventions)
+    service_fill: str = "#1a1510"
+    database_fill: str = "#101520"
+    gpu_fill: str = "#15120a"
+    ai_fill: str = "#0a1515"
+    api_fill: str = "#1a2436"
+    queue_fill: str = "#2a2436"
+    external_fill: str = "#151015"
 
-    # Text colors
-    text_primary: str = "#E8E2DE"
-    text_secondary: str = "#CAC4BF"
-    text_muted: str = "#6B7280"
+    # Text colors — warm white / natural earth
+    text_primary: str = "#F5F0EB"
+    text_secondary: str = "#A8A29E"
+    text_muted: str = "#78716C"
+    text_disabled: str = "#44403C"
 
     # Border colors
-    border_default: str = "#3A3634"
-    border_hover: str = "#4A4644"
+    border_default: str = "rgba(255,255,255,0.08)"
+    border_variant: str = "rgba(255,255,255,0.12)"
+    border_hover: str = "#B87333"
 
-    # Connection colors
-    connection_default: str = "#B85A3C"
+    # Connection colors (trace signals — ISO 128)
+    connection_default: str = "#B87333"
     connection_active: str = "#22C55E"
-    connection_muted: str = "#6B7280"
+    connection_muted: str = "#78716C"
+
+    # Engineering trace colors (IEC 60617)
+    trace_signal: str = "#B87333"
+    trace_data: str = "#7EA8BE"
+    trace_power: str = "#C47070"
+    trace_control: str = "#D4A054"
+    trace_ground: str = "#78716C"
+
+    # Watchmaker jewel colors
+    jewel_green: str = "#22C55E"
+    jewel_amber: str = "#D4A054"
+    jewel_red: str = "#C47070"
+    jewel_blue: str = "#7EA8BE"
+
+    # Dev cycle stage colors
+    stage_plan: str = "#7EA8BE"
+    stage_code: str = "#B87333"
+    stage_test: str = "#D4A054"
+    stage_deploy: str = "#78B89A"
+    stage_feedback: str = "#9B89B3"
 
 
 @dataclass
 class SchematicTypography:
-    """Typography settings for schematic rendering."""
-    font_display: str = "'Segoe UI', 'Inter', system-ui, sans-serif"
-    font_mono: str = "'Consolas', 'JetBrains Mono', monospace"
+    """Typography settings — φ-derived scale (Golden Ratio)."""
+    font_display: str = "'Inter Tight', 'Segoe UI', system-ui, sans-serif"
+    font_body: str = "'Inter', 'Segoe UI', system-ui, sans-serif"
+    font_mono: str = "'Cascadia Code', 'JetBrains Mono', 'Consolas', monospace"
+    font_schematic: str = "'Consolas', 'Courier New', monospace"
 
-    # Font sizes
-    title_size: int = 24
-    subtitle_size: int = 14
-    label_size: int = 12
-    sublabel_size: int = 10
+    # Font sizes — φ-derived: 8, 11, 13, 16, 21, 34
+    display_size: int = 34
+    title_size: int = 21
+    subtitle_size: int = 16
+    label_size: int = 13
+    sublabel_size: int = 11
     badge_size: int = 11
+    caption_size: int = 8
 
     # Font weights
     weight_bold: int = 700
@@ -91,7 +125,7 @@ class SchematicTypography:
 
 @dataclass
 class SchematicEffects:
-    """Visual effects for schematic rendering."""
+    """Visual effects — Fibonacci spacing (1,2,3,5,8,13,21,34)."""
     # Shadow
     shadow_dx: int = 2
     shadow_dy: int = 4
@@ -102,10 +136,12 @@ class SchematicEffects:
     # Glow
     glow_blur: int = 2
 
-    # Border radius
-    radius_sm: int = 4
+    # Border radius — Fibonacci
+    radius_xs: int = 3
+    radius_sm: int = 5
     radius_md: int = 8
-    radius_lg: int = 12
+    radius_lg: int = 13
+    radius_xl: int = 21
 
 
 @dataclass
@@ -120,25 +156,34 @@ class SchematicTheme:
 class ThemeManager:
     """Manages schematic themes and integrates with design tokens."""
 
-    # Pre-defined themes
+    # Pre-defined themes — all unified with Spec 014 copper palette
     THEMES: Dict[str, Dict] = {
         "blueprint": {
             "background": "#0D1B2A",
             "background_gradient_end": "#1B3A4B",
             "grid_lines": "#1B3A4B",
-            "primary": "#B85A3C",
+            "primary": "#B87333",
+            "primary_light": "#C9956B",
+            "primary_dark": "#8B5E2B",
         },
         "dark": {
-            "background": "#1A1816",
-            "background_gradient_end": "#2A2624",
-            "grid_lines": "#3A3634",
-            "primary": "#B85A3C",
+            "background": "#0a0a0a",
+            "background_gradient_end": "#141210",
+            "grid_lines": "rgba(255,255,255,0.08)",
+            "primary": "#B87333",
+            "primary_light": "#C9956B",
+            "primary_dark": "#8B5E2B",
+            "surface": "#0a0a0a",
+            "surface_container": "#141210",
+            "surface_elevated": "#222020",
         },
         "light": {
             "background": "#FBF8F6",
             "background_gradient_end": "#F0EBE7",
             "grid_lines": "#E4E0DC",
-            "primary": "#B85A3C",
+            "primary": "#B87333",
+            "primary_light": "#C9956B",
+            "primary_dark": "#8B5E2B",
             "text_primary": "#1C1B1A",
             "text_secondary": "#4D4845",
             "surface_container": "#F5F2F0",

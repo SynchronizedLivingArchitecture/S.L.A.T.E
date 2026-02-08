@@ -160,3 +160,6 @@ _temp/
 # OS
 .DS_Store
 Thumbs.db
+
+# Transient test output
+test_results.txt

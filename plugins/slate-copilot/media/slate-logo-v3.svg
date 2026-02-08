@@ -1,0 +1,83 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512">
+  <!-- Modified: 2026-02-07T23:30:00Z | Author: COPILOT | Change: New SLATE logo — starburst + S letterform + acronym -->
+  <defs>
+    <linearGradient id="copperGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#C9956B"/>
+      <stop offset="50%" style="stop-color:#B87333"/>
+      <stop offset="100%" style="stop-color:#8B5E2B"/>
+    </linearGradient>
+    <linearGradient id="glowGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#D4A054;stop-opacity:0.6"/>
+      <stop offset="100%" style="stop-color:#B87333;stop-opacity:0"/>
+    </linearGradient>
+    <radialGradient id="centerGlow" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" style="stop-color:#B87333;stop-opacity:0.25"/>
+      <stop offset="100%" style="stop-color:#0a0a0a;stop-opacity:0"/>
+    </radialGradient>
+    <filter id="copperGlow">
+      <feGaussianBlur stdDeviation="4" result="blur"/>
+      <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
+    </filter>
+  </defs>
+
+  <!-- Background -->
+  <rect width="512" height="512" rx="96" fill="#0a0a0a"/>
+  
+  <!-- Subtle center glow -->
+  <circle cx="256" cy="230" r="200" fill="url(#centerGlow)"/>
+
+  <!-- Outer ring — architectural precision -->
+  <circle cx="256" cy="230" r="165" fill="none" stroke="#1a1a1a" stroke-width="1"/>
+  <circle cx="256" cy="230" r="185" fill="none" stroke="#111111" stroke-width="0.5"/>
+
+  <!-- 12 Starburst rays — radiating architecture -->
+  <!-- Primary rays at 0°, 90°, 180°, 270° (thicker) -->
+  <line x1="256" y1="230" x2="256" y2="55" stroke="url(#copperGrad)" stroke-width="2.5" stroke-linecap="round" opacity="0.9"/>
+  <line x1="256" y1="230" x2="431" y2="230" stroke="url(#copperGrad)" stroke-width="2.5" stroke-linecap="round" opacity="0.9"/>
+  <line x1="256" y1="230" x2="256" y2="405" stroke="url(#copperGrad)" stroke-width="2.5" stroke-linecap="round" opacity="0.9"/>
+  <line x1="256" y1="230" x2="81" y2="230" stroke="url(#copperGrad)" stroke-width="2.5" stroke-linecap="round" opacity="0.9"/>
+  
+  <!-- Secondary rays at 45° intervals (thinner) -->
+  <line x1="256" y1="230" x2="379.7" y2="106.3" stroke="#B87333" stroke-width="1.5" stroke-linecap="round" opacity="0.5"/>
+  <line x1="256" y1="230" x2="379.7" y2="353.7" stroke="#B87333" stroke-width="1.5" stroke-linecap="round" opacity="0.5"/>
+  <line x1="256" y1="230" x2="132.3" y2="353.7" stroke="#B87333" stroke-width="1.5" stroke-linecap="round" opacity="0.5"/>
+  <line x1="256" y1="230" x2="132.3" y2="106.3" stroke="#B87333" stroke-width="1.5" stroke-linecap="round" opacity="0.5"/>
+  
+  <!-- Tertiary rays at 22.5° intervals (finest) -->
+  <line x1="256" y1="230" x2="323" y2="64" stroke="#B87333" stroke-width="0.8" stroke-linecap="round" opacity="0.25"/>
+  <line x1="256" y1="230" x2="420" y2="163" stroke="#B87333" stroke-width="0.8" stroke-linecap="round" opacity="0.25"/>
+  <line x1="256" y1="230" x2="420" y2="297" stroke="#B87333" stroke-width="0.8" stroke-linecap="round" opacity="0.25"/>
+  <line x1="256" y1="230" x2="323" y2="396" stroke="#B87333" stroke-width="0.8" stroke-linecap="round" opacity="0.25"/>
+  <line x1="256" y1="230" x2="189" y2="396" stroke="#B87333" stroke-width="0.8" stroke-linecap="round" opacity="0.25"/>
+  <line x1="256" y1="230" x2="92" y2="297" stroke="#B87333" stroke-width="0.8" stroke-linecap="round" opacity="0.25"/>
+  <line x1="256" y1="230" x2="92" y2="163" stroke="#B87333" stroke-width="0.8" stroke-linecap="round" opacity="0.25"/>
+  <line x1="256" y1="230" x2="189" y2="64" stroke="#B87333" stroke-width="0.8" stroke-linecap="round" opacity="0.25"/>
+
+  <!-- Inner hexagon — architecture symbol -->
+  <polygon points="256,155 331,192.5 331,267.5 256,305 181,267.5 181,192.5" 
+           fill="none" stroke="#B87333" stroke-width="1.5" opacity="0.3"/>
+
+  <!-- Center circle — the core -->
+  <circle cx="256" cy="230" r="58" fill="#0a0a0a" stroke="url(#copperGrad)" stroke-width="2.5"/>
+  
+  <!-- Stylized S letterform inside circle -->
+  <path d="M280 205 H240 C230.06 205 222 213.06 222 223 C222 232.94 230.06 241 240 241 H272 C281.94 241 290 249.06 290 259 C290 268.94 281.94 277 272 277 H232" 
+        fill="none" stroke="url(#copperGrad)" stroke-width="5" stroke-linecap="round" stroke-linejoin="round" filter="url(#copperGlow)"/>
+
+  <!-- Node dots at primary ray endpoints (5 active = 5 SLATE principles) -->
+  <circle cx="256" cy="55" r="5" fill="#B87333" opacity="0.8"/>
+  <circle cx="431" cy="230" r="5" fill="#B87333" opacity="0.8"/>
+  <circle cx="256" cy="405" r="5" fill="#B87333" opacity="0.8"/>
+  <circle cx="81" cy="230" r="5" fill="#B87333" opacity="0.8"/>
+  <circle cx="379.7" cy="106.3" r="3.5" fill="#B87333" opacity="0.5"/>
+  <circle cx="379.7" cy="353.7" r="3.5" fill="#B87333" opacity="0.5"/>
+  <circle cx="132.3" cy="353.7" r="3.5" fill="#B87333" opacity="0.5"/>
+  <circle cx="132.3" cy="106.3" r="3.5" fill="#B87333" opacity="0.5"/>
+
+  <!-- SLATE text — below the starburst -->
+  <text x="256" y="448" text-anchor="middle" font-family="'Inter','Segoe UI',system-ui,sans-serif" font-size="52" font-weight="700" letter-spacing="12" fill="#F5F0EB">SLATE</text>
+  
+  <!-- Acronym — micro text -->
+  <text x="256" y="480" text-anchor="middle" font-family="'Inter','Segoe UI',system-ui,sans-serif" font-size="11" font-weight="400" letter-spacing="2.5" fill="#78716C">SYNCHRONIZED LIVING ARCHITECTURE</text>
+  <text x="256" y="496" text-anchor="middle" font-family="'Inter','Segoe UI',system-ui,sans-serif" font-size="11" font-weight="400" letter-spacing="2.5" fill="#78716C">TRANSFORMATION &amp; EVOLUTION</text>
+</svg>

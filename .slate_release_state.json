@@ -1,0 +1,13 @@
+{
+  "channel": "stable",
+  "stable_version": "2.4.0",
+  "stable_sha": "16ab37284969",
+  "stable_date": "2026-02-08T05:38:28.553735+00:00",
+  "rc_version": null,
+  "rc_sha": null,
+  "rc_date": null,
+  "last_validation": null,
+  "validation_passed": false,
+  "locked": true,
+  "history": []
+}

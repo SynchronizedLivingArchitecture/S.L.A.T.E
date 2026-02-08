@@ -1,6 +1,7 @@
 {
     "name": "SLATE Dark",
     "type": "dark",
+    "$description": "SLATE Watchmaker + Golden Ratio (Spec 014) — ISO 128 · IEC 60617 · φ = 1.618 — Modified: 2026-02-08T02:00:00Z | Author: COPILOT | Change: Unified tokens with Spec 014 watchmaker golden ratio",
     "colors": {
         "editor.background": "#0a0a0a",
         "editor.foreground": "#E7E0D8",
@@ -12,6 +13,8 @@
         "editor.wordHighlightStrongBackground": "#B8733320",
         "editor.findMatchBackground": "#B8733330",
         "editor.findMatchHighlightBackground": "#B8733318",
+        "editor.linkedEditingBackground": "#B8733315",
+        "editor.foldBackground": "#141210",
 
         "editorCursor.foreground": "#B87333",
         "editorWhitespace.foreground": "#1a1a1a",
@@ -21,6 +24,23 @@
         "editorLineNumber.activeForeground": "#A8A29E",
         "editorBracketMatch.background": "#B8733315",
         "editorBracketMatch.border": "#B8733340",
+
+        "editorBracketHighlight.foreground1": "#B87333",
+        "editorBracketHighlight.foreground2": "#7EA8BE",
+        "editorBracketHighlight.foreground3": "#D4A054",
+        "editorBracketHighlight.foreground4": "#78B89A",
+        "editorBracketHighlight.foreground5": "#9B89B3",
+        "editorBracketHighlight.foreground6": "#C9956B",
+        "editorBracketHighlight.unexpectedBracket.foreground": "#C47070",
+
+        "editorBracketPairGuide.activeBackground1": "#B8733340",
+        "editorBracketPairGuide.activeBackground2": "#7EA8BE40",
+        "editorBracketPairGuide.activeBackground3": "#D4A05440",
+
+        "editorInlayHint.background": "#141210",
+        "editorInlayHint.foreground": "#78716C",
+        "editorInlayHint.typeForeground": "#A8A29E",
+        "editorInlayHint.parameterForeground": "#8B7355",
 
         "editorGroupHeader.tabsBackground": "#080808",
         "editorGroupHeader.tabsBorder": "#161616",
@@ -202,7 +222,35 @@
         "keybindingLabel.bottomBorder": "#222222",
 
         "chat.avatarBackground": "#B8733320",
-        "chat.avatarForeground": "#B87333"
+        "chat.avatarForeground": "#B87333",
+
+        "testing.iconPassed": "#22C55E",
+        "testing.iconFailed": "#C47070",
+        "testing.iconErrored": "#C47070",
+        "testing.iconQueued": "#7EA8BE",
+        "testing.iconUnset": "#78716C",
+        "testing.iconSkipped": "#D4A054",
+        "testing.runAction": "#22C55E",
+
+        "notebook.cellBorderColor": "#222222",
+        "notebook.cellEditorBackground": "#0d0d0d",
+        "notebook.cellStatusBarItemHoverBackground": "#B8733320",
+        "notebook.focusedCellBorder": "#B87333",
+        "notebook.selectedCellBackground": "#141210",
+        "notebook.selectedCellBorder": "#B87333",
+
+        "welcomePage.tileBackground": "#0d0d0d",
+        "welcomePage.tileBorder": "#222222",
+        "welcomePage.progress.foreground": "#B87333",
+
+        "charts.foreground": "#E7E0D8",
+        "charts.lines": "#78716C",
+        "charts.red": "#C47070",
+        "charts.green": "#22C55E",
+        "charts.yellow": "#D4A054",
+        "charts.blue": "#7EA8BE",
+        "charts.purple": "#9B89B3",
+        "charts.orange": "#B87333"
     },
     "tokenColors": [
         {
