@@ -1,0 +1,75 @@
+# Modified: 2026-02-08T07:15:00Z | Author: COPILOT | Change: Create Helm RBAC template
+{{- if .Values.rbac.create }}
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: {{ .Values.rbac.serviceAccounts.core }}
+  namespace: {{ include "slate.namespace" . }}
+  labels:
+    {{- include "slate.labels" . | nindent 4 }}
+
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: {{ .Values.rbac.serviceAccounts.agent }}
+  namespace: {{ include "slate.namespace" . }}
+  labels:
+    {{- include "slate.labels" . | nindent 4 }}
+
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: slate-core-role
+  namespace: {{ include "slate.namespace" . }}
+rules:
+  - apiGroups: [""]
+    resources: ["pods"]
+    verbs: ["get", "list", "watch"]
+  - apiGroups: [""]
+    resources: ["configmaps"]
+    verbs: ["get", "list", "create", "update", "patch"]
+
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: slate-agent-role
+  namespace: {{ include "slate.namespace" . }}
+rules:
+  - apiGroups: [""]
+    resources: ["pods", "services"]
+    verbs: ["get", "list"]
+
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: slate-core-binding
+  namespace: {{ include "slate.namespace" . }}
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: Role
+  name: slate-core-role
+subjects:
+  - kind: ServiceAccount
+    name: {{ .Values.rbac.serviceAccounts.core }}
+    namespace: {{ include "slate.namespace" . }}
+
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: slate-agent-binding
+  namespace: {{ include "slate.namespace" . }}
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: Role
+  name: slate-agent-role
+subjects:
+  - kind: ServiceAccount
+    name: {{ .Values.rbac.serviceAccounts.agent }}
+    namespace: {{ include "slate.namespace" . }}
+{{- end }}

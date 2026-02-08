@@ -1,0 +1,102 @@
+# Modified: 2026-02-08T07:15:00Z | Author: COPILOT | Change: Create Helm values for SLATE local K8s deployment
+# SLATE Helm Values — Local Deployment
+# Override with: helm install slate ./helm/slate -f my-values.yaml
+
+# ── Global ──
+global:
+  namespace: slate
+  environment: local    # local | prod
+  securityPolicy: restricted
+
+# ── SLATE Core ──
+slate:
+  image:
+    repository: slate
+    tag: local
+    pullPolicy: Never    # Local build: docker build -t slate:local .
+  replicas: 1
+  port: 8080
+  env:
+    SLATE_MODE: dev
+    SLATE_K8S: "true"
+    PYTHONPATH: /slate:/workspace
+  resources:
+    requests:
+      cpu: 250m
+      memory: 512Mi
+    limits:
+      cpu: 2000m
+      memory: 4Gi
+  gpu:
+    enabled: false       # Set true if NVIDIA device plugin is installed
+    count: 1
+  nodeSelector: {}       # Override: { nvidia.com/gpu.present: "true" }
+  tolerations: []
+  storage:
+    workspace:
+      size: 50Gi
+      hostPath: /slate-workspace    # Docker Desktop: /run/desktop/mnt/host/e/11132025
+    data:
+      size: 5Gi
+      hostPath: /slate-data
+
+# ── Ollama ──
+ollama:
+  enabled: true
+  image:
+    repository: ollama/ollama
+    tag: latest
+    pullPolicy: IfNotPresent
+  replicas: 1
+  port: 11434
+  resources:
+    requests:
+      cpu: 500m
+      memory: 4Gi
+    limits:
+      cpu: 4000m
+      memory: 16Gi
+  gpu:
+    enabled: false       # Set true for GPU inference
+    count: 1
+  nodeSelector: {}
+  tolerations: []
+  storage:
+    size: 50Gi
+    hostPath: /ollama-data
+
+# ── ChromaDB ──
+chromadb:
+  enabled: true
+  image:
+    repository: chromadb/chroma
+    tag: latest
+    pullPolicy: IfNotPresent
+  replicas: 1
+  port: 8000
+  env:
+    IS_PERSISTENT: "TRUE"
+    ANONYMIZED_TELEMETRY: "FALSE"
+  resources:
+    requests:
+      cpu: 250m
+      memory: 512Mi
+    limits:
+      cpu: 1000m
+      memory: 2Gi
+  storage:
+    size: 5Gi
+    hostPath: /chroma-data
+
+# ── Network ──
+network:
+  defaultDeny: true      # Default deny-all NetworkPolicy
+  allowGitHub: true      # Allow HTTPS egress to GitHub
+  dashboardIngress: false  # No ingress — use port-forward
+
+# ── RBAC ──
+rbac:
+  create: true
+  serviceAccounts:
+    core: slate-core
+    agent: slate-agent

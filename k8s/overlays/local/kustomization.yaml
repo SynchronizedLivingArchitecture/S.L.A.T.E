@@ -1,0 +1,119 @@
+# Modified: 2026-02-08T07:10:00Z | Author: COPILOT | Change: Create Kustomize local overlay for Docker Desktop K8s / minikube / k3s
+# SLATE Local Overlay — Kustomize
+#
+# Adapts the base K8s manifests for local development:
+#   - Local images (built locally, never pulled from ghcr.io)
+#   - hostPath volumes (mount workspace directly from host)
+#   - Relaxed GPU nodeSelector (Docker Desktop K8s doesn't label GPU nodes)
+#   - Dev mode config
+#
+# Deploy:  kubectl apply -k k8s/overlays/local/
+# Teardown: kubectl delete -k k8s/overlays/local/
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+namespace: slate
+
+resources:
+  - ../../namespace.yaml
+  - ../../rbac.yaml
+  - ../../network-policy.yaml
+  - ../../secrets.yaml
+  - ../../deployments.yaml
+  - local-storage.yaml
+
+# Override base storage with local hostPath volumes
+# (local-storage.yaml provides PVs; we don't need the base PVCs since we redefine them)
+
+patches:
+  # ── slate-core: use local image, remove GPU nodeSelector ──
+  - target:
+      kind: Deployment
+      name: slate-core
+    patch: |
+      apiVersion: apps/v1
+      kind: Deployment
+      metadata:
+        name: slate-core
+      spec:
+        template:
+          spec:
+            # Remove GPU nodeSelector for local K8s
+            nodeSelector: null
+            tolerations: []
+            containers:
+              - name: slate
+                # Use locally-built image
+                image: slate:local
+                imagePullPolicy: Never
+                env:
+                  - name: SLATE_MODE
+                    value: dev
+                  - name: SLATE_WORKSPACE
+                    value: /workspace
+                  - name: OLLAMA_HOST
+                    value: ollama-svc:11434
+                  - name: PYTHONPATH
+                    value: /slate:/workspace
+                  - name: SLATE_K8S
+                    value: "true"
+                resources:
+                  requests:
+                    cpu: 250m
+                    memory: 512Mi
+                  limits:
+                    cpu: 2000m
+                    memory: 4Gi
+                    # GPU limit removed — NVIDIA device plugin handles it if present
+
+  # ── ollama: remove GPU nodeSelector for local ──
+  - target:
+      kind: Deployment
+      name: ollama
+    patch: |
+      apiVersion: apps/v1
+      kind: Deployment
+      metadata:
+        name: ollama
+      spec:
+        template:
+          spec:
+            nodeSelector: null
+            tolerations: []
+            containers:
+              - name: ollama
+                image: ollama/ollama:latest
+                imagePullPolicy: IfNotPresent
+                resources:
+                  requests:
+                    cpu: 500m
+                    memory: 4Gi
+                  limits:
+                    cpu: 4000m
+                    memory: 16Gi
+                    # GPU assigned automatically by NVIDIA runtime if available
+
+  # ── chromadb: use IfNotPresent for local caching ──
+  - target:
+      kind: Deployment
+      name: chromadb
+    patch: |
+      apiVersion: apps/v1
+      kind: Deployment
+      metadata:
+        name: chromadb
+      spec:
+        template:
+          spec:
+            containers:
+              - name: chromadb
+                imagePullPolicy: IfNotPresent
+
+commonLabels:
+  app.kubernetes.io/managed-by: slate
+  app.kubernetes.io/version: "2.4.0"
+  slate.io/environment: local
+
+commonAnnotations:
+  slate.io/overlay: local
+  slate.io/security-policy: restricted

@@ -1,0 +1,8 @@
+# Modified: 2026-02-08T07:15:00Z | Author: COPILOT | Change: Create Helm namespace template
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: {{ include "slate.namespace" . }}
+  labels:
+    {{- include "slate.labels" . | nindent 4 }}
+    pod-security.kubernetes.io/enforce: restricted

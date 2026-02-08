@@ -1,0 +1,158 @@
+# Modified: 2026-02-08T07:15:00Z | Author: COPILOT | Change: Create Helm storage template
+# SLATE PersistentVolumes + PVCs for local hostPath storage
+---
+# Workspace PV
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: slate-workspace-pv
+  labels:
+    {{- include "slate.labels" . | nindent 4 }}
+    type: local
+spec:
+  capacity:
+    storage: {{ .Values.slate.storage.workspace.size }}
+  accessModes:
+    - ReadWriteOnce
+  persistentVolumeReclaimPolicy: Retain
+  storageClassName: manual
+  hostPath:
+    path: {{ .Values.slate.storage.workspace.hostPath }}
+    type: DirectoryOrCreate
+  claimRef:
+    name: slate-workspace-pvc
+    namespace: {{ include "slate.namespace" . }}
+
+---
+# Data PV
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: slate-data-pv
+  labels:
+    {{- include "slate.labels" . | nindent 4 }}
+    type: local
+spec:
+  capacity:
+    storage: {{ .Values.slate.storage.data.size }}
+  accessModes:
+    - ReadWriteOnce
+  persistentVolumeReclaimPolicy: Retain
+  storageClassName: manual
+  hostPath:
+    path: {{ .Values.slate.storage.data.hostPath }}
+    type: DirectoryOrCreate
+  claimRef:
+    name: slate-data-pvc
+    namespace: {{ include "slate.namespace" . }}
+
+{{- if .Values.ollama.enabled }}
+---
+# Ollama Data PV
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: ollama-data-pv
+  labels:
+    {{- include "slate.labels" . | nindent 4 }}
+    type: local
+spec:
+  capacity:
+    storage: {{ .Values.ollama.storage.size }}
+  accessModes:
+    - ReadWriteOnce
+  persistentVolumeReclaimPolicy: Retain
+  storageClassName: manual
+  hostPath:
+    path: {{ .Values.ollama.storage.hostPath }}
+    type: DirectoryOrCreate
+  claimRef:
+    name: ollama-data-pvc
+    namespace: {{ include "slate.namespace" . }}
+{{- end }}
+
+{{- if .Values.chromadb.enabled }}
+---
+# ChromaDB Data PV
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: chroma-data-pv
+  labels:
+    {{- include "slate.labels" . | nindent 4 }}
+    type: local
+spec:
+  capacity:
+    storage: {{ .Values.chromadb.storage.size }}
+  accessModes:
+    - ReadWriteOnce
+  persistentVolumeReclaimPolicy: Retain
+  storageClassName: manual
+  hostPath:
+    path: {{ .Values.chromadb.storage.hostPath }}
+    type: DirectoryOrCreate
+  claimRef:
+    name: chroma-data-pvc
+    namespace: {{ include "slate.namespace" . }}
+{{- end }}
+
+---
+# PVCs
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: slate-workspace-pvc
+  namespace: {{ include "slate.namespace" . }}
+spec:
+  accessModes:
+    - ReadWriteOnce
+  storageClassName: manual
+  resources:
+    requests:
+      storage: {{ .Values.slate.storage.workspace.size }}
+
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: slate-data-pvc
+  namespace: {{ include "slate.namespace" . }}
+spec:
+  accessModes:
+    - ReadWriteOnce
+  storageClassName: manual
+  resources:
+    requests:
+      storage: {{ .Values.slate.storage.data.size }}
+
+{{- if .Values.ollama.enabled }}
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: ollama-data-pvc
+  namespace: {{ include "slate.namespace" . }}
+spec:
+  accessModes:
+    - ReadWriteOnce
+  storageClassName: manual
+  resources:
+    requests:
+      storage: {{ .Values.ollama.storage.size }}
+{{- end }}
+
+{{- if .Values.chromadb.enabled }}
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: chroma-data-pvc
+  namespace: {{ include "slate.namespace" . }}
+spec:
+  accessModes:
+    - ReadWriteOnce
+  storageClassName: manual
+  resources:
+    requests:
+      storage: {{ .Values.chromadb.storage.size }}
+{{- end }}

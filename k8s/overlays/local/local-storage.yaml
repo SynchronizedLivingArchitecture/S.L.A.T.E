@@ -1,0 +1,161 @@
+# Modified: 2026-02-08T07:10:00Z | Author: COPILOT | Change: Create local hostPath storage for SLATE K8s
+# SLATE Local Storage — hostPath PersistentVolumes
+#
+# For local K8s (Docker Desktop, minikube, k3s), we use hostPath volumes
+# to mount directories directly from the host machine.
+#
+# The workspace volume maps your actual SLATE checkout for live development.
+# Data volumes persist Ollama models and ChromaDB data across restarts.
+#
+# NOTE: hostPath volumes are NODE-LOCAL. This is intentional — SLATE is local-only.
+---
+# PersistentVolume: SLATE workspace (maps host workspace directory)
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: slate-workspace-pv
+  labels:
+    app.kubernetes.io/name: slate
+    type: local
+spec:
+  capacity:
+    storage: 50Gi
+  accessModes:
+    - ReadWriteOnce
+  persistentVolumeReclaimPolicy: Retain
+  storageClassName: manual
+  hostPath:
+    # Default: adjust SLATE_HOST_WORKSPACE in your environment
+    # Docker Desktop: /run/desktop/mnt/host/e/11132025
+    # minikube: mount with `minikube mount E:\11132025:/slate-workspace`
+    path: /slate-workspace
+    type: DirectoryOrCreate
+  claimRef:
+    name: slate-workspace-pvc
+    namespace: slate
+
+---
+# PersistentVolume: SLATE data (index, memory, config)
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: slate-data-pv
+  labels:
+    app.kubernetes.io/name: slate
+    type: local
+spec:
+  capacity:
+    storage: 5Gi
+  accessModes:
+    - ReadWriteOnce
+  persistentVolumeReclaimPolicy: Retain
+  storageClassName: manual
+  hostPath:
+    path: /slate-data
+    type: DirectoryOrCreate
+  claimRef:
+    name: slate-data-pvc
+    namespace: slate
+
+---
+# PersistentVolume: Ollama model data
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: ollama-data-pv
+  labels:
+    app.kubernetes.io/name: ollama
+    type: local
+spec:
+  capacity:
+    storage: 50Gi
+  accessModes:
+    - ReadWriteOnce
+  persistentVolumeReclaimPolicy: Retain
+  storageClassName: manual
+  hostPath:
+    path: /ollama-data
+    type: DirectoryOrCreate
+  claimRef:
+    name: ollama-data-pvc
+    namespace: slate
+
+---
+# PersistentVolume: ChromaDB data
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: chroma-data-pv
+  labels:
+    app.kubernetes.io/name: chromadb
+    type: local
+spec:
+  capacity:
+    storage: 5Gi
+  accessModes:
+    - ReadWriteOnce
+  persistentVolumeReclaimPolicy: Retain
+  storageClassName: manual
+  hostPath:
+    path: /chroma-data
+    type: DirectoryOrCreate
+  claimRef:
+    name: chroma-data-pvc
+    namespace: slate
+
+---
+# PVCs — local overlay versions with manual storageClass
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: slate-workspace-pvc
+  namespace: slate
+spec:
+  accessModes:
+    - ReadWriteOnce
+  storageClassName: manual
+  resources:
+    requests:
+      storage: 50Gi
+
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: slate-data-pvc
+  namespace: slate
+spec:
+  accessModes:
+    - ReadWriteOnce
+  storageClassName: manual
+  resources:
+    requests:
+      storage: 5Gi
+
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: ollama-data-pvc
+  namespace: slate
+spec:
+  accessModes:
+    - ReadWriteOnce
+  storageClassName: manual
+  resources:
+    requests:
+      storage: 50Gi
+
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: chroma-data-pvc
+  namespace: slate
+spec:
+  accessModes:
+    - ReadWriteOnce
+  storageClassName: manual
+  resources:
+    requests:
+      storage: 5Gi

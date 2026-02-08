@@ -1,0 +1,86 @@
+# Modified: 2026-02-08T07:15:00Z | Author: COPILOT | Change: Create Helm ChromaDB deployment template
+{{- if .Values.chromadb.enabled }}
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: chromadb
+  namespace: {{ include "slate.namespace" . }}
+  labels:
+    {{- include "slate.labels" . | nindent 4 }}
+    app.kubernetes.io/component: vectorstore
+spec:
+  replicas: {{ .Values.chromadb.replicas }}
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: chromadb
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: chromadb
+        app.kubernetes.io/component: vectorstore
+        {{- include "slate.labels" . | nindent 8 }}
+    spec:
+      serviceAccountName: {{ .Values.rbac.serviceAccounts.agent }}
+      automountServiceAccountToken: false
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 1000
+        fsGroup: 1000
+        seccompProfile:
+          type: RuntimeDefault
+      containers:
+        - name: chromadb
+          image: "{{ .Values.chromadb.image.repository }}:{{ .Values.chromadb.image.tag }}"
+          imagePullPolicy: {{ .Values.chromadb.image.pullPolicy }}
+          ports:
+            - containerPort: {{ .Values.chromadb.port }}
+              name: chroma
+          env:
+            {{- range $key, $val := .Values.chromadb.env }}
+            - name: {{ $key }}
+              value: {{ $val | quote }}
+            {{- end }}
+          securityContext:
+            allowPrivilegeEscalation: false
+            readOnlyRootFilesystem: true
+            capabilities:
+              drop:
+                - ALL
+          resources:
+            requests:
+              cpu: {{ .Values.chromadb.resources.requests.cpu }}
+              memory: {{ .Values.chromadb.resources.requests.memory }}
+            limits:
+              cpu: {{ .Values.chromadb.resources.limits.cpu }}
+              memory: {{ .Values.chromadb.resources.limits.memory }}
+          volumeMounts:
+            - name: chroma-data
+              mountPath: /chroma/chroma
+            - name: tmp
+              mountPath: /tmp
+      volumes:
+        - name: chroma-data
+          persistentVolumeClaim:
+            claimName: chroma-data-pvc
+        - name: tmp
+          emptyDir:
+            sizeLimit: 100Mi
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: chromadb-svc
+  namespace: {{ include "slate.namespace" . }}
+  labels:
+    {{- include "slate.labels" . | nindent 4 }}
+    app.kubernetes.io/component: vectorstore
+spec:
+  type: ClusterIP
+  selector:
+    app.kubernetes.io/name: chromadb
+  ports:
+    - port: {{ .Values.chromadb.port }}
+      targetPort: {{ .Values.chromadb.port }}
+      protocol: TCP
+      name: chroma
+{{- end }}
