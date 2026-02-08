@@ -150,3 +150,47 @@ routing:
   claude|mcp|sdk|integration: DELTA
   diagnose|investigate|troubleshoot|interactive|explain: COPILOT_CHAT
   complex|multi-step: COPILOT
+
+# Modified: 2026-02-07T22:00:00Z | Author: COPILOT | Change: Add participant enforcement and execution routing
+# Participant Enforcement
+participant_routing:
+  # Primary execution interface — participants FIRST, terminal as fallback
+  execution_priority:
+    - participant_tool    # e.g., slate_workflow, slate_specKit
+    - participant_command # e.g., @slate /status
+    - subagent_delegation # runSubagent with 'slate'
+    - terminal_fallback   # ONLY if all participant paths fail
+
+  # Participant assignments
+  participants:
+    slate:
+      extension: slate.slate-copilot
+      scope: [system, runner, ci, gpu, orchestrator, specs, agents, benchmarks, workflows]
+      tools: [slate_systemStatus, slate_runtimeCheck, slate_hardwareInfo, slate_runnerStatus, slate_orchestrator, slate_workflow, slate_benchmark, slate_securityAudit, slate_specKit, slate_planContext, slate_devCycle, slate_codeGuidance, slate_agentBridge, slate_autonomous, slate_executeWork, slate_handoff, slate_forkCheck, slate_gpuManager, slate_learningProgress, slate_runCommand]
+
+    vscode:
+      extension: built-in
+      scope: [files, settings, extensions, debugging, editor]
+
+  # Subagent routing with participant enforcement
+  subagent_participants:
+    slate: "@slate"       # System health, runner, CI, specs, agents
+    Plan: null            # Planning agent — no participant
+
+  # Spec-Kit mandate — all spec processing goes through slate_specKit
+  spec_kit:
+    tool: slate_specKit
+    command: "@slate /specs"
+    fallback: "python slate/slate_spec_kit.py"
+    enforce: true  # NEVER bypass spec-kit for spec work
+
+# Document Evolution
+document_rules:
+  mode: append_only
+  require_timestamps: true
+  allow_deletions: false
+  deprecation_marker: "# DEPRECATED:"
+  governed_files:
+    - .github/copilot-instructions.md
+    - AGENTS.md
+    - .github/slate.config.yaml

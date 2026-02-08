@@ -1,5 +1,5 @@
 # S.L.A.T.E. Agent Instructions
-# Modified: 2026-02-08T04:00:00Z | Author: COPILOT | Change: Add hardware portability rules — never hardcode dev machine specs
+# Modified: 2026-02-07T22:00:00Z | Author: COPILOT | Change: Add document evolution rules, participant enforcement, spec-kit mandate
 
 ## Overview
 SLATE (Synchronized Living Architecture for Transformation and Evolution) is a local-first
@@ -184,13 +184,13 @@ skills/             # Copilot Chat skill definitions
 
 ## Self-Hosted Runner
 - **Name**: slate-runner
-- **Labels**: `[self-hosted, Windows, X64, slate, gpu, cuda]`
+- **Labels**: `[self-hosted, Windows, X64, slate, gpu, cuda, gpu-2, blackwell]`
 - **Work folder**: `slate_work`
-- **GPUs**: Detected at runtime via `nvidia-smi` or `torch.cuda` — NEVER hardcode GPU models/counts
-- **Pre-job hook**: Sets `CUDA_VISIBLE_DEVICES`, SLATE env vars, Python PATH
-- **Python**: `<workspace>\.venv\Scripts\python.exe`
+- **GPUs**: 2x NVIDIA GeForce RTX 5070 Ti (Blackwell, compute 12.0, 16GB each)
+- **Pre-job hook**: Sets `CUDA_VISIBLE_DEVICES=0,1`, SLATE env vars, Python PATH
+- **Python**: `<workspace>\.venv\Scripts\python.exe` (3.11.9)
 - **No `actions/setup-python`**: All jobs use `GITHUB_PATH` to prepend venv
-- **SLATE Custom Models**: Detected via Ollama at runtime — query the API, never assume
+- **SLATE Custom Models**: slate-coder (12B), slate-fast (3B), slate-planner (7B)
 
 ## Workflow Conventions
 - All jobs: `runs-on: [self-hosted, slate]`
@@ -205,17 +205,6 @@ skills/             # Copilot Chat skill definitions
 - No `curl.exe` (freezes on this system  use `urllib.request`)
 - Protected files in forks: `.github/workflows/*`, `CODEOWNERS`, action guards
 - Blocked patterns: `eval(`, `exec(os`, `rm -rf /`, `base64.b64decode`
-
-## Hardware Portability Rules (ENFORCED)
-SLATE is installed on many different machines. Code MUST detect hardware at runtime:
-- **NEVER** hardcode GPU model names (e.g., "RTX 5070 Ti"), counts (e.g., "2x"), or VRAM sizes
-- **NEVER** hardcode `CUDA_VISIBLE_DEVICES` values — detect device count dynamically
-- **ALWAYS** use `nvidia-smi`, `torch.cuda`, or SLATE detection scripts to get actual hardware
-- **ALWAYS** use placeholder/generic text in UI that gets replaced by runtime detection
-- **Dashboard/Extension**: Service cards, status text, and prompts must show detected values
-- **System prompts**: Never include specific GPU specs — instruct the agent to detect at runtime
-- **Ollama models**: Never assume which models are installed — query the API
-- When writing GPU-related code, test the path where `gpuCount == 0` (CPU-only installs)
 
 ## Terminal Rules
 - Use `isBackground=true` for long-running commands (servers, watchers, runner)
@@ -235,3 +224,53 @@ token = [l.split('=',1)[1] for l in result.stdout.splitlines()
          if l.startswith('password=')][0]
 ```
 Repository API base: `https://api.github.com/repos/SynchronizedLivingArchitecture/S.L.A.T.E`
+
+## Document Evolution Rules (ENFORCED)
+
+All protocol files (`AGENTS.md`, `copilot-instructions.md`, `slate.config.yaml`) are
+**append-only living documents**:
+
+1. **ADDITIVE ONLY** — New rules are APPENDED. Never overwrite or remove existing behaviors.
+2. **Preserve All Existing Rules** — Every existing section remains intact.
+3. **Timestamp Every Change** — Each edit includes `# Modified:` with ISO timestamp.
+4. **No Silent Overwrites** — Add NEW sections that augment originals. Never delete.
+5. **Deprecation Protocol** — Add `# DEPRECATED: YYYY-MM-DD | Reason:` above retired sections.
+6. **Version Accumulation** — The document grows over time. This is the complete behavioral history.
+
+## Chat Participant Enforcement (MANDATORY)
+
+All agents MUST use VS Code chat participants as their PRIMARY execution interface.
+
+### Available Participants
+
+| Participant | Purpose | When to Use |
+|-------------|---------|-------------|
+| `@slate` | SLATE system ops, runner, CI, GPU, specs, agents | System management, health, deployments |
+| `@vscode` | Editor operations, files, settings | File ops, editor config, extensions |
+
+### Enforcement Rules
+
+1. **Subagents MUST use `@slate`** — Always prefer `@slate` over raw terminal commands.
+2. **Spec work MUST use `slate_specKit`** — Never process specs manually.
+3. **System operations MUST go through `@slate`** — Health, runner, CI, GPU — use the participant.
+4. **Editor operations SHOULD use `@vscode`** — File management, settings, extensions.
+5. **Multi-participant chaining** — Complex tasks chain: `@slate /status` → `@slate /specs` → `@vscode`.
+6. **Never bypass participants** — If a tool exists for the operation, USE IT.
+
+### Execution Priority
+
+```
+1. Participant tool (e.g., slate_workflow, slate_specKit)
+2. Participant command (e.g., @slate /status)
+3. Subagent delegation (runSubagent with 'slate')
+4. Terminal (ONLY as last resort fallback)
+```
+
+### Spec-Kit Mandate
+
+All specification processing, roadmap analysis, and wiki generation MUST go through:
+- `slate_specKit` tool (via @slate participant)
+- `@slate /specs` command
+- `python slate/slate_spec_kit.py` (only as terminal fallback)
+
+Never manually parse specs, manually write wiki pages, or skip the spec-kit pipeline.

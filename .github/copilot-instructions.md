@@ -1,5 +1,5 @@
 # S.L.A.T.E. Copilot Instructions
-# Modified: 2026-02-08T04:00:00Z | Author: COPILOT | Change: Add hardware portability rules — never hardcode dev machine specs
+# Modified: 2026-02-07T22:00:00Z | Author: COPILOT | Change: Add document evolution rules, chat participant enforcement, aggressive execution patterns
 
 ## Workspace
 
@@ -220,11 +220,11 @@ skills/             # Copilot Chat skill definitions
 
 ## Self-Hosted Runner Details
 - **Name**: slate-runner
-- **Labels**: `[self-hosted, Windows, X64, slate, gpu, cuda]`
+- **Labels**: `[self-hosted, Windows, X64, slate, gpu, cuda, gpu-2, blackwell]`
 - **Work folder**: `slate_work`
-- **GPUs**: Detected at runtime via `nvidia-smi` or `torch.cuda` — NEVER hardcode GPU models/counts
-- **Pre-job hook**: Sets `CUDA_VISIBLE_DEVICES`, SLATE env vars, Python PATH
-- **SLATE Custom Models**: Detected via Ollama at runtime
+- **GPUs**: 2x NVIDIA GeForce RTX 5070 Ti (Blackwell, compute 12.0, 16GB each)
+- **Pre-job hook**: Sets `CUDA_VISIBLE_DEVICES=0,1`, SLATE env vars, Python PATH
+- **SLATE Custom Models**: slate-coder (12B), slate-fast (3B), slate-planner (7B)
 
 ## Workflow Conventions
 - All jobs use `runs-on: [self-hosted, slate]`
@@ -280,17 +280,6 @@ python slate/copilot_agent_bridge.py --cleanup     # Clean stale entries
 - Protected files in forks: `.github/workflows/*`, `CODEOWNERS`, action guards
 - Blocked patterns: `eval(`, `exec(os`, `rm -rf /`, `base64.b64decode`
 
-## Hardware Portability Rules (ENFORCED)
-SLATE is installed on many different machines. Code MUST detect hardware at runtime:
-- **NEVER** hardcode GPU model names (e.g., "RTX 5070 Ti"), counts (e.g., "2x"), or VRAM sizes
-- **NEVER** hardcode `CUDA_VISIBLE_DEVICES` values — detect device count dynamically
-- **ALWAYS** use `nvidia-smi`, `torch.cuda`, or SLATE detection scripts to get actual hardware
-- **ALWAYS** use placeholder/generic text in UI that gets replaced by runtime detection
-- **Dashboard/Extension**: Service cards, status text, and prompts must show detected values
-- **System prompts**: Never include specific GPU specs — instruct the agent to detect at runtime
-- **Ollama models**: Never assume which models are installed — query the API
-- When writing GPU-related code, test the path where `gpuCount == 0` (CPU-only installs)
-
 ## Terminal Rules
 - Use `isBackground=true` for long-running commands (servers, watchers, runner)
 - Never use `curl.exe`  use Python `urllib.request` or PowerShell `Invoke-RestMethod`
@@ -319,3 +308,109 @@ If you skip the mandatory protocols above, you risk:
 5. **GPU misconfiguration**  wrong model placement on dual-GPU system
 
 **Always run the protocols. They take <5 seconds and prevent hours of debugging.**
+
+## Document Evolution Rules (ENFORCED)
+
+These instruction files are **append-only living documents**. All protocol files
+(`copilot-instructions.md`, `AGENTS.md`, `slate.config.yaml`) follow strict evolution rules:
+
+1. **ADDITIVE ONLY** — New behaviors, sections, and rules are APPENDED. Never overwrite,
+   remove, or replace existing behaviors unless explicitly deprecated via `# DEPRECATED:`.
+2. **Preserve All Existing Rules** — Every existing section, behavior, safeguard, and protocol
+   remains intact. New additions extend the system, they do not contradict or supersede.
+3. **Timestamp Every Change** — Each edit includes `# Modified:` with ISO timestamp, author, and
+   a change description that says what was ADDED, not what was "updated" or "replaced".
+4. **No Silent Overwrites** — If a behavior needs to change, add a NEW section that augments
+   the original. Reference the original section. Never delete the original.
+5. **Deprecation Protocol** — To retire a behavior: add `# DEPRECATED: YYYY-MM-DD | Reason:`
+   above the section. The section stays in-document for history. A new section replaces it.
+6. **Version Accumulation** — The document grows over time. This is intentional. It forms the
+   complete behavioral history of the system.
+
+## Chat Participant Enforcement (MANDATORY)
+
+SLATE provides three VS Code chat participants. All agents and subagents MUST use them
+aggressively for execution rather than falling back to raw terminal commands or manual work.
+
+### Available Chat Participants
+
+| Participant | Extension | Purpose | When to Use |
+|-------------|-----------|---------|-------------|
+| `@slate` | `slate.slate-copilot` | SLATE system ops — runner, CI, GPU, orchestrator, specs, agents | System management, health checks, deployments, agent routing |
+| `@vscode` | Built-in | VS Code editor operations — files, settings, extensions, debugging | File operations, editor configuration, extension management |
+
+### @slate Tools (20+ LM Tools)
+
+| Tool | Purpose |
+|------|--------|
+| `slate_systemStatus` | System health check |
+| `slate_runtimeCheck` | Integration verification |
+| `slate_hardwareInfo` | GPU detection & optimization |
+| `slate_runnerStatus` | Runner management |
+| `slate_orchestrator` | Service lifecycle |
+| `slate_workflow` | Task management |
+| `slate_benchmark` | Performance benchmarks |
+| `slate_securityAudit` | Security scanning |
+| `slate_specKit` | Spec processing, wiki generation, roadmap |
+| `slate_planContext` | Compressed context for token efficiency |
+| `slate_devCycle` | Development stage management |
+| `slate_codeGuidance` | Stage-aligned code guidance |
+| `slate_agentBridge` | Autonomous loop ↔ chat bridge |
+| `slate_autonomous` | Autonomous task execution |
+| `slate_executeWork` | Direct work execution |
+| `slate_handoff` | Task delegation between agents |
+| `slate_forkCheck` | Fork sync and security |
+| `slate_gpuManager` | Dual-GPU load balancing |
+| `slate_learningProgress` | Learning/XP tracking |
+| `slate_runCommand` | Escape hatch — run any SLATE Python script |
+
+### Enforcement Rules
+
+1. **Subagents MUST use `@slate`** — When delegating to `runSubagent` with agent name `slate`,
+   the subagent has full access to all 20+ SLATE tools. Always prefer `@slate` over raw
+   terminal commands for SLATE operations.
+2. **Spec work MUST use `slate_specKit`** — Never process specs manually. Use
+   `@slate /specs` or invoke `slate_specKit` tool directly.
+3. **System operations MUST use `@slate`** — Health checks, runner management, CI dispatch,
+   GPU management — all go through `@slate` participant, not ad-hoc Python commands.
+4. **Editor operations SHOULD use `@vscode`** — File management, settings changes, extension
+   installs — prefer `@vscode` participant when available.
+5. **Multi-participant chaining** — Complex tasks should chain participants:
+   - `@slate /status` → verify system health
+   - `@slate /specs` → process specifications
+   - `@vscode` → apply editor-level changes
+6. **Never bypass participants for covered operations** — If a participant tool exists for the
+   operation, USE IT. Don't fall back to manual terminal unless the tool fails.
+
+### Aggressive Execution Patterns
+
+Participants are NOT optional helpers — they are the PRIMARY execution interface.
+Every task should be routed through the appropriate participant FIRST.
+
+```
+Task Arrives → Classify Intent → Route to Participant → Execute via Tools → Report
+                                        ↓
+                            @slate (system/infra/specs/agents)
+                            @vscode (editor/files/settings)
+                            Terminal (ONLY as fallback)
+```
+
+**Escalation Order:**
+1. Try participant tool first (e.g., `slate_workflow` for task management)
+2. Try participant command second (e.g., `@slate /status`)
+3. Try subagent delegation third (e.g., `runSubagent` with `slate` agent)
+4. Fall back to terminal ONLY if all participant paths fail
+
+### Subagent Delegation with Participants
+
+When using `runSubagent`, always specify the appropriate agent:
+
+| Task Type | Subagent | Participant Used |
+|-----------|----------|------------------|
+| System health, runner, CI | `slate` | `@slate` |
+| Spec processing, roadmap | `slate` | `@slate /specs` |
+| Agent management, autonomous loops | `slate` | `@slate /agents` |
+| Multi-step complex operations | `slate` | `@slate` (full orchestration) |
+| Code research, file analysis | Default | `@vscode` |
+| Planning, architecture | `Plan` | N/A |
+
