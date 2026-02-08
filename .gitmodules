@@ -1,0 +1,3 @@
+[submodule "vendor/copilot-sdk"]
+	path = vendor/copilot-sdk
+	url = https://github.com/SynchronizedLivingArchitecture/copilot-sdk.git

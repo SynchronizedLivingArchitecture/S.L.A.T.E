@@ -116,6 +116,28 @@ fork_manager:
     4_contribute: "python slate_fork_manager.py --contribute 'branch' --title 'title'"
     5_sync: "python slate_fork_manager.py --sync"
 
+# Modified: 2026-02-08T14:00:00Z | Author: COPILOT | Change: Add copilot-sdk dependency tracking
+# Copilot SDK Dependency (GitHub upstream → SLATE fork → submodule)
+copilot_sdk:
+  upstream: https://github.com/github/copilot-sdk.git
+  fork: https://github.com/SynchronizedLivingArchitecture/copilot-sdk.git
+  submodule_path: vendor/copilot-sdk
+  bridge: slate/slate_copilot_sdk_bridge.py
+  sync_workflow: .github/workflows/sync-copilot-sdk.yml
+  protocol_version: 2
+  components:
+    python:
+      path: vendor/copilot-sdk/python
+      package: github-copilot-sdk
+      imports: [CopilotClient, CopilotSession, define_tool]
+    nodejs:
+      path: vendor/copilot-sdk/nodejs
+      package: "@github/copilot-sdk"
+  sync:
+    schedule: "0 6 * * *"  # Daily at 06:00 UTC
+    auto_merge_threshold: 5  # Direct push if ≤5 commits
+    pr_labels: [automated, sdk-sync, copilot-sdk]
+
 # Release & Package System
 release:
   version_source: pyproject.toml

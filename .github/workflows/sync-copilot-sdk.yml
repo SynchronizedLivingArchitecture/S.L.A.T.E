@@ -1,0 +1,167 @@
+# Modified: 2026-02-08T14:00:00Z | Author: COPILOT | Change: Create upstream sync workflow for github/copilot-sdk fork
+# Syncs SynchronizedLivingArchitecture/copilot-sdk from upstream github/copilot-sdk
+# Triggers: schedule (daily), manual dispatch, or when submodule ref is stale
+name: Sync Copilot SDK
+
+on:
+  schedule:
+    # Run daily at 06:00 UTC to catch upstream updates
+    - cron: '0 6 * * *'
+  workflow_dispatch:
+    inputs:
+      force_sync:
+        description: 'Force sync even if no changes detected'
+        required: false
+        default: 'false'
+        type: boolean
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  sync-fork:
+    name: Sync Fork from Upstream
+    runs-on: [self-hosted, slate]
+    defaults:
+      run:
+        shell: powershell
+    steps:
+      - name: Checkout S.L.A.T.E.
+        uses: actions/checkout@v4
+        with:
+          submodules: true
+          fetch-depth: 0
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Setup Python
+        run: |
+          "$env:GITHUB_WORKSPACE\.venv\Scripts" | Out-File -Append $env:GITHUB_PATH
+
+      - name: Sync Fork from Upstream
+        run: |
+          # Navigate to submodule
+          Push-Location vendor/copilot-sdk
+
+          # Ensure upstream remote exists
+          $remotes = git remote
+          if ($remotes -notcontains 'upstream') {
+            git remote add upstream 'https://github.com/github/copilot-sdk.git'
+          }
+
+          # Fetch upstream
+          git fetch upstream main --tags 2>&1
+          Write-Host "Fetched upstream github/copilot-sdk"
+
+          # Check for new commits
+          $behind = git rev-list --count HEAD..upstream/main
+          Write-Host "Commits behind upstream: $behind"
+
+          if ($behind -eq 0 -and '${{ inputs.force_sync }}' -ne 'true') {
+            Write-Host "Fork is up to date with upstream. No sync needed."
+            "SYNC_NEEDED=false" | Out-File -Append $env:GITHUB_ENV
+            Pop-Location
+            exit 0
+          }
+
+          # Store pre-sync state
+          $oldHead = git rev-parse HEAD
+          "OLD_SDK_HEAD=$oldHead" | Out-File -Append $env:GITHUB_ENV
+
+          # Merge upstream changes
+          git checkout main
+          git merge upstream/main --no-edit 2>&1
+
+          # Push synced fork
+          git push origin main --tags 2>&1
+
+          $newHead = git rev-parse HEAD
+          "NEW_SDK_HEAD=$newHead" | Out-File -Append $env:GITHUB_ENV
+          "SYNC_NEEDED=true" | Out-File -Append $env:GITHUB_ENV
+          "COMMITS_SYNCED=$behind" | Out-File -Append $env:GITHUB_ENV
+
+          Write-Host "Synced $behind commits: $oldHead -> $newHead"
+          Pop-Location
+
+      - name: Update Submodule Reference
+        if: env.SYNC_NEEDED == 'true'
+        run: |
+          # Update the submodule pointer in S.L.A.T.E.
+          git config user.name "SLATE Bot"
+          git config user.email "slate-bot@synchronizedliving.dev"
+
+          # Update submodule to latest
+          git submodule update --remote vendor/copilot-sdk
+          git add vendor/copilot-sdk
+
+          # Check for SDK version changes
+          $sdkVersion = Get-Content vendor/copilot-sdk/sdk-protocol-version.json | ConvertFrom-Json
+          $pyVersion = (Get-Content vendor/copilot-sdk/python/copilot/__init__.py | Select-String '__version__').ToString().Split('"')[1]
+
+          git commit -m "deps(copilot-sdk): sync upstream ${{ env.COMMITS_SYNCED }} commits
+
+          SDK Protocol: v$($sdkVersion.version)
+          Python SDK: v$pyVersion
+          Upstream: github/copilot-sdk@${{ env.NEW_SDK_HEAD }}
+          Previous: ${{ env.OLD_SDK_HEAD }}
+
+          # Modified: $(Get-Date -Format 'yyyy-MM-ddTHH:mm:ssZ') | Author: SLATE-BOT | Change: Upstream copilot-sdk sync"
+
+      - name: Run SLATE Integration Check
+        if: env.SYNC_NEEDED == 'true'
+        run: |
+          python slate/slate_copilot_sdk_bridge.py --check 2>&1
+
+      - name: Create PR for SDK Update
+        if: env.SYNC_NEEDED == 'true'
+        run: |
+          $branch = "deps/copilot-sdk-sync-$(Get-Date -Format 'yyyyMMdd')"
+          git checkout -b $branch
+          git push origin $branch 2>&1
+
+          # Create PR via GitHub API
+          $token = $env:GITHUB_TOKEN
+          $headers = @{
+            Authorization = "token $token"
+            Accept = "application/vnd.github.v3+json"
+          }
+          $body = @{
+            title = "deps(copilot-sdk): sync ${{ env.COMMITS_SYNCED }} upstream commits"
+            body = @"
+          ## Copilot SDK Upstream Sync
+
+          Synced **${{ env.COMMITS_SYNCED }}** commits from ``github/copilot-sdk``.
+
+          | Detail | Value |
+          |--------|-------|
+          | Previous | ``${{ env.OLD_SDK_HEAD }}`` |
+          | Current | ``${{ env.NEW_SDK_HEAD }}`` |
+          | SDK Protocol | See ``sdk-protocol-version.json`` |
+
+          ### Automated Checks
+          - [ ] SLATE integration bridge validated
+          - [ ] Python SDK imports verified
+          - [ ] Node.js SDK types compatible
+
+          > Auto-generated by ``sync-copilot-sdk.yml``
+          "@
+            head = $branch
+            base = "main"
+            labels = @("dependencies", "copilot-sdk")
+          } | ConvertTo-Json -Depth 3
+
+          try {
+            Invoke-RestMethod -Uri "https://api.github.com/repos/SynchronizedLivingArchitecture/S.L.A.T.E/pulls" `
+              -Method POST -Headers $headers -Body $body -ContentType "application/json"
+            Write-Host "PR created for SDK sync"
+          } catch {
+            Write-Host "PR creation skipped (may already exist): $($_.Exception.Message)"
+          }
+
+      - name: Push Direct (if minor update)
+        if: env.SYNC_NEEDED == 'true' && env.COMMITS_SYNCED <= 5
+        run: |
+          # For small syncs (<=5 commits), push directly to main
+          git checkout main
+          git push origin main 2>&1
+          Write-Host "Direct push to main (small sync: ${{ env.COMMITS_SYNCED }} commits)"
