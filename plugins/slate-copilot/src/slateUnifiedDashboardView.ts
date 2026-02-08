@@ -1,4 +1,4 @@
-// Modified: 2026-02-07T18:00:00Z | Author: COPILOT | Change: Unified dashboard combining guided setup, control board, and dashboard into one view
+// Modified: 2026-02-07T22:00:00Z | Author: COPILOT | Change: Fix dashboard service status + guided setup theme to SLATE M3 ProArt copper accent
 /**
  * SLATE Unified Dashboard View
  * ==============================
@@ -498,7 +498,36 @@ export class SlateUnifiedDashboardViewProvider implements vscode.WebviewViewProv
 	}
 
 	private async _refreshStatus(): Promise<void> {
-		this._sendToWebview({ type: 'statusUpdate' });
+		const config = getSlateConfig();
+		const py = config.pythonPath;
+		const cwd = this._workspaceRoot;
+
+		const checks = [
+			{ id: 'svcDashboard', cmd: `"${py}" -c "import urllib.request; urllib.request.urlopen('http://127.0.0.1:8080', timeout=2); print('ok')"`, ok: ':8080 ●', fail: ':8080 ○' },
+			{ id: 'svcOllama', cmd: `"${py}" -c "import urllib.request; urllib.request.urlopen('http://127.0.0.1:11434/api/tags', timeout=2); print('ok')"`, ok: ':11434 ●', fail: ':11434 ○' },
+			{ id: 'svcRunner', cmd: `"${py}" slate/slate_runner_manager.py --detect`, ok: 'Online', fail: 'Offline' },
+			{ id: 'svcGPU', cmd: `"${py}" -c "import torch; print('ok' if torch.cuda.is_available() else 'no')"`, ok: '2x RTX ●', fail: 'No GPU' },
+			{ id: 'svcDocker', cmd: `"${py}" -c "import subprocess; r=subprocess.run(['docker','info'],capture_output=True,text=True,timeout=5); print('ok' if r.returncode==0 else 'no')"`, ok: 'Running', fail: 'Stopped' },
+			{ id: 'svcMCP', cmd: `"${py}" -c "import os; print('ok' if os.path.exists('slate/mcp_server.py') else 'no')"`, ok: 'Ready', fail: 'Missing' },
+		];
+
+		const results = await Promise.allSettled(
+			checks.map(async (c) => {
+				try {
+					const { stdout } = await execAsync(c.cmd, { cwd, timeout: 8000 });
+					const up = stdout.trim().includes('ok') || stdout.trim().includes('Found');
+					return { id: c.id, active: up, status: up ? c.ok : c.fail };
+				} catch {
+					return { id: c.id, active: false, status: c.fail };
+				}
+			})
+		);
+
+		const services = results
+			.filter((r): r is PromiseFulfilledResult<{ id: string; active: boolean; status: string }> => r.status === 'fulfilled')
+			.map(r => r.value);
+
+		this._sendToWebview({ type: 'serviceStatus', services });
 	}
 
 	private async _transitionDevCycleStage(stage: string): Promise<void> {
@@ -803,7 +832,7 @@ export class SlateUnifiedDashboardViewProvider implements vscode.WebviewViewProv
 			background: var(--sl-text-tertiary);
 			transition: all 0.3s;
 		}
-		.step-dot.active { background: var(--sl-info); transform: scale(1.3); box-shadow: 0 0 10px var(--sl-info); }
+		.step-dot.active { background: var(--sl-accent); transform: scale(1.3); box-shadow: 0 0 10px var(--sl-accent-glow); }
 		.step-dot.complete { background: var(--sl-success); }
 		.step-dot.error { background: var(--sl-error); }
 
@@ -837,7 +866,7 @@ export class SlateUnifiedDashboardViewProvider implements vscode.WebviewViewProv
 		.step-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; }
 		.step-title { font-size: 16px; font-weight: 600; color: var(--sl-accent-light); }
 		.step-status { font-size: 11px; padding: 3px 10px; border-radius: var(--sl-radius-full); font-weight: 500; }
-		.step-status.active { background: rgba(126,168,190,0.15); color: var(--sl-info); }
+		.step-status.active { background: var(--sl-accent-container); color: var(--sl-accent-light); }
 		.step-status.executing { background: rgba(212,160,84,0.15); color: var(--sl-warning); }
 		.step-status.complete { background: rgba(120,184,154,0.15); color: var(--sl-success); }
 		.step-status.error { background: rgba(196,112,112,0.15); color: var(--sl-error); }
@@ -1624,11 +1653,17 @@ export class SlateUnifiedDashboardViewProvider implements vscode.WebviewViewProv
 					if (msg.data && msg.data.dev_cycle) updateDevCycleRing(msg.data.dev_cycle);
 					if (msg.data && msg.data.learning) updateLearningStats(msg.data.learning);
 					break;
-				case 'statusUpdate':
-					document.querySelectorAll('.service-card').forEach(c => {
-						c.style.animation = 'slideIn 0.3s ease-out';
-						setTimeout(() => c.style.animation = '', 300);
-					});
+				case 'serviceStatus':
+					if (msg.services) {
+						msg.services.forEach(function(svc) {
+							var card = document.getElementById(svc.id);
+							if (card) {
+								if (svc.active) { card.classList.add('active'); } else { card.classList.remove('active'); }
+								var st = card.querySelector('.service-status');
+								if (st) st.textContent = svc.status;
+							}
+						});
+					}
 					break;
 				case 'guidedExit': exitGuided(); break;
 			}

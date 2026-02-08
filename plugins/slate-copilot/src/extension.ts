@@ -1,4 +1,4 @@
-// Modified: 2026-02-07T18:00:00Z | Author: COPILOT | Change: Unified dashboard — merge guided setup, control board, and dashboard into single view
+// Modified: 2026-02-07T22:00:00Z | Author: COPILOT | Change: Fix full-panel dashboard theme to SLATE M3 ProArt + unified view cleanup
 import * as vscode from 'vscode';
 import { registerSlateParticipant } from './slateParticipant';
 import { registerSlateTools } from './tools';
@@ -223,44 +223,50 @@ function getDashboardHtml(webview: vscode.Webview): string {
 			width: 100%;
 			margin: 0;
 			padding: 0;
-			background: #0b0c10;
-			color: #e5e7eb;
-			font-family: "Segoe UI", Arial, sans-serif;
+			background: #0a0a0a;
+			color: #F5F0EB;
+			font-family: 'Inter', 'Segoe UI', system-ui, -apple-system, sans-serif;
 		}
 		.toolbar {
 			display: flex;
 			align-items: center;
 			justify-content: space-between;
 			padding: 10px 14px;
-			border-bottom: 1px solid #1f2937;
-			background: #0f1115;
+			border-bottom: 1px solid rgba(255,255,255,0.08);
+			background: #050505;
 		}
 		.title {
 			font-size: 14px;
-			letter-spacing: 0.04em;
+			letter-spacing: 0.08em;
 			text-transform: uppercase;
-			color: #9ca3af;
+			color: #B87333;
+			font-weight: 600;
 		}
 		.actions {
 			display: flex;
 			gap: 8px;
 		}
 		button {
-			background: #1f2937;
-			color: #e5e7eb;
-			border: 1px solid #374151;
-			border-radius: 6px;
-			padding: 6px 10px;
+			background: #111111;
+			color: #F5F0EB;
+			border: 1px solid rgba(255,255,255,0.12);
+			border-radius: 8px;
+			padding: 6px 14px;
 			cursor: pointer;
 			font-size: 12px;
+			font-family: inherit;
+			transition: all 0.2s;
 		}
 		button:hover {
-			background: #374151;
+			background: #1a1a1a;
+			border-color: #B87333;
+			color: #C9956B;
 		}
 		.frame {
 			height: calc(100% - 44px);
 			width: 100%;
 			border: none;
+			background: #0a0a0a;
 		}
 	</style>
 </head>
