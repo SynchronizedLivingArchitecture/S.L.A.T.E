@@ -16,7 +16,7 @@ on:
       build_exe:
         description: 'Build EXE artifact'
         required: false
-        default: 'true'
+        default: true
         type: boolean
   # Called by stable-release.yml after validation
   workflow_call:

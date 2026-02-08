@@ -31,7 +31,7 @@ on:
       push_images:
         description: 'Push images to registry'
         required: false
-        default: 'true'
+        default: true
         type: boolean
 
 env:
@@ -93,25 +93,21 @@ jobs:
             tag_latest: latest-gpu
             platforms: ''
             timeout: 30
-            test_cmd: >-
-              docker run --rm --gpus all ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:latest-gpu nvidia-smi;
-              docker run --rm ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:latest-gpu python -c "import slate; print(f'SLATE v{slate.__version__}')"
+            needs_gpu: true
           - variant: cpu
             dockerfile: ./Dockerfile.cpu
             tag_prefix: cpu
             tag_latest: latest-cpu
             platforms: linux/amd64,linux/arm64
             timeout: 20
-            test_cmd: >-
-              docker run --rm ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:latest-cpu python -c "import slate; print(f'SLATE v{slate.__version__}')"
+            needs_gpu: false
           - variant: dev
             dockerfile: ./Dockerfile.dev
             tag_prefix: dev
             tag_latest: latest-dev
             platforms: ''
             timeout: 20
-            test_cmd: >-
-              docker run --rm ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:latest-dev python -c "import slate; print(f'SLATE v{slate.__version__}')"
+            needs_gpu: false
     outputs:
       gpu-digest: ${{ steps.build.outputs.digest }}
       cpu-digest: ${{ steps.build.outputs.digest }}
@@ -157,9 +153,15 @@ jobs:
             BUILD_DATE=${{ github.event.repository.updated_at }}
             VCS_REF=${{ github.sha }}
 
+      # Modified: 2026-02-08T18:00:00Z | Author: COPILOT | Change: Fix env context not available in matrix — construct image ref at step level
       - name: Test ${{ matrix.variant }} image
         if: github.event_name != 'pull_request'
-        run: ${{ matrix.test_cmd }}
+        run: |
+          $image = "${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ matrix.tag_latest }}"
+          if ('${{ matrix.needs_gpu }}' -eq 'true') {
+            docker run --rm --gpus all $image nvidia-smi
+          }
+          docker run --rm $image python -c "import slate; print(f'SLATE v{slate.__version__}')"
         shell: powershell
 
   # Tag latest after both builds succeed
