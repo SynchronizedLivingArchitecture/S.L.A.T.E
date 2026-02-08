@@ -1,5 +1,21 @@
 # S.L.A.T.E. Copilot Instructions
-# Modified: 2026-02-07T04:57:00Z | Author: COPILOT | Change: Add AAA standards for ongoing development
+# Modified: 2026-02-08T01:00:00Z | Author: COPILOT | Change: Document test install workspace, direct-to-main workflow
+
+## Test Install Workspace
+
+**This workspace (`E:\SLATE TEST INSTALL`) is a test installation of S.L.A.T.E.**
+It is used to validate the installer, test updates, and verify install procedures.
+
+- **Repo**: `SynchronizedLivingArchitecture/S.L.A.T.E` (direct push to `main`)
+- **Purpose**: Test install system, benchmark GPU setup, validate dependency resolver
+- **Workflow**: Install fixes and error reports are committed and pushed directly to `main`
+- **Git**: `origin` → `https://github.com/SynchronizedLivingArchitecture/S.L.A.T.E.git`
+
+When install issues are found in this workspace:
+1. Fix the issue in the relevant installer/SDK file
+2. Include `# Modified:` timestamp comment per SLATE rules
+3. Commit with `fix(installer):` prefix
+4. Push directly to `main` (`git push origin main`)
 
 ## MANDATORY PROTOCOL  Read Before Any Operation
 
