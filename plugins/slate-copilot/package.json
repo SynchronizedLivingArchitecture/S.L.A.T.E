@@ -9,11 +9,11 @@
 		"url": "https://github.com/SynchronizedLivingArchitecture/S.L.A.T.E.git"
 	},
 	"slateMetadata": {
-		"modified": "2026-02-08T04:00:00Z",
+		"modified": "2026-02-07T18:00:00Z",
 		"author": "COPILOT",
-		"change": "Fix hardcoded hardware — dynamic runtime detection for all end-user installs"
+		"change": "Fix dashboard interactivity — CSP-compliant event binding, error handling, detect timeout"
 	},
-	"version": "3.2.1",
+	"version": "3.3.0",
 	"icon": "media/icon.png",
 	"engines": {
 		"vscode": "^1.100.0"

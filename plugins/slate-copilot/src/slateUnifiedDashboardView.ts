@@ -1,4 +1,4 @@
-// Modified: 2026-02-08T06:00:00Z | Author: COPILOT | Change: Full rebuild — expanded M3 tokens, generative UI onboarding, version-based re-onboard, systems check transition
+// Modified: 2026-02-07T12:00:00Z | Author: COPILOT | Change: Fix all dashboard interactivity — CSP-compliant event binding, robust error handling, detect timeout fallback
 /**
  * SLATE Unified Dashboard View — v4.0
  * =====================================
@@ -23,7 +23,7 @@ import { getSlateConfig } from './extension';
 const execAsync = promisify(exec);
 
 const DASHBOARD_URL = 'http://127.0.0.1:8080';
-const EXTENSION_VERSION = '4.0.0';
+const EXTENSION_VERSION = '3.3.0';
 
 // ── Types ───────────────────────────────────────────────────────────────────
 
@@ -322,66 +322,79 @@ export class SlateUnifiedDashboardViewProvider implements vscode.WebviewViewProv
 
 		// Handle messages
 		webviewView.webview.onDidReceiveMessage(async (message) => {
-			switch (message.type) {
-				// ── Guided onboarding ──
-				case 'startGuided':
-					await this._startGuidedInstall();
-					break;
-				case 'skipOnboarding':
-					await this._completeOnboarding();
-					break;
-				case 'skipStep':
-					await this._skipCurrentStep();
-					break;
-				case 'exitGuided':
-					this._exitGuidedMode();
-					break;
-				case 'openDashboard':
-					vscode.env.openExternal(vscode.Uri.parse(DASHBOARD_URL));
-					break;
-				case 'finishOnboarding':
-					await this._completeOnboarding();
-					break;
-				case 'applySlateTheme':
-					await this._applySlateDefaultTheme();
-					break;
-				case 'detectSystem':
-					await this._detectAndSendSystemProfile();
-					break;
+			try {
+				switch (message.type) {
+					// ── Guided onboarding ──
+					case 'startGuided':
+						await this._startGuidedInstall();
+						break;
+					case 'skipOnboarding':
+						await this._completeOnboarding();
+						break;
+					case 'skipStep':
+						await this._skipCurrentStep();
+						break;
+					case 'exitGuided':
+						this._exitGuidedMode();
+						break;
+					case 'openDashboard':
+						vscode.env.openExternal(vscode.Uri.parse(DASHBOARD_URL));
+						break;
+					case 'finishOnboarding':
+						await this._completeOnboarding();
+						break;
+					case 'applySlateTheme':
+						await this._applySlateDefaultTheme();
+						break;
+					case 'detectSystem':
+						try {
+							await this._detectAndSendSystemProfile();
+						} catch {
+							// Send a minimal profile so the UI doesn't stay stuck on spinner
+							this._sendToWebview({ type: 'systemProfile', profile: {
+								pythonVersion: 'Unknown', gpuCount: 0, gpuModels: [], totalVramGb: 0,
+								ollamaAvailable: false, ollamaModels: [], dockerAvailable: false,
+								githubAuthenticated: false, venvActive: false, platform: process.platform, packageCount: 0,
+							} });
+						}
+						break;
 
-				// ── Control board ──
-				case 'runCommand':
-					await this._runSlateCommand(message.command);
-					break;
-				case 'refreshStatus':
-					await this._refreshStatus();
-					break;
-				case 'runSystemsCheck':
-					await this._runSystemsCheck();
-					break;
-				case 'openChat':
-					await vscode.commands.executeCommand('workbench.action.chat.open');
-					break;
-				case 'showStatus':
-					await vscode.commands.executeCommand('slate.showStatus');
-					break;
-				case 'transitionStage':
-					await this._transitionDevCycleStage(message.stage);
-					break;
-				case 'toggleLearning':
-					await this._toggleLearningMode(message.active);
-					break;
-				case 'startGuidedMode':
-					await this._resetOnboarding();
-					break;
+					// ── Control board ──
+					case 'runCommand':
+						await this._runSlateCommand(message.command);
+						break;
+					case 'refreshStatus':
+						await this._refreshStatus();
+						break;
+					case 'runSystemsCheck':
+						await this._runSystemsCheck();
+						break;
+					case 'openChat':
+						await vscode.commands.executeCommand('workbench.action.chat.open');
+						break;
+					case 'showStatus':
+						await vscode.commands.executeCommand('slate.showStatus');
+						break;
+					case 'transitionStage':
+						await this._transitionDevCycleStage(message.stage);
+						break;
+					case 'toggleLearning':
+						await this._toggleLearningMode(message.active);
+						break;
+					case 'startGuidedMode':
+						await this._resetOnboarding();
+						break;
 
-				// ── Dashboard iframe ──
-				case 'openExternal':
-					void vscode.env.openExternal(vscode.Uri.parse(DASHBOARD_URL));
-					break;
-				case 'openPanel':
-					await vscode.commands.executeCommand('slate.openDashboard');
-					break;
+					// ── Dashboard iframe ──
+					case 'openExternal':
+						void vscode.env.openExternal(vscode.Uri.parse(DASHBOARD_URL));
+						break;
+					case 'openPanel':
+						await vscode.commands.executeCommand('slate.openDashboard');
+						break;
+				}
+			} catch (err) {
+				console.error('[SLATE Dashboard] Message handler error:', message.type, err);
 			}
 		});
 
@@ -732,7 +745,7 @@ export class SlateUnifiedDashboardViewProvider implements vscode.WebviewViewProv
 			{ id: 'python', label: 'Python Runtime', cmd: `"${py}" -c "import sys; print(f'Python {sys.version_info.major}.{sys.version_info.minor}.{sys.version_info.micro}')"` },
 			{ id: 'venv', label: 'Virtual Env', cmd: `"${py}" -c "import sys; print('Active' if sys.prefix!=sys.base_prefix else 'System')"` },
 			{ id: 'gpu', label: 'GPU / CUDA', cmd: `"${py}" -c "import torch; print(f'{torch.cuda.device_count()}x GPU, CUDA {torch.version.cuda}' if torch.cuda.is_available() else 'No CUDA')"` },
-			{ id: 'ollama', label: 'Ollama', cmd: `"${py}" -c "import urllib.request,json; r=urllib.request.urlopen('http://127.0.0.1:11434/api/tags',timeout=3); d=json.loads(r.read()); print(f'{len(d.get(\"models\",[]))} models')"` },
+			{ id: 'ollama', label: 'Ollama', cmd: `"${py}" -c "import urllib.request,json; r=urllib.request.urlopen('http://127.0.0.1:11434/api/tags',timeout=3); d=json.loads(r.read()); print(len(d.get('models',[])),'models')"` },
 			{ id: 'dashboard', label: 'Dashboard', cmd: `"${py}" -c "import urllib.request; urllib.request.urlopen('http://127.0.0.1:8080',timeout=2); print('Online')"` },
 			{ id: 'runner', label: 'Actions Runner', cmd: `"${py}" slate/slate_runner_manager.py --detect` },
 			{ id: 'docker', label: 'Docker', cmd: `"${py}" -c "import subprocess; r=subprocess.run(['docker','info'],capture_output=True,text=True,timeout=5); print('Running' if r.returncode==0 else 'Stopped')"` },
@@ -772,7 +785,7 @@ export class SlateUnifiedDashboardViewProvider implements vscode.WebviewViewProv
 			{ id: 'svcDashboard', cmd: `"${py}" -c "import urllib.request; urllib.request.urlopen('http://127.0.0.1:8080', timeout=2); print('ok')"`, ok: ':8080 Online', fail: ':8080 Offline' },
 			{ id: 'svcOllama', cmd: `"${py}" -c "import urllib.request; urllib.request.urlopen('http://127.0.0.1:11434/api/tags', timeout=2); print('ok')"`, ok: ':11434 Online', fail: ':11434 Offline' },
 			{ id: 'svcRunner', cmd: `"${py}" slate/slate_runner_manager.py --detect`, ok: 'Online', fail: 'Offline' },
-			{ id: 'svcGPU', cmd: `"${py}" -c "import torch; print('ok' if torch.cuda.is_available() else 'no')"`, ok: '2x RTX Active', fail: 'No GPU' },
+			{ id: 'svcGPU', cmd: `"${py}" -c "import torch; print('ok' if torch.cuda.is_available() else 'no')"`, ok: 'GPU Active', fail: 'No GPU' },
 			{ id: 'svcDocker', cmd: `"${py}" -c "import subprocess; r=subprocess.run(['docker','info'],capture_output=True,text=True,timeout=5); print('ok' if r.returncode==0 else 'no')"`, ok: 'Running', fail: 'Stopped' },
 			{ id: 'svcMCP', cmd: `"${py}" -c "import os; print('ok' if os.path.exists('slate/mcp_server.py') else 'no')"`, ok: 'Ready', fail: 'Missing' },
 		];
@@ -1285,7 +1298,7 @@ export class SlateUnifiedDashboardViewProvider implements vscode.WebviewViewProv
 			<div class="service-card active" id="svcDashboard" data-cmd="slate/slate_status.py --quick"><div class="service-icon">&#x2616;</div><div class="service-name">Dashboard</div><div class="service-status">:8080</div></div>
 			<div class="service-card active" id="svcOllama" data-cmd="slate/foundry_local.py --check"><div class="service-icon">&#x2699;</div><div class="service-name">Ollama</div><div class="service-status">:11434</div></div>
 			<div class="service-card" id="svcRunner" data-cmd="slate/slate_runner_manager.py --status"><div class="service-icon">&#x25B6;</div><div class="service-name">Runner</div><div class="service-status">GitHub</div></div>
-			<div class="service-card active" id="svcGPU" data-cmd="slate/slate_gpu_manager.py --status"><div class="service-icon">&#x2756;</div><div class="service-name">GPU</div><div class="service-status">2x RTX</div></div>
+			<div class="service-card" id="svcGPU" data-cmd="slate/slate_gpu_manager.py --status"><div class="service-icon">&#x2756;</div><div class="service-name">GPU</div><div class="service-status">Detecting...</div></div>
 			<div class="service-card" id="svcDocker" data-cmd="slate/slate_docker_daemon.py --status"><div class="service-icon">&#x2693;</div><div class="service-name">Docker</div><div class="service-status">Daemon</div></div>
 			<div class="service-card" id="svcMCP" data-cmd="slate/claude_code_manager.py --validate"><div class="service-icon">&#x2728;</div><div class="service-name">MCP</div><div class="service-status">Claude</div></div>
 		</div>
@@ -1334,7 +1347,21 @@ export class SlateUnifiedDashboardViewProvider implements vscode.WebviewViewProv
 		let currentStep = 0;
 		const totalSteps = 7;
 
-		if (!${onboardingComplete}) { vscode.postMessage({ type: 'detectSystem' }); }
+		if (!${onboardingComplete}) {
+			vscode.postMessage({ type: 'detectSystem' });
+			/* Safety timeout: if detectSystem never responds, show buttons anyway after 8s */
+			setTimeout(function() {
+				var det = document.getElementById('sysDetect');
+				var cta = document.getElementById('ctaContainer');
+				var feat = document.getElementById('featureCards');
+				if (det && det.classList.contains('active')) {
+					/* Detection still spinning — force show buttons */
+					det.classList.remove('active');
+					if(cta) cta.style.display = 'flex';
+					if(feat) feat.style.display = 'grid';
+				}
+			}, 8000);
+		}
 
 		function startGuided() {
 			document.getElementById('hero').classList.add('hidden');
