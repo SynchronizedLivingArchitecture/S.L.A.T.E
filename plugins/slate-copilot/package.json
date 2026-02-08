@@ -11,9 +11,9 @@
 	"slateMetadata": {
 		"modified": "2026-02-07T18:00:00Z",
 		"author": "COPILOT",
-		"change": "Fix dashboard interactivity — CSP-compliant event binding, error handling, detect timeout"
+		"change": "Dashboard redesign — collapsible sections, consolidated layout, sidebar-optimized, version-aware onboarding"
 	},
-	"version": "3.3.0",
+	"version": "3.4.0",
 	"icon": "media/icon.png",
 	"engines": {
 		"vscode": "^1.100.0"

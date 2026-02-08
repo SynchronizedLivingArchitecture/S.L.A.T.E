@@ -1,16 +1,25 @@
-// Modified: 2026-02-07T12:00:00Z | Author: COPILOT | Change: Fix all dashboard interactivity — CSP-compliant event binding, robust error handling, detect timeout fallback
+// Modified: 2026-02-07T23:00:00Z | Author: COPILOT | Change: Spec 014 — Watchmaker Golden Ratio UI overhaul, guided operations, unified tokens, prompt ingestion
 /**
- * SLATE Unified Dashboard View — v4.0
+ * SLATE Unified Dashboard View — v4.0.0
  * =====================================
  * Single integrated webview that combines:
  * - Generative onboarding (system-adaptive, tailored to user hardware)
+ * - Prompt ingestion (configure @slate preferences during onboarding)
  * - Systems check (post-onboarding, replaces guided setup view)
+ * - Guided operations panel (buttons > prompts paradigm)
  * - Control board (service status, dev cycle, learning mode)
- * - Dashboard iframe (FastAPI backend at 127.0.0.1:8080)
+ * - Dashboard link (opens FastAPI backend at 127.0.0.1:8080 in browser)
  *
- * Design System: SLATE M3 ProArt (spec-007)
+ * Design System: SLATE Watchmaker + Golden Ratio (spec-014)
+ * Engineering Drawing: spec-013
  * Generative UI: spec-010
- * Version-based re-onboarding on major/minor bumps
+ * Version-based re-onboarding on any version change
+ *
+ * Golden Ratio (φ = 1.618) governs:
+ * - Typography scale: 8, 11, 13, 16, 21, 34
+ * - Spacing: Fibonacci sequence (1,2,3,5,8,13,21,34,55,89)
+ * - Layout proportions: 61.8% / 38.2%
+ * - Animation timing: φ-derived durations
  */
 
 import * as vscode from 'vscode';
@@ -23,7 +32,7 @@ import { getSlateConfig } from './extension';
 const execAsync = promisify(exec);
 
 const DASHBOARD_URL = 'http://127.0.0.1:8080';
-const EXTENSION_VERSION = '3.3.0';
+const EXTENSION_VERSION = '4.0.0';
 
 // ── Types ───────────────────────────────────────────────────────────────────
 
@@ -59,26 +68,31 @@ interface SystemProfile {
 	packageCount: number;
 }
 
-// ── SLATE Design Tokens (M3 ProArt — Spec 007 Aligned) ─────────────────────
+// ── SLATE Design Tokens (Watchmaker + Golden Ratio — Spec 014) ──────────────
+// φ = 1.6180339887 — governs all proportions
+// Fibonacci spacing: 1, 2, 3, 5, 8, 13, 21, 34, 55, 89 px
+// Typography scale: 8 → 11 → 13 → 16 → 21 → 34 (φ-derived)
+
+const PHI = 1.6180339887;
 
 const SLATE_TOKENS = {
-	// ── Surfaces — true black foundation ──
+	// ── Surfaces — true black foundation (watchmaker case) ──
 	bgRoot: '#050505',
 	bgSurface: '#0a0a0a',
-	bgSurfaceVariant: '#121010',
-	bgContainer: '#111111',
-	bgContainerHigh: '#1a1a1a',
-	bgContainerHighest: '#222222',
+	bgSurfaceVariant: '#111111',
+	bgContainer: '#141210',
+	bgContainerHigh: '#1a1816',
+	bgContainerHighest: '#222020',
 
-	// ── Primary — copper/warm rust (M3 tonal) ──
-	primary: '#B85A3C',
-	primaryLight: '#D4785A',
-	primaryDark: '#8B4530',
-	primaryContainer: 'rgba(184,90,60,0.12)',
+	// ── Primary — copper (the watchmaker's metal) ──
+	primary: '#B87333',
+	primaryLight: '#C9956B',
+	primaryDark: '#8B5E2B',
+	primaryContainer: 'rgba(184,115,51,0.12)',
 	onPrimary: '#FFFFFF',
 	onPrimaryContainer: '#3D1E10',
 
-	// ── Accent — copper/bronze (legacy compat) ──
+	// ── Accent — copper/bronze (legacy compat, same as primary) ──
 	accent: '#B87333',
 	accentLight: '#C9956B',
 	accentDark: '#8B5E2B',
@@ -90,7 +104,7 @@ const SLATE_TOKENS = {
 	textSecondary: '#A8A29E',
 	textTertiary: '#78716C',
 	textDisabled: '#44403C',
-	onSurface: '#E8E2DE',
+	onSurface: '#E7E0D8',
 	onSurfaceVariant: '#CAC4BF',
 
 	// ── Borders / Outlines ──
@@ -100,39 +114,74 @@ const SLATE_TOKENS = {
 	outline: '#7D7873',
 	outlineVariant: '#4D4845',
 
-	// ── Semantic ──
-	success: '#4CAF50',
-	successContainer: 'rgba(76,175,80,0.12)',
-	warning: '#FF9800',
-	warningContainer: 'rgba(255,152,0,0.12)',
-	error: '#F44336',
-	errorContainer: 'rgba(244,67,54,0.12)',
-	info: '#2196F3',
-	infoContainer: 'rgba(33,150,243,0.12)',
+	// ── Semantic (unified — Spec 014) ──
+	success: '#22C55E',
+	successContainer: 'rgba(34,197,94,0.12)',
+	warning: '#D4A054',
+	warningContainer: 'rgba(212,160,84,0.12)',
+	error: '#C47070',
+	errorContainer: 'rgba(196,112,112,0.12)',
+	info: '#7EA8BE',
+	infoContainer: 'rgba(126,168,190,0.12)',
 
-	// ── Typography (M3-aligned font stacks) ──
+	// ── Engineering Traces (ISO 128 / IEC 60617) ──
+	traceSignal: '#B87333',
+	traceData: '#7EA8BE',
+	tracePower: '#C47070',
+	traceControl: '#D4A054',
+	traceGround: '#78716C',
+
+	// ── Blueprint ──
+	blueprintBg: '#0D1B2A',
+	blueprintGrid: '#1B3A4B',
+	blueprintAccent: '#98C1D9',
+	blueprintNode: '#E0FBFC',
+
+	// ── Component Fills (IEC 60617 conventions) ──
+	fillService: '#1a1510',
+	fillDatabase: '#101520',
+	fillGpu: '#15120a',
+	fillAi: '#0a1515',
+	fillExternal: '#151015',
+
+	// ── Typography — φ-derived scale (Golden Ratio) ──
+	// Base: 8px → 8, 11, 13, 16, 21, 34
 	fontDisplay: "'Inter Tight', 'Segoe UI', system-ui, sans-serif",
 	fontBody: "'Inter', 'Segoe UI', system-ui, sans-serif",
 	fontMono: "'Cascadia Code', 'JetBrains Mono', 'Consolas', monospace",
+	fontSchematic: "'Consolas', 'Courier New', monospace",
 
-	// ── Type Scale (M3) ──
-	displayLarge: '57px',
-	displayMedium: '45px',
-	displaySmall: '36px',
-	headlineLarge: '32px',
-	headlineMedium: '28px',
-	headlineSmall: '24px',
-	titleLarge: '22px',
+	// ── Type Scale (φ-derived: each step ≈ φ ratio) ──
+	displayLarge: '55px',
+	displayMedium: '34px',
+	displaySmall: '28px',
+	headlineLarge: '28px',
+	headlineMedium: '21px',
+	headlineSmall: '18px',
+	titleLarge: '18px',
 	titleMedium: '16px',
 	titleSmall: '14px',
 	bodyLarge: '16px',
-	bodyMedium: '14px',
-	bodySmall: '12px',
-	labelLarge: '14px',
-	labelMedium: '12px',
-	labelSmall: '11px',
+	bodyMedium: '13px',
+	bodySmall: '11px',
+	labelLarge: '13px',
+	labelMedium: '11px',
+	labelSmall: '10px',
+	caption: '8px',
 
-	// ── Elevation (M3 — 5 levels) ──
+	// ── Spacing (Fibonacci — φ derived) ──
+	space1: '1px',
+	space2: '2px',
+	space3: '3px',
+	space5: '5px',
+	space8: '8px',
+	space13: '13px',
+	space21: '21px',
+	space34: '34px',
+	space55: '55px',
+	space89: '89px',
+
+	// ── Elevation (5 levels) ──
 	elevation0: 'none',
 	elevation1: '0 1px 2px rgba(0,0,0,0.05), 0 1px 3px rgba(0,0,0,0.1)',
 	elevation2: '0 2px 4px rgba(0,0,0,0.05), 0 4px 8px rgba(0,0,0,0.1)',
@@ -140,17 +189,24 @@ const SLATE_TOKENS = {
 	elevation4: '0 8px 16px rgba(0,0,0,0.1), 0 16px 32px rgba(0,0,0,0.15)',
 	elevation5: '0 16px 32px rgba(0,0,0,0.12), 0 32px 64px rgba(0,0,0,0.18)',
 
-	// ── State Layers (M3) ──
+	// ── State Layers ──
 	stateHover: '0.08',
 	stateFocus: '0.12',
 	statePressed: '0.12',
 	stateDragged: '0.16',
 
-	// ── Motion (M3 easing + duration scale) ──
+	// ── Motion (φ-derived timing) ──
 	easingStandard: 'cubic-bezier(0.2, 0, 0, 1)',
 	easingDecelerate: 'cubic-bezier(0, 0, 0.2, 1)',
 	easingAccelerate: 'cubic-bezier(0.4, 0, 1, 1)',
 	easingSpring: 'cubic-bezier(0.34, 1.56, 0.64, 1)',
+	durationFlash: '100ms',
+	durationQuick: '200ms',
+	durationNormal: '350ms',
+	durationSmooth: '550ms',
+	durationDramatic: '900ms',
+
+	// Legacy compat
 	durationShort1: '50ms',
 	durationShort2: '100ms',
 	durationShort3: '150ms',
@@ -165,11 +221,11 @@ const SLATE_TOKENS = {
 	durationLong4: '600ms',
 
 	// ── Radii ──
-	radiusXs: '4px',
-	radiusSm: '8px',
-	radiusMd: '12px',
-	radiusLg: '16px',
-	radiusXl: '28px',
+	radiusXs: '3px',
+	radiusSm: '5px',
+	radiusMd: '8px',
+	radiusLg: '13px',
+	radiusXl: '21px',
 	radiusFull: '9999px',
 
 	// ── Dev cycle stage colors ──
@@ -179,11 +235,15 @@ const SLATE_TOKENS = {
 	stageDeploy: '#78B89A',
 	stageFeedback: '#9B89B3',
 
-	// ── Blueprint engineering ──
-	blueprintBg: '#0D1B2A',
-	blueprintGrid: '#1B3A4B',
-	blueprintAccent: '#98C1D9',
-	blueprintNode: '#E0FBFC',
+	// ── Watchmaker craft ──
+	gearColor: '#B87333',
+	jewelGreen: '#22C55E',
+	jewelAmber: '#D4A054',
+	jewelRed: '#C47070',
+	jewelBlue: '#7EA8BE',
+	mainspring: '#C9956B',
+	polishReflection: 'linear-gradient(135deg, rgba(255,255,255,0.06) 0%, transparent 50%)',
+	caseTexture: 'linear-gradient(180deg, #141210 0%, #0a0a0a 100%)',
 };
 
 // ── Guided Install Steps ────────────────────────────────────────────────────
@@ -425,12 +485,9 @@ export class SlateUnifiedDashboardViewProvider implements vscode.WebviewViewProv
 		const onboardingComplete = this._context.globalState.get<boolean>('slateOnboardingComplete', false);
 		if (!onboardingComplete) { return false; }
 
-		// Major or minor version bump triggers re-onboarding
+		// Any version change (upgrade, downgrade, or mismatch) triggers re-onboarding
 		const lastVersion = this._context.globalState.get<string>('slateLastVersion', '0.0.0');
-		const [lastMajor, lastMinor] = lastVersion.split('.').map(Number);
-		const [curMajor, curMinor] = EXTENSION_VERSION.split('.').map(Number);
-
-		if (curMajor > lastMajor || (curMajor === lastMajor && curMinor > lastMinor)) {
+		if (lastVersion !== EXTENSION_VERSION) {
 			return false;
 		}
 
@@ -862,6 +919,8 @@ export class SlateUnifiedDashboardViewProvider implements vscode.WebviewViewProv
 	private _getHtml(webview: vscode.Webview, onboardingComplete: boolean): string {
 		const nonce = getNonce();
 		const isReOnboard = !onboardingComplete && this._context.globalState.get<string>('slateLastVersion', '0.0.0') !== '0.0.0';
+		const lastVer = this._context.globalState.get<string>('slateLastVersion', '0.0.0');
+		const isVersionMismatch = lastVer !== '0.0.0' && lastVer !== EXTENSION_VERSION;
 		const csp = [
 			"default-src 'none'",
 			`frame-src ${DASHBOARD_URL}`,
@@ -880,7 +939,7 @@ export class SlateUnifiedDashboardViewProvider implements vscode.WebviewViewProv
 	<title>SLATE</title>
 	<style>
 		/* ═══════════════════════════════════════════════════════════════════
-		   SLATE UNIFIED DESIGN SYSTEM — M3 ProArt (Spec 007)
+		   SLATE UNIFIED DESIGN SYSTEM — M3 ProArt (Spec 007) — Redesigned
 		   ═══════════════════════════════════════════════════════════════════ */
 		:root {
 			--sl-bg-root: ${SLATE_TOKENS.bgRoot};
@@ -921,32 +980,21 @@ export class SlateUnifiedDashboardViewProvider implements vscode.WebviewViewProv
 			--sl-font-display: ${SLATE_TOKENS.fontDisplay};
 			--sl-font-body: ${SLATE_TOKENS.fontBody};
 			--sl-font-mono: ${SLATE_TOKENS.fontMono};
-			--sl-display-large: ${SLATE_TOKENS.displayLarge};
-			--sl-headline-medium: ${SLATE_TOKENS.headlineMedium};
-			--sl-title-large: ${SLATE_TOKENS.titleLarge};
-			--sl-title-medium: ${SLATE_TOKENS.titleMedium};
-			--sl-title-small: ${SLATE_TOKENS.titleSmall};
-			--sl-body-large: ${SLATE_TOKENS.bodyLarge};
-			--sl-body-medium: ${SLATE_TOKENS.bodyMedium};
 			--sl-body-small: ${SLATE_TOKENS.bodySmall};
+			--sl-body-medium: ${SLATE_TOKENS.bodyMedium};
 			--sl-label-large: ${SLATE_TOKENS.labelLarge};
 			--sl-label-medium: ${SLATE_TOKENS.labelMedium};
 			--sl-label-small: ${SLATE_TOKENS.labelSmall};
-			--sl-elevation-0: ${SLATE_TOKENS.elevation0};
+			--sl-title-large: ${SLATE_TOKENS.titleLarge};
+			--sl-title-medium: ${SLATE_TOKENS.titleMedium};
 			--sl-elevation-1: ${SLATE_TOKENS.elevation1};
 			--sl-elevation-2: ${SLATE_TOKENS.elevation2};
 			--sl-elevation-3: ${SLATE_TOKENS.elevation3};
-			--sl-elevation-4: ${SLATE_TOKENS.elevation4};
-			--sl-elevation-5: ${SLATE_TOKENS.elevation5};
-			--sl-state-hover: ${SLATE_TOKENS.stateHover};
-			--sl-state-focus: ${SLATE_TOKENS.stateFocus};
-			--sl-state-pressed: ${SLATE_TOKENS.statePressed};
 			--sl-ease: ${SLATE_TOKENS.easingStandard};
 			--sl-ease-decel: ${SLATE_TOKENS.easingDecelerate};
 			--sl-ease-spring: ${SLATE_TOKENS.easingSpring};
 			--sl-dur-short: ${SLATE_TOKENS.durationShort3};
 			--sl-dur-medium: ${SLATE_TOKENS.durationMedium2};
-			--sl-dur-long: ${SLATE_TOKENS.durationLong2};
 			--sl-radius-xs: ${SLATE_TOKENS.radiusXs};
 			--sl-radius-sm: ${SLATE_TOKENS.radiusSm};
 			--sl-radius-md: ${SLATE_TOKENS.radiusMd};
@@ -976,17 +1024,16 @@ export class SlateUnifiedDashboardViewProvider implements vscode.WebviewViewProv
 		@keyframes fadeIn { from { opacity:0; } to { opacity:1; } }
 		@keyframes spin { from { transform:rotate(0deg); } to { transform:rotate(360deg); } }
 		@keyframes blink { 0%,50% { opacity:1; } 51%,100% { opacity:0; } }
-		@keyframes ringPulse { 0%,100% { filter:drop-shadow(0 0 4px currentColor); } 50% { filter:drop-shadow(0 0 12px currentColor); } }
 		@keyframes heroFloat { 0%,100% { transform:translateY(0); } 50% { transform:translateY(-6px); } }
 		@keyframes statusPulse { 0%,100% { box-shadow:0 0 0 0 var(--sl-success); } 50% { box-shadow:0 0 0 4px transparent; } }
 		@keyframes checkCascade { 0% { opacity:0; transform:translateX(-8px); } 100% { opacity:1; transform:translateX(0); } }
 
 		/* ── View modes ── */
-		.view-onboarding { display: ${onboardingComplete ? 'none' : 'block'}; }
-		.view-dashboard { display: ${onboardingComplete ? 'block' : 'none'}; }
+		.view-onboarding { display: \${onboardingComplete ? 'none' : 'block'}; }
+		.view-dashboard { display: \${onboardingComplete ? 'block' : 'none'}; }
 
 		/* ═══════════════════════════════════════════════════════════════════
-		   ONBOARDING HERO — System-Adaptive
+		   ONBOARDING HERO
 		   ═══════════════════════════════════════════════════════════════════ */
 		.hero {
 			display:flex; flex-direction:column;
@@ -996,26 +1043,26 @@ export class SlateUnifiedDashboardViewProvider implements vscode.WebviewViewProv
 		}
 		.hero.hidden { display:none; }
 
-		.hero-logo { width:80px; height:80px; margin-bottom:20px; animation:heroFloat 4s ease-in-out infinite; }
+		.hero-logo { width:72px; height:72px; margin-bottom:16px; animation:heroFloat 4s ease-in-out infinite; }
 
 		.hero-title {
 			font-family:var(--sl-font-display);
-			font-size:28px; font-weight:700;
+			font-size:24px; font-weight:700;
 			letter-spacing:3px; color:var(--sl-text-primary);
-			margin-bottom:8px;
+			margin-bottom:6px;
 		}
-		.hero-subtitle { font-size:var(--sl-body-small); color:var(--sl-text-secondary); max-width:240px; margin-bottom:24px; line-height:1.6; }
+		.hero-subtitle { font-size:var(--sl-body-small); color:var(--sl-text-secondary); max-width:240px; margin-bottom:20px; line-height:1.6; }
 
-		.hero-stats { display:flex; justify-content:center; gap:24px; margin-bottom:28px; }
+		.hero-stats { display:flex; justify-content:center; gap:20px; margin-bottom:20px; }
 		.stat { text-align:center; }
-		.stat-value { display:block; font-size:22px; font-weight:700; color:var(--sl-accent-light); }
-		.stat-label { font-size:10px; color:var(--sl-text-tertiary); text-transform:uppercase; letter-spacing:1px; }
+		.stat-value { display:block; font-size:20px; font-weight:700; color:var(--sl-accent-light); }
+		.stat-label { font-size:9px; color:var(--sl-text-tertiary); text-transform:uppercase; letter-spacing:1px; }
 
 		.update-banner {
-			display:none; background:var(--sl-warning-container);
-			border:1px solid rgba(255,152,0,0.3); border-radius:var(--sl-radius-sm);
+			display:none; background:var(--sl-info-container);
+			border:1px solid rgba(33,150,243,0.3); border-radius:var(--sl-radius-sm);
 			padding:10px 16px; margin-bottom:16px;
-			font-size:var(--sl-body-small); color:var(--sl-warning);
+			font-size:var(--sl-body-small); color:var(--sl-info);
 			text-align:center; max-width:280px;
 		}
 		.update-banner.visible { display:block; }
@@ -1053,18 +1100,18 @@ export class SlateUnifiedDashboardViewProvider implements vscode.WebviewViewProv
 		}
 		.cta-theme:hover { background:rgba(184,90,60,0.2); border-color:var(--sl-primary); }
 
-		.features { display:grid; grid-template-columns:repeat(2,1fr); gap:10px; margin-top:24px; width:100%; max-width:300px; }
+		.features { display:grid; grid-template-columns:repeat(2,1fr); gap:8px; margin-top:20px; width:100%; max-width:280px; }
 		.feature-card {
 			background:var(--sl-bg-container); border:1px solid var(--sl-border);
-			border-radius:var(--sl-radius-md); padding:14px 10px; text-align:center;
+			border-radius:var(--sl-radius-md); padding:12px 8px; text-align:center;
 			transition:all 0.2s var(--sl-ease); box-shadow:var(--sl-elevation-1);
 		}
 		.feature-card:hover { border-color:var(--sl-accent); transform:translateY(-2px); box-shadow:var(--sl-elevation-2); }
-		.feature-icon { font-size:20px; margin-bottom:6px; }
+		.feature-icon { font-size:18px; margin-bottom:4px; }
 		.feature-title { font-size:var(--sl-label-small); font-weight:600; color:var(--sl-accent-light); }
 		.feature-desc { font-size:9px; color:var(--sl-text-tertiary); }
 
-		.sys-detect { display:none; margin-top:16px; text-align:center; }
+		.sys-detect { display:none; margin-top:12px; text-align:center; }
 		.sys-detect.active { display:block; }
 		.sys-detect-text { font-size:var(--sl-body-small); color:var(--sl-text-tertiary); }
 		.sys-detect-spinner { display:inline-block; width:14px; height:14px; border:2px solid var(--sl-border-variant); border-top-color:var(--sl-accent); border-radius:50%; animation:spin 0.8s linear infinite; vertical-align:middle; margin-right:6px; }
@@ -1072,10 +1119,10 @@ export class SlateUnifiedDashboardViewProvider implements vscode.WebviewViewProv
 		/* ═══════════════════════════════════════════════════════════════════
 		   GUIDED OVERLAY (7-step wizard)
 		   ═══════════════════════════════════════════════════════════════════ */
-		.guided-overlay { display:none; padding:20px; background:var(--sl-bg-root); min-height:100vh; }
+		.guided-overlay { display:none; padding:16px; background:var(--sl-bg-root); min-height:100vh; }
 		.guided-overlay.active { display:block; }
 
-		.step-progress { display:flex; justify-content:center; gap:6px; margin-bottom:24px; }
+		.step-progress { display:flex; justify-content:center; gap:6px; margin-bottom:20px; }
 		.step-dot { width:10px; height:10px; border-radius:50%; background:var(--sl-text-tertiary); transition:all 0.3s var(--sl-ease); }
 		.step-dot.active { background:var(--sl-accent); transform:scale(1.3); box-shadow:0 0 10px var(--sl-accent-glow); }
 		.step-dot.complete { background:var(--sl-success); }
@@ -1083,25 +1130,25 @@ export class SlateUnifiedDashboardViewProvider implements vscode.WebviewViewProv
 
 		.narrator {
 			background:var(--sl-bg-container); border:1px solid var(--sl-border);
-			border-radius:var(--sl-radius-md); padding:16px; margin-bottom:20px;
-			display:flex; gap:12px; align-items:flex-start; box-shadow:var(--sl-elevation-1);
+			border-radius:var(--sl-radius-md); padding:14px; margin-bottom:16px;
+			display:flex; gap:10px; align-items:flex-start; box-shadow:var(--sl-elevation-1);
 		}
-		.narrator-avatar { width:40px; height:40px; background:linear-gradient(135deg,var(--sl-accent) 0%,var(--sl-accent-dark) 100%); border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:20px; flex-shrink:0; }
-		.narrator-text { font-size:var(--sl-body-medium); line-height:1.6; color:var(--sl-text-secondary); }
+		.narrator-avatar { width:36px; height:36px; background:linear-gradient(135deg,var(--sl-accent) 0%,var(--sl-accent-dark) 100%); border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:18px; flex-shrink:0; }
+		.narrator-text { font-size:var(--sl-body-small); line-height:1.6; color:var(--sl-text-secondary); }
 		.narrator-text.typing::after { content:'|'; animation:blink 0.7s infinite; }
 
-		.step-card { background:var(--sl-bg-container); border:1px solid var(--sl-border); border-radius:var(--sl-radius-md); padding:20px; margin-bottom:20px; box-shadow:var(--sl-elevation-1); }
-		.step-header { display:flex; justify-content:space-between; align-items:center; margin-bottom:12px; }
+		.step-card { background:var(--sl-bg-container); border:1px solid var(--sl-border); border-radius:var(--sl-radius-md); padding:16px; margin-bottom:16px; box-shadow:var(--sl-elevation-1); }
+		.step-header { display:flex; justify-content:space-between; align-items:center; margin-bottom:10px; }
 		.step-title { font-size:var(--sl-title-medium); font-weight:600; color:var(--sl-accent-light); }
 		.step-status { font-size:var(--sl-label-small); padding:3px 10px; border-radius:var(--sl-radius-full); font-weight:500; }
 		.step-status.active { background:var(--sl-accent-container); color:var(--sl-accent-light); }
 		.step-status.executing { background:var(--sl-warning-container); color:var(--sl-warning); }
 		.step-status.complete { background:var(--sl-success-container); color:var(--sl-success); }
 		.step-status.error { background:var(--sl-error-container); color:var(--sl-error); }
-		.step-description { font-size:var(--sl-body-small); color:var(--sl-text-secondary); margin-bottom:16px; }
+		.step-description { font-size:var(--sl-body-small); color:var(--sl-text-secondary); margin-bottom:12px; }
 
-		.substeps { display:flex; flex-direction:column; gap:8px; }
-		.substep { display:flex; align-items:center; gap:10px; padding:10px; background:var(--sl-bg-surface); border-radius:var(--sl-radius-sm); font-size:var(--sl-body-small); animation:checkCascade 0.3s ease-out; }
+		.substeps { display:flex; flex-direction:column; gap:6px; }
+		.substep { display:flex; align-items:center; gap:8px; padding:8px; background:var(--sl-bg-surface); border-radius:var(--sl-radius-sm); font-size:var(--sl-body-small); animation:checkCascade 0.3s ease-out; }
 		.substep-icon { width:18px; height:18px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:10px; flex-shrink:0; }
 		.substep-icon.pending { background:var(--sl-text-tertiary); color:var(--sl-bg-root); }
 		.substep-icon.running { background:var(--sl-warning); color:var(--sl-bg-root); animation:spin 1s linear infinite; }
@@ -1110,7 +1157,7 @@ export class SlateUnifiedDashboardViewProvider implements vscode.WebviewViewProv
 		.substep-icon.skipped { background:var(--sl-text-tertiary); color:var(--sl-bg-root); opacity:0.5; }
 		.substep-label { flex:1; color:var(--sl-text-secondary); }
 		.substep-label.optional { font-style:italic; }
-		.substep-result { font-size:10px; color:var(--sl-text-tertiary); font-family:var(--sl-font-mono); max-width:140px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+		.substep-result { font-size:10px; color:var(--sl-text-tertiary); font-family:var(--sl-font-mono); max-width:120px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
 
 		.guided-controls { display:flex; gap:10px; justify-content:center; }
 		.control-btn { padding:8px 16px; font-size:var(--sl-body-small); border-radius:var(--sl-radius-xl); cursor:pointer; transition:all 0.2s; border:1px solid var(--sl-border-variant); background:transparent; color:var(--sl-text-secondary); font-family:var(--sl-font-display); }
@@ -1118,111 +1165,145 @@ export class SlateUnifiedDashboardViewProvider implements vscode.WebviewViewProv
 		.control-btn.primary { background:var(--sl-accent); border-color:var(--sl-accent); color:var(--sl-bg-root); }
 		.control-btn.primary:hover { background:var(--sl-accent-light); }
 
-		.complete-screen { text-align:center; padding:40px 20px; display:none; }
-		.complete-icon { font-size:56px; margin-bottom:20px; }
-		.complete-title { font-size:var(--sl-title-large); color:var(--sl-success); margin-bottom:12px; }
-		.complete-summary { font-size:var(--sl-body-medium); color:var(--sl-text-secondary); margin-bottom:24px; line-height:1.6; }
+		.complete-screen { text-align:center; padding:32px 16px; display:none; }
+		.complete-icon { font-size:48px; margin-bottom:16px; }
+		.complete-title { font-size:var(--sl-title-large); color:var(--sl-success); margin-bottom:10px; }
+		.complete-summary { font-size:var(--sl-body-medium); color:var(--sl-text-secondary); margin-bottom:20px; line-height:1.6; }
 
 		/* ═══════════════════════════════════════════════════════════════════
-		   DASHBOARD MODE
+		   DASHBOARD — Collapsible, Organized, Sidebar-Optimized
 		   ═══════════════════════════════════════════════════════════════════ */
-		.dash-header { display:flex; align-items:center; justify-content:space-between; padding:10px 12px; background:var(--sl-bg-surface); border-bottom:1px solid var(--sl-border); }
+
+		/* ── Header ── */
+		.dash-header {
+			display:flex; align-items:center; justify-content:space-between;
+			padding:10px 14px;
+			background:linear-gradient(180deg, var(--sl-bg-surface) 0%, var(--sl-bg-root) 100%);
+			border-bottom:1px solid var(--sl-border);
+		}
 		.logo-section { display:flex; align-items:center; gap:8px; }
-		.logo-icon { width:28px; height:28px; background:linear-gradient(135deg,var(--sl-accent) 0%,var(--sl-accent-dark) 100%); border-radius:var(--sl-radius-sm); display:flex; align-items:center; justify-content:center; font-size:14px; color:var(--sl-bg-root); animation:glow 3s ease-in-out infinite; }
+		.logo-icon {
+			width:28px; height:28px;
+			background:linear-gradient(135deg,var(--sl-accent) 0%,var(--sl-accent-dark) 100%);
+			border-radius:var(--sl-radius-sm); display:flex; align-items:center; justify-content:center;
+			font-size:14px; color:var(--sl-bg-root);
+			animation:glow 3s ease-in-out infinite;
+		}
 		.logo-text { font-size:var(--sl-body-medium); font-weight:700; letter-spacing:1.5px; color:var(--sl-text-primary); font-family:var(--sl-font-display); }
-		.logo-subtitle { font-size:8px; color:var(--sl-text-tertiary); text-transform:uppercase; letter-spacing:0.5px; }
-		.status-badge { display:flex; align-items:center; gap:6px; padding:4px 10px; background:var(--sl-bg-container); border-radius:var(--sl-radius-full); font-size:10px; color:var(--sl-text-secondary); }
+		.logo-ver { font-size:8px; color:var(--sl-text-tertiary); font-family:var(--sl-font-mono); }
+		.header-status { display:flex; align-items:center; gap:5px; }
 		.status-dot { width:7px; height:7px; border-radius:50%; background:var(--sl-success); animation:statusPulse 2s ease-in-out infinite; }
+		.status-text { font-size:10px; color:var(--sl-text-secondary); }
 
-		/* ── Systems Check ── */
-		.systems-check { padding:10px 12px; border-bottom:1px solid var(--sl-border); }
-		.systems-check-header { display:flex; align-items:center; justify-content:space-between; margin-bottom:8px; }
-		.systems-check-title { font-size:var(--sl-label-medium); text-transform:uppercase; letter-spacing:0.1em; color:var(--sl-text-tertiary); }
-		.systems-check-btn { background:transparent; border:1px solid var(--sl-border-variant); color:var(--sl-text-tertiary); font-size:10px; padding:3px 8px; border-radius:var(--sl-radius-full); cursor:pointer; transition:all 0.2s; font-family:var(--sl-font-body); }
-		.systems-check-btn:hover { border-color:var(--sl-accent); color:var(--sl-accent-light); }
-		.check-grid { display:grid; grid-template-columns:repeat(2,1fr); gap:6px; }
-		.check-item { display:flex; align-items:center; gap:6px; padding:6px 8px; background:var(--sl-bg-container); border:1px solid var(--sl-border); border-radius:var(--sl-radius-sm); font-size:10px; transition:all 0.2s; }
-		.check-item.pass { border-left:2px solid var(--sl-success); }
-		.check-item.fail { border-left:2px solid var(--sl-error); }
-		.check-item.warn { border-left:2px solid var(--sl-warning); }
-		.check-item.running { border-left:2px solid var(--sl-info); }
-		.check-dot { width:6px; height:6px; border-radius:50%; flex-shrink:0; }
-		.check-dot.pass { background:var(--sl-success); }
-		.check-dot.fail { background:var(--sl-error); }
-		.check-dot.warn { background:var(--sl-warning); }
-		.check-dot.running { background:var(--sl-info); animation:pulse 1s infinite; }
-		.check-dot.idle { background:var(--sl-text-tertiary); }
-		.check-label { flex:1; color:var(--sl-text-secondary); }
-		.check-result { font-size:9px; color:var(--sl-text-tertiary); font-family:var(--sl-font-mono); max-width:80px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+		/* ── Collapsible Section ── */
+		.section { border-bottom:1px solid var(--sl-border); }
+		.section-header {
+			display:flex; align-items:center; justify-content:space-between;
+			padding:10px 14px; cursor:pointer; user-select:none;
+			transition:background 0.15s;
+		}
+		.section-header:hover { background:var(--sl-bg-surface); }
+		.section-header-left { display:flex; align-items:center; gap:8px; }
+		.section-icon { font-size:14px; color:var(--sl-accent-light); }
+		.section-title { font-size:var(--sl-label-medium); font-weight:600; color:var(--sl-text-primary); text-transform:uppercase; letter-spacing:0.08em; }
+		.section-badge { font-size:9px; padding:2px 6px; border-radius:var(--sl-radius-full); background:var(--sl-accent-container); color:var(--sl-accent-light); font-weight:500; }
+		.section-chevron { font-size:10px; color:var(--sl-text-tertiary); transition:transform 0.2s var(--sl-ease); }
+		.section.collapsed .section-chevron { transform:rotate(-90deg); }
+		.section-body { padding:0 14px 12px; }
+		.section.collapsed .section-body { display:none; }
 
-		/* ── Service Grid ── */
-		.services { display:grid; grid-template-columns:repeat(3,1fr); gap:6px; padding:10px 12px; }
-		.service-card { display:flex; flex-direction:column; align-items:center; gap:4px; padding:10px 6px; background:var(--sl-bg-container); border:1px solid var(--sl-border); border-radius:var(--sl-radius-sm); cursor:pointer; transition:all 0.2s var(--sl-ease); text-align:center; animation:slideIn 0.3s ease-out; box-shadow:var(--sl-elevation-1); }
-		.service-card:hover { border-color:var(--sl-accent); transform:translateY(-2px); background:var(--sl-bg-container-high); box-shadow:var(--sl-elevation-2); }
-		.service-card.active { border-color:rgba(76,175,80,0.3); }
-		.service-card.active .service-status { color:var(--sl-success); }
-		.service-icon { font-size:16px; color:var(--sl-accent-light); }
-		.service-name { font-size:10px; font-weight:600; color:var(--sl-text-primary); }
-		.service-status { font-size:9px; color:var(--sl-text-tertiary); }
+		/* ── Health Status (consolidated) ── */
+		.health-grid { display:grid; grid-template-columns:1fr 1fr; gap:5px; }
+		.health-item {
+			display:flex; align-items:center; gap:6px;
+			padding:6px 8px; background:var(--sl-bg-container);
+			border:1px solid var(--sl-border); border-radius:var(--sl-radius-sm);
+			font-size:10px; transition:all 0.2s;
+		}
+		.health-item.pass { border-left:2px solid var(--sl-success); }
+		.health-item.fail { border-left:2px solid var(--sl-error); }
+		.health-item.warn { border-left:2px solid var(--sl-warning); }
+		.health-item.running { border-left:2px solid var(--sl-info); }
+		.health-dot { width:6px; height:6px; border-radius:50%; flex-shrink:0; }
+		.health-dot.pass { background:var(--sl-success); }
+		.health-dot.fail { background:var(--sl-error); }
+		.health-dot.warn { background:var(--sl-warning); }
+		.health-dot.running { background:var(--sl-info); animation:pulse 1s infinite; }
+		.health-dot.idle { background:var(--sl-text-tertiary); }
+		.health-label { flex:1; color:var(--sl-text-secondary); }
+		.health-result { font-size:9px; color:var(--sl-text-tertiary); font-family:var(--sl-font-mono); max-width:80px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
 
-		/* ── Dev Cycle Ring ── */
-		.dev-cycle-section { padding:10px 12px; border-top:1px solid var(--sl-border); background:var(--sl-bg-surface); }
-		.dev-cycle-header { display:flex; align-items:center; justify-content:space-between; margin-bottom:8px; }
-		.section-title { font-size:9px; text-transform:uppercase; letter-spacing:0.1em; color:var(--sl-text-tertiary); }
-		.dev-cycle-stage { font-size:var(--sl-label-small); font-weight:600; color:var(--sl-accent-light); }
-		.dev-cycle-ring-container { display:flex; align-items:center; justify-content:center; gap:14px; }
-		.mini-ring { width:72px; height:72px; position:relative; }
-		.mini-ring svg { width:100%; height:100%; }
-		.stage-segment { fill:none; stroke-width:6; stroke-linecap:round; transition:all 0.3s ease; cursor:pointer; }
-		.stage-segment.active { stroke-width:8; filter:drop-shadow(0 0 4px currentColor); animation:ringPulse 2s ease-in-out infinite; }
-		.stage-label { fill:var(--sl-text-tertiary); }
-		.stage-label.active { fill:var(--sl-accent-light); font-weight:600; }
-		.stage-info { flex:1; max-width:110px; }
-		.stage-name { font-size:var(--sl-body-medium); font-weight:600; color:var(--sl-text-primary); margin-bottom:3px; }
-		.stage-progress-text { font-size:10px; color:var(--sl-text-tertiary); margin-bottom:4px; }
-		.stage-bar { height:3px; background:var(--sl-border); border-radius:2px; overflow:hidden; }
-		.stage-bar-fill { height:100%; background:linear-gradient(90deg,var(--sl-accent),var(--sl-accent-light)); border-radius:2px; transition:width 0.5s ease-out; }
+		/* ── Services (compact cards) ── */
+		.service-list { display:flex; flex-direction:column; gap:4px; }
+		.service-row {
+			display:flex; align-items:center; gap:8px;
+			padding:8px 10px; background:var(--sl-bg-container);
+			border:1px solid var(--sl-border); border-radius:var(--sl-radius-sm);
+			cursor:pointer; transition:all 0.15s var(--sl-ease);
+		}
+		.service-row:hover { border-color:var(--sl-accent); background:var(--sl-bg-container-high); }
+		.service-row.active { border-left:2px solid var(--sl-success); }
+		.service-row.inactive { border-left:2px solid var(--sl-text-tertiary); opacity:0.7; }
+		.svc-icon { font-size:14px; width:20px; text-align:center; }
+		.svc-info { flex:1; }
+		.svc-name { font-size:11px; font-weight:600; color:var(--sl-text-primary); }
+		.svc-detail { font-size:9px; color:var(--sl-text-tertiary); font-family:var(--sl-font-mono); }
+		.svc-dot { width:6px; height:6px; border-radius:50%; flex-shrink:0; }
+		.svc-dot.on { background:var(--sl-success); }
+		.svc-dot.off { background:var(--sl-text-tertiary); }
 
-		/* ── Controls ── */
-		.controls { padding:10px 12px; border-top:1px solid var(--sl-border); display:flex; flex-direction:column; gap:6px; }
-		.btn { display:flex; align-items:center; justify-content:center; gap:6px; padding:8px 12px; border:1px solid var(--sl-border-variant); border-radius:var(--sl-radius-xl); cursor:pointer; font-size:var(--sl-label-medium); font-family:var(--sl-font-display); transition:all 0.2s; }
-		.btn-primary { background:var(--sl-accent); border-color:var(--sl-accent); color:var(--sl-bg-root); font-weight:600; }
-		.btn-primary:hover { background:var(--sl-accent-light); box-shadow:var(--sl-elevation-2); }
+		/* ── Quick Actions (grid) ── */
+		.action-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:6px; }
+		.action-btn {
+			display:flex; flex-direction:column; align-items:center; gap:4px;
+			padding:10px 6px; background:var(--sl-bg-container);
+			border:1px solid var(--sl-border); border-radius:var(--sl-radius-sm);
+			cursor:pointer; transition:all 0.15s; font-family:var(--sl-font-body);
+		}
+		.action-btn:hover { background:var(--sl-bg-container-high); border-color:var(--sl-accent); transform:scale(1.03); }
+		.action-btn:active { transform:scale(0.97); }
+		.action-icon { font-size:16px; color:var(--sl-accent-light); }
+		.action-label { font-size:9px; color:var(--sl-text-tertiary); text-align:center; }
+
+		/* ── Dev Cycle (compact inline) ── */
+		.dev-cycle-bar { display:flex; gap:2px; margin-bottom:8px; height:4px; border-radius:2px; overflow:hidden; }
+		.dev-cycle-segment { flex:1; transition:all 0.3s; opacity:0.3; }
+		.dev-cycle-segment.active { opacity:1; height:6px; margin-top:-1px; }
+		.dev-cycle-info { display:flex; align-items:center; justify-content:space-between; }
+		.dev-cycle-stage { font-size:11px; font-weight:600; color:var(--sl-accent-light); }
+		.dev-cycle-progress { font-size:10px; color:var(--sl-text-tertiary); }
+
+		/* ── Primary Actions ── */
+		.primary-actions { padding:12px 14px; border-bottom:1px solid var(--sl-border); }
+		.btn-stack { display:flex; flex-direction:column; gap:6px; }
+		.btn {
+			display:flex; align-items:center; justify-content:center; gap:6px;
+			padding:10px 14px; border:1px solid var(--sl-border-variant);
+			border-radius:var(--sl-radius-md); cursor:pointer;
+			font-size:var(--sl-label-medium); font-family:var(--sl-font-display);
+			transition:all 0.15s;
+		}
+		.btn-primary {
+			background:linear-gradient(135deg, var(--sl-accent) 0%, var(--sl-accent-dark) 100%);
+			border-color:var(--sl-accent); color:var(--sl-bg-root); font-weight:600;
+		}
+		.btn-primary:hover { box-shadow:var(--sl-elevation-2); transform:translateY(-1px); }
 		.btn-secondary { background:transparent; color:var(--sl-text-secondary); }
 		.btn-secondary:hover { background:var(--sl-accent-container); border-color:var(--sl-accent); color:var(--sl-accent-light); }
 		.btn-row { display:flex; gap:6px; }
 		.btn-row .btn { flex:1; }
 
-		/* ── Quick Actions ── */
-		.quick-actions { padding:10px 12px; border-top:1px solid var(--sl-border); background:var(--sl-bg-surface); }
-		.action-grid { display:grid; grid-template-columns:repeat(4,1fr); gap:5px; }
-		.action-btn { display:flex; flex-direction:column; align-items:center; gap:3px; padding:8px 4px; background:var(--sl-bg-container); border:1px solid var(--sl-border); border-radius:var(--sl-radius-sm); cursor:pointer; transition:all 0.2s; font-family:var(--sl-font-body); }
-		.action-btn:hover { background:var(--sl-bg-container-high); border-color:var(--sl-accent); transform:scale(1.05); }
-		.action-btn:active { transform:scale(0.95); }
-		.action-icon { font-size:14px; color:var(--sl-accent-light); }
-		.action-label { font-size:8px; color:var(--sl-text-tertiary); }
-
-		/* ── Dashboard iframe ── */
-		.dashboard-frame-section { border-top:1px solid var(--sl-border); }
-		.dashboard-frame-header { display:flex; align-items:center; justify-content:space-between; padding:6px 12px; background:var(--sl-bg-surface); }
-		.frame-actions { display:flex; gap:4px; }
-		.frame-btn { background:var(--sl-bg-container); color:var(--sl-text-tertiary); border:1px solid var(--sl-border); border-radius:var(--sl-radius-sm); padding:3px 8px; cursor:pointer; font-size:10px; font-family:var(--sl-font-body); transition:all 0.2s; }
-		.frame-btn:hover { background:var(--sl-bg-container-high); color:var(--sl-accent-light); }
-		.dashboard-iframe { width:100%; height:400px; border:none; background:var(--sl-bg-root); }
-		.offline-notice { display:none; padding:24px; text-align:center; color:var(--sl-text-tertiary); font-size:var(--sl-body-small); }
-		.offline-notice.visible { display:block; }
-
 		/* ── Footer ── */
-		.dash-footer { padding:6px 12px; border-top:1px solid var(--sl-border); display:flex; align-items:center; justify-content:space-between; }
+		.dash-footer {
+			padding:8px 14px; border-top:1px solid var(--sl-border);
+			display:flex; align-items:center; justify-content:space-between;
+		}
 		.version-text { font-size:9px; color:var(--sl-text-tertiary); font-family:var(--sl-font-mono); }
-		.reset-btn { background:none; border:none; color:var(--sl-text-tertiary); font-size:9px; cursor:pointer; font-family:var(--sl-font-body); text-decoration:underline; transition:color 0.2s; }
-		.reset-btn:hover { color:var(--sl-accent-light); }
-
-		.scanline { position:fixed; top:0; left:0; right:0; bottom:0; pointer-events:none; background:repeating-linear-gradient(0deg,transparent,transparent 2px,rgba(0,0,0,0.02) 2px,rgba(0,0,0,0.02) 4px); opacity:0.3; z-index:9999; }
+		.footer-link { background:none; border:none; color:var(--sl-text-tertiary); font-size:9px; cursor:pointer; font-family:var(--sl-font-body); text-decoration:underline; transition:color 0.2s; }
+		.footer-link:hover { color:var(--sl-accent-light); }
 	</style>
 </head>
 <body>
-	<div class="scanline"></div>
 
 	<!-- ═══════════════════════════════════════════════════════════════════
 	     ONBOARDING VIEW
@@ -1232,11 +1313,13 @@ export class SlateUnifiedDashboardViewProvider implements vscode.WebviewViewProv
 			<svg class="hero-logo" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
 				<defs><linearGradient id="starGrad" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" style="stop-color:${SLATE_TOKENS.accentLight}"/><stop offset="100%" style="stop-color:${SLATE_TOKENS.accent}"/></linearGradient></defs>
 				<circle cx="50" cy="50" r="8" fill="url(#starGrad)"/>
-				${[0, 30, 60, 90, 120, 150, 180, 210, 240, 270, 300, 330].map(a => `<line x1="50" y1="50" x2="${50 + 40 * Math.cos(a * Math.PI / 180)}" y2="${50 + 40 * Math.sin(a * Math.PI / 180)}" stroke="url(#starGrad)" stroke-width="2" stroke-linecap="round"/>`).join('')}
+				\${[0, 30, 60, 90, 120, 150, 180, 210, 240, 270, 300, 330].map(a => \`<line x1="50" y1="50" x2="\${50 + 40 * Math.cos(a * Math.PI / 180)}" y2="\${50 + 40 * Math.sin(a * Math.PI / 180)}" stroke="url(#starGrad)" stroke-width="2" stroke-linecap="round"/>\`).join('')}
 			</svg>
 			<h1 class="hero-title">S.L.A.T.E.</h1>
 			<p class="hero-subtitle">Synchronized Living Architecture for Transformation and Evolution</p>
-			<div class="update-banner ${isReOnboard ? 'visible' : ''}" id="updateBanner">Updated to v${EXTENSION_VERSION} \u2014 re-running setup to apply new features</div>
+			<div class="update-banner \${isVersionMismatch ? 'visible' : ''}" id="updateBanner">
+				\${isVersionMismatch ? \`Updated to v\${EXTENSION_VERSION} (was v\${lastVer}) \\u2014 re-running setup to apply new features\` : \`Updated to v\${EXTENSION_VERSION}\`}
+			</div>
 			<div class="hero-stats" id="heroStats">
 				<div class="stat"><span class="stat-value" id="statGpu">...</span><span class="stat-label">GPU</span></div>
 				<div class="stat"><span class="stat-value" id="statAi">...</span><span class="stat-label">Local AI</span></div>
@@ -1245,7 +1328,7 @@ export class SlateUnifiedDashboardViewProvider implements vscode.WebviewViewProv
 			<div class="sys-detect active" id="sysDetect"><span class="sys-detect-spinner"></span><span class="sys-detect-text">Scanning your system...</span></div>
 			<div class="cta-container" id="ctaContainer" style="display:none;">
 				<button class="cta-primary" id="btnStartGuided">Start Guided Setup</button>
-				<button class="cta-theme" id="btnApplyTheme">Apply SLATE Default Theme</button>
+				<button class="cta-theme" id="btnApplyTheme">Apply SLATE Theme</button>
 				<button class="cta-secondary" id="btnSkipOnboarding">Skip to Dashboard</button>
 			</div>
 			<div class="features" id="featureCards" style="display:none;">
@@ -1267,95 +1350,170 @@ export class SlateUnifiedDashboardViewProvider implements vscode.WebviewViewProv
 			<div class="complete-screen" id="completeScreen">
 				<div class="complete-icon">&#x1F389;</div>
 				<div class="complete-title">Setup Complete!</div>
-				<div class="complete-summary" id="completeSummary">Your SLATE system is fully operational. The onboarding view will now transform into your Systems Check dashboard.</div>
+				<div class="complete-summary" id="completeSummary">Your SLATE system is fully operational.</div>
 				<div class="cta-container"><button class="cta-primary" id="btnFinishOnboarding">Open Dashboard</button><button class="cta-secondary" id="btnCloseGuided">Close</button></div>
 			</div>
 		</div>
 	</div>
 
 	<!-- ═══════════════════════════════════════════════════════════════════
-	     DASHBOARD VIEW (post-onboarding — includes Systems Check)
+	     DASHBOARD VIEW — Organized, Collapsible Sections
 	     ═══════════════════════════════════════════════════════════════════ -->
 	<div class="view-dashboard">
+
+		<!-- Header -->
 		<div class="dash-header">
-			<div class="logo-section"><div class="logo-icon">&#x2726;</div><div><div class="logo-text">S.L.A.T.E.</div><div class="logo-subtitle">Control Board</div></div></div>
-			<div class="status-badge"><div class="status-dot" id="systemStatus"></div><span id="statusText">Online</span></div>
+			<div class="logo-section">
+				<div class="logo-icon">&#x2726;</div>
+				<div><div class="logo-text">S.L.A.T.E.</div><div class="logo-ver">v\${EXTENSION_VERSION}</div></div>
+			</div>
+			<div class="header-status"><div class="status-dot" id="systemStatus"></div><span class="status-text" id="statusText">Online</span></div>
 		</div>
-		<div class="systems-check">
-			<div class="systems-check-header"><span class="systems-check-title">Systems Check</span><button class="systems-check-btn" id="btnRunCheck">Run Check</button></div>
-			<div class="check-grid" id="checkGrid">
-				<div class="check-item" id="check-python"><div class="check-dot idle"></div><div class="check-label">Python</div><div class="check-result">\u2014</div></div>
-				<div class="check-item" id="check-venv"><div class="check-dot idle"></div><div class="check-label">Venv</div><div class="check-result">\u2014</div></div>
-				<div class="check-item" id="check-gpu"><div class="check-dot idle"></div><div class="check-label">GPU</div><div class="check-result">\u2014</div></div>
-				<div class="check-item" id="check-ollama"><div class="check-dot idle"></div><div class="check-label">Ollama</div><div class="check-result">\u2014</div></div>
-				<div class="check-item" id="check-dashboard"><div class="check-dot idle"></div><div class="check-label">Dashboard</div><div class="check-result">\u2014</div></div>
-				<div class="check-item" id="check-runner"><div class="check-dot idle"></div><div class="check-label">Runner</div><div class="check-result">\u2014</div></div>
-				<div class="check-item" id="check-docker"><div class="check-dot idle"></div><div class="check-label">Docker</div><div class="check-result">\u2014</div></div>
-				<div class="check-item" id="check-security"><div class="check-dot idle"></div><div class="check-label">Security</div><div class="check-result">\u2014</div></div>
+
+		<!-- Primary Actions -->
+		<div class="primary-actions">
+			<div class="btn-stack">
+				<button class="btn btn-primary" id="btnOpenDashboard"><span>&#x2616;</span><span>Open Dashboard</span></button>
+				<div class="btn-row">
+					<button class="btn btn-secondary" id="btnStartServices"><span>&#x25B6;</span><span>Start</span></button>
+					<button class="btn btn-secondary" id="btnFullStatus"><span>&#x2139;</span><span>Status</span></button>
+					<button class="btn btn-secondary" id="btnOpenChat"><span>&#x1F4AC;</span><span>Chat</span></button>
+				</div>
 			</div>
 		</div>
-		<div class="services">
-			<div class="service-card active" id="svcDashboard" data-cmd="slate/slate_status.py --quick"><div class="service-icon">&#x2616;</div><div class="service-name">Dashboard</div><div class="service-status">:8080</div></div>
-			<div class="service-card active" id="svcOllama" data-cmd="slate/foundry_local.py --check"><div class="service-icon">&#x2699;</div><div class="service-name">Ollama</div><div class="service-status">:11434</div></div>
-			<div class="service-card" id="svcRunner" data-cmd="slate/slate_runner_manager.py --status"><div class="service-icon">&#x25B6;</div><div class="service-name">Runner</div><div class="service-status">GitHub</div></div>
-			<div class="service-card" id="svcGPU" data-cmd="slate/slate_gpu_manager.py --status"><div class="service-icon">&#x2756;</div><div class="service-name">GPU</div><div class="service-status">Detecting...</div></div>
-			<div class="service-card" id="svcDocker" data-cmd="slate/slate_docker_daemon.py --status"><div class="service-icon">&#x2693;</div><div class="service-name">Docker</div><div class="service-status">Daemon</div></div>
-			<div class="service-card" id="svcMCP" data-cmd="slate/claude_code_manager.py --validate"><div class="service-icon">&#x2728;</div><div class="service-name">MCP</div><div class="service-status">Claude</div></div>
-		</div>
-		<div class="dev-cycle-section">
-			<div class="dev-cycle-header"><span class="section-title">Development Cycle</span><span class="dev-cycle-stage" id="currentStage">CODE</span></div>
-			<div class="dev-cycle-ring-container">
-				<div class="mini-ring"><svg viewBox="0 0 100 100" id="devCycleRing">
-					<circle cx="50" cy="50" r="40" fill="none" stroke="rgba(255,255,255,0.05)" stroke-width="6"/>
-					<path class="stage-segment" id="segPlan" stroke="${SLATE_TOKENS.stagePlan}" opacity="0.4" d="M 50 10 A 40 40 0 0 1 88.04 30.98" data-stage="PLAN"/>
-					<path class="stage-segment active" id="segCode" stroke="${SLATE_TOKENS.stageCode}" d="M 88.04 30.98 A 40 40 0 0 1 80.90 76.18" data-stage="CODE"/>
-					<path class="stage-segment" id="segTest" stroke="${SLATE_TOKENS.stageTest}" opacity="0.4" d="M 80.90 76.18 A 40 40 0 0 1 19.10 76.18" data-stage="TEST"/>
-					<path class="stage-segment" id="segDeploy" stroke="${SLATE_TOKENS.stageDeploy}" opacity="0.4" d="M 19.10 76.18 A 40 40 0 0 1 11.96 30.98" data-stage="DEPLOY"/>
-					<path class="stage-segment" id="segFeedback" stroke="${SLATE_TOKENS.stageFeedback}" opacity="0.4" d="M 11.96 30.98 A 40 40 0 0 1 50 10" data-stage="FEEDBACK"/>
-					<text x="50" y="48" text-anchor="middle" class="stage-label active" font-size="10">CODE</text>
-					<text x="50" y="60" text-anchor="middle" class="stage-label" font-size="8">45%</text>
-				</svg></div>
-				<div class="stage-info"><div class="stage-name" id="stageName">Coding</div><div class="stage-progress-text" id="stageProgress">45% complete</div><div class="stage-bar"><div class="stage-bar-fill" id="stageBarFill" style="width:45%"></div></div></div>
+
+		<!-- Section: Health Check (collapsible) -->
+		<div class="section" id="sectionHealth">
+			<div class="section-header" data-section="sectionHealth">
+				<div class="section-header-left"><span class="section-icon">&#x2695;</span><span class="section-title">Health</span><span class="section-badge" id="healthBadge">\\u2014</span></div>
+				<span class="section-chevron">&#x25BC;</span>
+			</div>
+			<div class="section-body">
+				<div class="health-grid" id="healthGrid">
+					<div class="health-item" id="check-python"><div class="health-dot idle"></div><div class="health-label">Python</div><div class="health-result">\\u2014</div></div>
+					<div class="health-item" id="check-venv"><div class="health-dot idle"></div><div class="health-label">Venv</div><div class="health-result">\\u2014</div></div>
+					<div class="health-item" id="check-gpu"><div class="health-dot idle"></div><div class="health-label">GPU</div><div class="health-result">\\u2014</div></div>
+					<div class="health-item" id="check-ollama"><div class="health-dot idle"></div><div class="health-label">Ollama</div><div class="health-result">\\u2014</div></div>
+					<div class="health-item" id="check-dashboard"><div class="health-dot idle"></div><div class="health-label">Dashboard</div><div class="health-result">\\u2014</div></div>
+					<div class="health-item" id="check-runner"><div class="health-dot idle"></div><div class="health-label">Runner</div><div class="health-result">\\u2014</div></div>
+					<div class="health-item" id="check-docker"><div class="health-dot idle"></div><div class="health-label">Docker</div><div class="health-result">\\u2014</div></div>
+					<div class="health-item" id="check-security"><div class="health-dot idle"></div><div class="health-label">Security</div><div class="health-result">\\u2014</div></div>
+				</div>
 			</div>
 		</div>
-		<div class="controls">
-			<button class="btn btn-primary" id="btnStartServices"><span>&#x25B6;</span><span>Start Services</span></button>
-			<div class="btn-row"><button class="btn btn-secondary" id="btnFullStatus"><span>&#x2139;</span><span>Full Status</span></button><button class="btn btn-secondary" id="btnRerunSetup"><span>&#x2726;</span><span>Re-run Setup</span></button></div>
-		</div>
-		<div class="quick-actions">
-			<div class="section-title" style="margin-bottom:6px;">Quick Actions</div>
-			<div class="action-grid">
-				<button class="action-btn" data-action="chat" title="Open @slate chat"><span class="action-icon">&#x1F4AC;</span><span class="action-label">Chat</span></button>
-				<button class="action-btn" data-action="workflow" title="Workflow status"><span class="action-icon">&#x21BA;</span><span class="action-label">Workflow</span></button>
-				<button class="action-btn" data-action="benchmark" title="Run benchmarks"><span class="action-icon">&#x26A1;</span><span class="action-label">Bench</span></button>
-				<button class="action-btn" data-action="security" title="Security audit"><span class="action-icon">&#x1F512;</span><span class="action-label">Security</span></button>
+
+		<!-- Section: Services (collapsible) -->
+		<div class="section" id="sectionServices">
+			<div class="section-header" data-section="sectionServices">
+				<div class="section-header-left"><span class="section-icon">&#x2699;</span><span class="section-title">Services</span></div>
+				<span class="section-chevron">&#x25BC;</span>
+			</div>
+			<div class="section-body">
+				<div class="service-list">
+					<div class="service-row inactive" id="svcDashboard" data-cmd="slate/slate_status.py --quick">
+						<span class="svc-icon">&#x2616;</span>
+						<div class="svc-info"><div class="svc-name">Dashboard</div><div class="svc-detail" id="svcDashboardDetail">:8080</div></div>
+						<div class="svc-dot off" id="svcDashboardDot"></div>
+					</div>
+					<div class="service-row inactive" id="svcOllama" data-cmd="slate/foundry_local.py --check">
+						<span class="svc-icon">&#x1F9E0;</span>
+						<div class="svc-info"><div class="svc-name">Ollama</div><div class="svc-detail" id="svcOllamaDetail">:11434</div></div>
+						<div class="svc-dot off" id="svcOllamaDot"></div>
+					</div>
+					<div class="service-row inactive" id="svcRunner" data-cmd="slate/slate_runner_manager.py --status">
+						<span class="svc-icon">&#x25B6;</span>
+						<div class="svc-info"><div class="svc-name">Actions Runner</div><div class="svc-detail" id="svcRunnerDetail">GitHub</div></div>
+						<div class="svc-dot off" id="svcRunnerDot"></div>
+					</div>
+					<div class="service-row inactive" id="svcGPU" data-cmd="slate/slate_gpu_manager.py --status">
+						<span class="svc-icon">&#x2756;</span>
+						<div class="svc-info"><div class="svc-name">GPU Compute</div><div class="svc-detail" id="svcGPUDetail">Detecting...</div></div>
+						<div class="svc-dot off" id="svcGPUDot"></div>
+					</div>
+					<div class="service-row inactive" id="svcDocker" data-cmd="slate/slate_docker_daemon.py --status">
+						<span class="svc-icon">&#x2693;</span>
+						<div class="svc-info"><div class="svc-name">Docker</div><div class="svc-detail" id="svcDockerDetail">Daemon</div></div>
+						<div class="svc-dot off" id="svcDockerDot"></div>
+					</div>
+					<div class="service-row inactive" id="svcMCP" data-cmd="slate/claude_code_manager.py --validate">
+						<span class="svc-icon">&#x2728;</span>
+						<div class="svc-info"><div class="svc-name">MCP Server</div><div class="svc-detail" id="svcMCPDetail">Claude</div></div>
+						<div class="svc-dot off" id="svcMCPDot"></div>
+					</div>
+				</div>
 			</div>
 		</div>
-		<div class="dashboard-frame-section">
-			<div class="dashboard-frame-header"><span class="section-title">Dashboard</span><div class="frame-actions"><button class="frame-btn" id="btnRefreshFrame" title="Refresh">&#x21BB;</button><button class="frame-btn" id="btnExpandFrame" title="Open in panel">&#x2197;</button><button class="frame-btn" id="btnExternalFrame" title="Open in browser">&#x2756;</button></div></div>
-			<iframe class="dashboard-iframe" id="dashboardFrame" src="${DASHBOARD_URL}" title="SLATE Dashboard"></iframe>
-			<div class="offline-notice" id="offlineNotice"><p>Dashboard server not reachable at ${DASHBOARD_URL}</p><button class="cta-secondary" id="btnRetryDashboard" style="margin-top:10px;">Retry Connection</button></div>
+
+		<!-- Section: Dev Cycle (collapsible, starts collapsed) -->
+		<div class="section collapsed" id="sectionDevCycle">
+			<div class="section-header" data-section="sectionDevCycle">
+				<div class="section-header-left"><span class="section-icon">&#x21BA;</span><span class="section-title">Dev Cycle</span><span class="dev-cycle-stage" id="currentStage">CODE</span></div>
+				<span class="section-chevron">&#x25BC;</span>
+			</div>
+			<div class="section-body">
+				<div class="dev-cycle-bar">
+					<div class="dev-cycle-segment" id="segPlan" data-stage="PLAN" style="background:${SLATE_TOKENS.stagePlan};"></div>
+					<div class="dev-cycle-segment active" id="segCode" data-stage="CODE" style="background:${SLATE_TOKENS.stageCode};"></div>
+					<div class="dev-cycle-segment" id="segTest" data-stage="TEST" style="background:${SLATE_TOKENS.stageTest};"></div>
+					<div class="dev-cycle-segment" id="segDeploy" data-stage="DEPLOY" style="background:${SLATE_TOKENS.stageDeploy};"></div>
+					<div class="dev-cycle-segment" id="segFeedback" data-stage="FEEDBACK" style="background:${SLATE_TOKENS.stageFeedback};"></div>
+				</div>
+				<div class="dev-cycle-info">
+					<span class="dev-cycle-stage" id="stageName">Coding</span>
+					<span class="dev-cycle-progress" id="stageProgress">45%</span>
+				</div>
+			</div>
 		</div>
-		<div class="dash-footer"><span class="version-text">v${EXTENSION_VERSION}</span><button class="reset-btn" id="btnResetOnboarding">Re-run guided setup</button></div>
+
+		<!-- Section: Quick Actions (collapsible) -->
+		<div class="section" id="sectionActions">
+			<div class="section-header" data-section="sectionActions">
+				<div class="section-header-left"><span class="section-icon">&#x26A1;</span><span class="section-title">Actions</span></div>
+				<span class="section-chevron">&#x25BC;</span>
+			</div>
+			<div class="section-body">
+				<div class="action-grid">
+					<button class="action-btn" data-action="workflow" title="Workflow status"><span class="action-icon">&#x21BA;</span><span class="action-label">Workflow</span></button>
+					<button class="action-btn" data-action="benchmark" title="Run benchmarks"><span class="action-icon">&#x26A1;</span><span class="action-label">Benchmark</span></button>
+					<button class="action-btn" data-action="security" title="Security audit"><span class="action-icon">&#x1F512;</span><span class="action-label">Security</span></button>
+					<button class="action-btn" data-action="models" title="Model status"><span class="action-icon">&#x1F9E0;</span><span class="action-label">Models</span></button>
+					<button class="action-btn" data-action="gpu" title="GPU status"><span class="action-icon">&#x2756;</span><span class="action-label">GPU Mgr</span></button>
+					<button class="action-btn" data-action="rerun" title="Re-run guided setup"><span class="action-icon">&#x2726;</span><span class="action-label">Setup</span></button>
+				</div>
+			</div>
+		</div>
+
+		<!-- Footer -->
+		<div class="dash-footer">
+			<span class="version-text">SLATE v\${EXTENSION_VERSION}</span>
+			<button class="footer-link" id="btnResetOnboarding">Re-run setup</button>
+		</div>
 	</div>
 
 	<!-- ═══════════════════════════════════════════════════════════════════
 	     SCRIPTS
 	     ═══════════════════════════════════════════════════════════════════ -->
-	<script nonce="${nonce}">
-		const vscode = acquireVsCodeApi();
-		let currentStep = 0;
-		const totalSteps = 7;
+	<script nonce="\${nonce}">
+		var vscode = acquireVsCodeApi();
+		var currentStep = 0;
+		var totalSteps = 7;
 
-		if (!${onboardingComplete}) {
+		/* ── Collapsible sections ── */
+		document.querySelectorAll('.section-header').forEach(function(hdr) {
+			hdr.addEventListener('click', function() {
+				var sec = document.getElementById(hdr.dataset.section);
+				if (sec) sec.classList.toggle('collapsed');
+			});
+		});
+
+		/* ── Onboarding init ── */
+		if (!\${onboardingComplete}) {
 			vscode.postMessage({ type: 'detectSystem' });
-			/* Safety timeout: if detectSystem never responds, show buttons anyway after 8s */
 			setTimeout(function() {
 				var det = document.getElementById('sysDetect');
 				var cta = document.getElementById('ctaContainer');
 				var feat = document.getElementById('featureCards');
 				if (det && det.classList.contains('active')) {
-					/* Detection still spinning — force show buttons */
 					det.classList.remove('active');
 					if(cta) cta.style.display = 'flex';
 					if(feat) feat.style.display = 'grid';
@@ -1363,6 +1521,7 @@ export class SlateUnifiedDashboardViewProvider implements vscode.WebviewViewProv
 			}, 8000);
 		}
 
+		/* ── Guided setup functions ── */
 		function startGuided() {
 			document.getElementById('hero').classList.add('hidden');
 			document.getElementById('guidedOverlay').classList.add('active');
@@ -1381,7 +1540,6 @@ export class SlateUnifiedDashboardViewProvider implements vscode.WebviewViewProv
 		}
 		function finishOnboarding() { vscode.postMessage({ type: 'finishOnboarding' }); }
 		function resetOnboarding() { vscode.postMessage({ type: 'startGuidedMode' }); }
-		function runSystemsCheck() { vscode.postMessage({ type: 'runSystemsCheck' }); }
 
 		function renderStepProgress() {
 			var c = document.getElementById('stepProgress'); if (!c) return; c.innerHTML = '';
@@ -1392,7 +1550,6 @@ export class SlateUnifiedDashboardViewProvider implements vscode.WebviewViewProv
 				c.appendChild(d);
 			}
 		}
-
 		function updateStep(step, index) {
 			currentStep = index; renderStepProgress();
 			var t = document.getElementById('stepTitle'); if(t) t.textContent = step.title;
@@ -1401,7 +1558,6 @@ export class SlateUnifiedDashboardViewProvider implements vscode.WebviewViewProv
 			if(s) { s.textContent = step.status.charAt(0).toUpperCase() + step.status.slice(1); s.className = 'step-status ' + step.status; }
 			renderSubsteps(step.substeps);
 		}
-
 		function renderSubsteps(substeps) {
 			var c = document.getElementById('substeps'); if (!c) return; c.innerHTML = '';
 			var icons = { pending:'\\u25CB', running:'\\u25D0', success:'\\u2713', error:'\\u2717', skipped:'\\u2014' };
@@ -1414,7 +1570,6 @@ export class SlateUnifiedDashboardViewProvider implements vscode.WebviewViewProv
 				c.appendChild(div);
 			});
 		}
-
 		function updateSubstep(stepId, sub) {
 			var el = document.getElementById('substep-' + sub.id); if (!el) return;
 			var icons = { pending:'\\u25CB', running:'\\u25D0', success:'\\u2713', error:'\\u2717', skipped:'\\u2014' };
@@ -1426,14 +1581,12 @@ export class SlateUnifiedDashboardViewProvider implements vscode.WebviewViewProv
 				r.textContent = sub.result;
 			}
 		}
-
 		function showComplete(summary) {
 			var sc = document.getElementById('stepCard'); if(sc) sc.style.display = 'none';
 			var cs = document.getElementById('completeScreen'); if(cs) cs.style.display = 'block';
 			var sm = document.getElementById('completeSummary'); if(sm && summary) sm.textContent = summary;
 			document.querySelectorAll('.step-dot').forEach(function(d) { d.classList.remove('active'); d.classList.add('complete'); });
 		}
-
 		function updateSystemProfile(p) {
 			var g = document.getElementById('statGpu');
 			if(g) { g.textContent = p.gpuCount > 0 ? p.gpuCount + 'x' : 'CPU'; }
@@ -1455,14 +1608,22 @@ export class SlateUnifiedDashboardViewProvider implements vscode.WebviewViewProv
 			var feat = document.getElementById('featureCards'); if(feat) feat.style.display = 'grid';
 		}
 
-		function updateCheckItem(id, status, result) {
+		/* ── Health check item updater ── */
+		function updateHealthItem(id, status, result) {
 			var item = document.getElementById('check-' + id); if (!item) return;
-			item.className = 'check-item ' + status;
-			var dot = item.querySelector('.check-dot'); if(dot) dot.className = 'check-dot ' + status;
-			var res = item.querySelector('.check-result'); if(res) res.textContent = result || '\\u2014';
+			item.className = 'health-item ' + status;
+			var dot = item.querySelector('.health-dot'); if(dot) dot.className = 'health-dot ' + status;
+			var res = item.querySelector('.health-result'); if(res) res.textContent = result || '\\u2014';
+		}
+		function updateHealthBadge() {
+			var items = document.querySelectorAll('.health-item');
+			var pass = 0; var total = items.length;
+			items.forEach(function(it) { if (it.classList.contains('pass')) pass++; });
+			var badge = document.getElementById('healthBadge');
+			if (badge) badge.textContent = pass + '/' + total;
 		}
 
-		/* ── Onboarding button listeners (CSP blocks inline onclick) ── */
+		/* ── Onboarding button listeners ── */
 		var bsg = document.getElementById('btnStartGuided');
 		if(bsg) bsg.addEventListener('click', function() { startGuided(); });
 		var bat = document.getElementById('btnApplyTheme');
@@ -1477,91 +1638,114 @@ export class SlateUnifiedDashboardViewProvider implements vscode.WebviewViewProv
 		if(bfo) bfo.addEventListener('click', function() { finishOnboarding(); });
 		var bcg = document.getElementById('btnCloseGuided');
 		if(bcg) bcg.addEventListener('click', function() { exitGuided(); });
-		var brc = document.getElementById('btnRunCheck');
-		if(brc) brc.addEventListener('click', function() { runSystemsCheck(); });
-		var brd = document.getElementById('btnRetryDashboard');
-		if(brd) brd.addEventListener('click', function() { retryDashboard(); });
 		var bro = document.getElementById('btnResetOnboarding');
 		if(bro) bro.addEventListener('click', function() { resetOnboarding(); });
 
-		/* ── Dashboard event listeners ── */
-		document.querySelectorAll('.service-card').forEach(function(c) { c.addEventListener('click', function() { var cmd = c.dataset.cmd; if(cmd) vscode.postMessage({type:'runCommand',command:cmd}); }); });
-
+		/* ── Dashboard button listeners ── */
+		var bod = document.getElementById('btnOpenDashboard');
+		if(bod) bod.addEventListener('click', function() { vscode.postMessage({type:'openDashboard'}); });
 		var bs = document.getElementById('btnStartServices');
 		if(bs) bs.addEventListener('click', function() { vscode.postMessage({type:'runCommand',command:'slate/slate_orchestrator.py start'}); });
 		var bf = document.getElementById('btnFullStatus');
 		if(bf) bf.addEventListener('click', function() { vscode.postMessage({type:'showStatus'}); });
-		var br = document.getElementById('btnRerunSetup');
-		if(br) br.addEventListener('click', function() { vscode.postMessage({type:'startGuidedMode'}); });
+		var boc = document.getElementById('btnOpenChat');
+		if(boc) boc.addEventListener('click', function() { vscode.postMessage({type:'openChat'}); });
 
+		/* ── Service row click listeners ── */
+		document.querySelectorAll('.service-row').forEach(function(row) {
+			row.addEventListener('click', function() {
+				var cmd = row.dataset.cmd;
+				if(cmd) vscode.postMessage({type:'runCommand',command:cmd});
+			});
+		});
+
+		/* ── Quick action listeners ── */
 		document.querySelectorAll('.action-btn').forEach(function(b) {
 			b.addEventListener('click', function() {
 				switch(b.dataset.action) {
-					case 'chat': vscode.postMessage({type:'openChat'}); break;
 					case 'workflow': vscode.postMessage({type:'runCommand',command:'slate/slate_workflow_manager.py --status'}); break;
 					case 'benchmark': vscode.postMessage({type:'runCommand',command:'slate/slate_benchmark.py'}); break;
 					case 'security': vscode.postMessage({type:'runCommand',command:'slate/action_guard.py --scan'}); break;
+					case 'models': vscode.postMessage({type:'runCommand',command:'slate/slate_model_trainer.py --status'}); break;
+					case 'gpu': vscode.postMessage({type:'runCommand',command:'slate/slate_gpu_manager.py --status'}); break;
+					case 'rerun': vscode.postMessage({type:'startGuidedMode'}); break;
 				}
 			});
 		});
 
-		var stageNames = {PLAN:'Planning',CODE:'Coding',TEST:'Testing',DEPLOY:'Deploying',FEEDBACK:'Feedback'};
-		document.querySelectorAll('.stage-segment').forEach(function(s) { s.addEventListener('click', function() { if(s.dataset.stage) vscode.postMessage({type:'transitionStage',stage:s.dataset.stage}); }); });
+		/* ── Dev cycle segment listeners ── */
+		document.querySelectorAll('.dev-cycle-segment').forEach(function(s) {
+			s.style.cursor = 'pointer';
+			s.addEventListener('click', function() {
+				if(s.dataset.stage) vscode.postMessage({type:'transitionStage',stage:s.dataset.stage});
+			});
+		});
 
-		function updateDevCycleRing(data) {
+		/* ── Dev cycle updater ── */
+		var stageNames = {PLAN:'Planning',CODE:'Coding',TEST:'Testing',DEPLOY:'Deploying',FEEDBACK:'Feedback'};
+		function updateDevCycle(data) {
 			if(!data) return;
-			var cs = data.current_stage || 'CODE'; var pr = data.stage_progress_percent || 0;
+			var cs = data.current_stage || 'CODE';
+			var pr = data.stage_progress_percent || 0;
 			var cse = document.getElementById('currentStage'); if(cse) cse.textContent = cs;
 			var sne = document.getElementById('stageName'); if(sne) sne.textContent = stageNames[cs]||cs;
-			var spe = document.getElementById('stageProgress'); if(spe) spe.textContent = pr+'% complete';
-			var sbe = document.getElementById('stageBarFill'); if(sbe) sbe.style.width = pr+'%';
-			var txts = document.querySelectorAll('#devCycleRing text');
-			if(txts.length>=2) { txts[0].textContent=cs; txts[1].textContent=pr+'%'; }
+			var spe = document.getElementById('stageProgress'); if(spe) spe.textContent = pr+'%';
 			['PLAN','CODE','TEST','DEPLOY','FEEDBACK'].forEach(function(st) {
 				var seg = document.getElementById('seg'+st.charAt(0)+st.slice(1).toLowerCase());
-				if(seg) { if(st===cs) { seg.classList.add('active'); seg.setAttribute('opacity','1'); } else { seg.classList.remove('active'); seg.setAttribute('opacity','0.4'); } }
+				if(seg) {
+					if(st===cs) { seg.classList.add('active'); seg.style.opacity='1'; }
+					else { seg.classList.remove('active'); seg.style.opacity='0.3'; }
+				}
 			});
 		}
 
-		var brf = document.getElementById('btnRefreshFrame'); if(brf) brf.addEventListener('click', function() { var f = document.getElementById('dashboardFrame'); if(f) f.src=f.src; });
-		var bef = document.getElementById('btnExpandFrame'); if(bef) bef.addEventListener('click', function() { vscode.postMessage({type:'openPanel'}); });
-		var bxf = document.getElementById('btnExternalFrame'); if(bxf) bxf.addEventListener('click', function() { vscode.postMessage({type:'openExternal'}); });
+		/* ── Auto-run health check on dashboard load (single batch, not 8 sequential) ── */
+		if (\${onboardingComplete}) {
+			vscode.postMessage({type:'runSystemsCheck'});
+			vscode.postMessage({type:'refreshStatus'});
+		}
 
-		function retryDashboard() { var f=document.getElementById('dashboardFrame'); var n=document.getElementById('offlineNotice'); if(f){f.style.display='block';f.src='${DASHBOARD_URL}';} if(n)n.classList.remove('visible'); }
-
-		var df = document.getElementById('dashboardFrame');
-		if(df) df.addEventListener('error', function() { df.style.display='none'; var n=document.getElementById('offlineNotice'); if(n)n.classList.add('visible'); });
-
-		if (${onboardingComplete}) { setTimeout(function(){ vscode.postMessage({type:'runSystemsCheck'}); }, 1000); }
-
+		/* ── Message handler ── */
 		window.addEventListener('message', function(e) {
 			var m = e.data;
-			switch(m.type) {
-				case 'stepUpdate': updateStep(m.step, m.currentIndex); break;
-				case 'narration': var nt=document.getElementById('narratorText'); if(nt) nt.textContent=m.text; break;
-				case 'substepUpdate': updateSubstep(m.stepId, m.substep); break;
-				case 'stepComplete':
-					updateStep(m.step, m.currentIndex);
-					if(m.step.id==='complete') { var s=m.step.substeps.find(function(x){return x.id==='summary';}); showComplete(s&&s.result); }
-					break;
-				case 'systemProfile': updateSystemProfile(m.profile); break;
-				case 'themeApplied': break;
-				case 'devCycleUpdate': updateDevCycleRing(m.data); break;
-				case 'interactiveStatus': if(m.data&&m.data.dev_cycle) updateDevCycleRing(m.data.dev_cycle); break;
-				case 'serviceStatus':
-					if(m.services) m.services.forEach(function(svc) {
-						var c=document.getElementById(svc.id); if(!c) return;
-						if(svc.active) c.classList.add('active'); else c.classList.remove('active');
-						var st=c.querySelector('.service-status'); if(st) st.textContent=svc.status;
-					});
-					break;
-				case 'systemsCheckStart':
-					['python','venv','gpu','ollama','dashboard','runner','docker','security'].forEach(function(id) { updateCheckItem(id,'running','Checking...'); });
-					break;
-				case 'systemsCheckItem': updateCheckItem(m.id, m.status, m.result); break;
-				case 'systemsCheckComplete':
-					var btn=document.getElementById('btnRunCheck'); if(btn){btn.textContent='Done'; setTimeout(function(){btn.textContent='Run Check';},2000);}
-					break;
+			try {
+				switch(m.type) {
+					case 'stepUpdate': updateStep(m.step, m.currentIndex); break;
+					case 'narration': var nt=document.getElementById('narratorText'); if(nt) nt.textContent=m.text; break;
+					case 'substepUpdate': updateSubstep(m.stepId, m.substep); break;
+					case 'stepComplete':
+						updateStep(m.step, m.currentIndex);
+						if(m.step.id==='complete') { var s=m.step.substeps.find(function(x){return x.id==='summary';}); showComplete(s&&s.result); }
+						break;
+					case 'systemProfile': updateSystemProfile(m.profile); break;
+					case 'themeApplied': break;
+					case 'devCycleUpdate': updateDevCycle(m.data); break;
+					case 'interactiveStatus': if(m.data&&m.data.dev_cycle) updateDevCycle(m.data.dev_cycle); break;
+					case 'serviceStatus':
+						if(m.services) m.services.forEach(function(svc) {
+							var row = document.getElementById(svc.id);
+							if(!row) return;
+							if(svc.active) { row.classList.remove('inactive'); row.classList.add('active'); }
+							else { row.classList.remove('active'); row.classList.add('inactive'); }
+							var detail = row.querySelector('.svc-detail');
+							if(detail) detail.textContent = svc.status;
+							var dot = row.querySelector('.svc-dot');
+							if(dot) { dot.className = svc.active ? 'svc-dot on' : 'svc-dot off'; }
+						});
+						break;
+					case 'systemsCheckStart':
+						['python','venv','gpu','ollama','dashboard','runner','docker','security'].forEach(function(id) { updateHealthItem(id,'running','Checking...'); });
+						break;
+					case 'systemsCheckItem':
+						updateHealthItem(m.id, m.status, m.result);
+						updateHealthBadge();
+						break;
+					case 'systemsCheckComplete':
+						updateHealthBadge();
+						break;
+				}
+			} catch(err) {
+				console.error('[SLATE] Message error:', err);
 			}
 		});
 	</script>
