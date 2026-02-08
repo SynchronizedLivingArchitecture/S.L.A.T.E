@@ -53,7 +53,7 @@ jobs:
       ollama_ok: ${{ steps.check.outputs.ollama_ok }}
       model_available: ${{ steps.check.outputs.model_available }}
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
       - name: Setup Python
         run: |
           "$env:GITHUB_WORKSPACE\\.venv\\Scripts" | Out-File -Append $env:GITHUB_PATH
@@ -102,7 +102,7 @@ jobs:
       OLLAMA_HOST: '127.0.0.1:11434'
       SLATE_RUNNER: 'true'
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
         with:
           fetch-depth: 0  # Full git history
       - name: Setup Python
@@ -303,7 +303,7 @@ jobs:
       CUDA_VISIBLE_DEVICES: '0,1'
       OLLAMA_HOST: '127.0.0.1:11434'
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
       - name: Setup Python
         run: |
           "$env:GITHUB_WORKSPACE\\.venv\\Scripts" | Out-File -Append $env:GITHUB_PATH
@@ -431,7 +431,7 @@ jobs:
       CUDA_VISIBLE_DEVICES: '0,1'
       OLLAMA_HOST: '127.0.0.1:11434'
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
       - name: Setup Python
         run: |
           "$env:GITHUB_WORKSPACE\\.venv\\Scripts" | Out-File -Append $env:GITHUB_PATH
@@ -542,7 +542,7 @@ jobs:
       CUDA_VISIBLE_DEVICES: '0,1'
       OLLAMA_HOST: '127.0.0.1:11434'
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
       - name: Setup Python
         run: |
           "$env:GITHUB_WORKSPACE\\.venv\\Scripts" | Out-File -Append $env:GITHUB_PATH
@@ -717,7 +717,7 @@ jobs:
               print(json.dumps({'modules': len(results), 'results': results}, indent=2))
               "
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
         with:
           fetch-depth: 0
       - name: Setup Python

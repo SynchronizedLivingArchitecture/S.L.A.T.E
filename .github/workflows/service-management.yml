@@ -44,7 +44,7 @@ jobs:
 
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
 
       # Modified: 2026-02-07T07:30:00Z | Author: COPILOT | Change: Add venv to GITHUB_PATH per SLATE conventions
       - name: Setup Python

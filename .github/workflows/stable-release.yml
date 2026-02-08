@@ -93,7 +93,7 @@ jobs:
       is_release: ${{ steps.version.outputs.is_release }}
       validation_passed: ${{ steps.validate.outputs.passed }}
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
         with:
           fetch-depth: 0
           submodules: recursive
@@ -172,7 +172,7 @@ jobs:
     env:
       CUDA_VISIBLE_DEVICES: '0,1'
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
       - name: Setup Python
         run: |
           "$env:GITHUB_WORKSPACE\\.venv\\Scripts" | Out-File -Append $env:GITHUB_PATH
@@ -267,7 +267,7 @@ jobs:
             dockerfile: ''
             tag_suffix: ''
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
         with:
           submodules: recursive
       - name: Setup Python
@@ -340,7 +340,7 @@ jobs:
     runs-on: [self-hosted, slate]
     timeout-minutes: 20
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
         with:
           submodules: recursive
       - name: Setup Python
@@ -452,7 +452,7 @@ jobs:
     runs-on: [self-hosted, slate]
     timeout-minutes: 10
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
         with:
           fetch-depth: 0
           submodules: recursive
