@@ -736,6 +736,19 @@ PAGE ARCHITECTURE (LOCKED)
    - CSS animations use `transform` and `opacity` only
    - Prefers-reduced-motion support
 
+<!-- Modified: 2026-02-09T06:55:00Z | Author: COPILOT | Change: Add static performance audit metrics -->
+### Performance Audit (Static)
+
+Static audit metrics for GitHub Pages assets:
+
+- `docs/pages/index.html`: 60,185 bytes
+- `docs/pages/css/watchmaker.css`: 12,447 bytes
+- Inline blocks: 2 style, 2 script
+- Animation mentions: 4 (index), 16 (watchmaker.css)
+- Keyframes: 7 (watchmaker.css)
+
+Note: 60fps verification requires manual browser profiling and remains pending.
+
 3. **SEO**
    - Semantic `<h1>` through `<h6>` hierarchy
    - Meta description
